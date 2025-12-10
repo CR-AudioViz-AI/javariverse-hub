@@ -82,15 +82,15 @@ export default function Header() {
       {/* ROW 1: Logo + Navigation Links - Single Row, No Wrap */}
       <div className="border-b border-gray-200">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-14 lg:h-16">
-            {/* Logo */}
+          <div className="flex items-center justify-between h-20 lg:h-24">
+            {/* Logo - 3X LARGER */}
             <Link href="/" className="flex items-center flex-shrink-0">
               <Image
                 src="/craudiovizailogo.png"
                 alt="CR AudioViz AI"
-                width={160}
-                height={50}
-                className="h-10 lg:h-12 w-auto"
+                width={480}
+                height={150}
+                className="h-16 lg:h-20 w-auto"
                 priority
               />
             </Link>
@@ -164,12 +164,14 @@ export default function Header() {
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <Link href="/auth/login">
-                      <Button variant="ghost" size="sm" className="h-8 text-xs text-gray-600 hover:text-blue-600">
+                    {/* FIXED: Changed from /auth/login to /login */}
+                    <Link href="/login">
+                      <Button variant="ghost" size="sm" className="h-8 text-xs text-gray-700 hover:text-blue-600">
                         Sign In
                       </Button>
                     </Link>
-                    <Link href="/auth/signup">
+                    {/* FIXED: Changed from /auth/signup to /signup */}
+                    <Link href="/signup">
                       <Button
                         size="sm"
                         className="h-8 text-xs bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white"
@@ -242,15 +244,17 @@ export default function Header() {
                       </>
                     ) : (
                       <>
+                        {/* FIXED: Changed from /auth/login to /login */}
                         <Link
-                          href="/auth/login"
+                          href="/login"
                           onClick={() => setMobileMenuOpen(false)}
                           className="block px-4 py-3 rounded-lg text-center text-gray-700 hover:bg-gray-50 border border-gray-200"
                         >
                           Sign In
                         </Link>
+                        {/* FIXED: Changed from /auth/signup to /signup */}
                         <Link
-                          href="/auth/signup"
+                          href="/signup"
                           onClick={() => setMobileMenuOpen(false)}
                           className="block px-4 py-3 rounded-lg text-center bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold"
                         >

@@ -10,12 +10,29 @@ const nextConfig = {
     unoptimized: true,
     domains: ['kteobfyferrukqeolofj.supabase.co'],
   },
-  // Treat warnings as non-fatal
-  onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
+  // Handle server-side packages
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Dont resolve server-only modules on client
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        pg: false,
+        crypto: false,
+        stream: false,
+        dns: false,
+        child_process: false,
+      };
+    }
+    // Externalize pg on server side
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push('pg', 'pg-native');
+    }
+    return config;
   },
-  // Experimental features to handle dynamic routes better
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // app/admin/analytics/page.tsx
 // Analytics Dashboard - User behavior and engagement
 // Timestamp: Dec 11, 2025 11:28 PM EST

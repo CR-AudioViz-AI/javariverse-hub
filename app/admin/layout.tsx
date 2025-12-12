@@ -1,3 +1,6 @@
+// Force dynamic rendering for all admin routes
+export const dynamic = 'force-dynamic';
+
 import { AdminNavigation } from '@/components/AdminNavigation';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -24,3 +27,4 @@ export default async function AdminLayout({
     </div>
   );
 }
+

@@ -1,5 +1,10 @@
 'use client';
 
+// components/JavariWidget.tsx
+// JAVARI AI Widget - Connected to Real AI v4.1
+// NEVER SAY NO Edition
+// Timestamp: 2025-12-11 5:15 PM EST
+
 import React, { useState, useEffect, useRef } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Button } from '@/components/ui/button';
@@ -18,6 +23,10 @@ import {
   HelpCircle,
   TrendingUp,
   Lightbulb,
+  Bot,
+  Zap,
+  Brain,
+  Globe,
 } from 'lucide-react';
 
 // Brand colors
@@ -27,12 +36,25 @@ const COLORS = {
   cyan: '#00BCD4',
 };
 
+// Provider configuration for UI
+const PROVIDER_CONFIG = {
+  claude: { name: 'Claude', color: 'bg-orange-500', icon: Brain },
+  openai: { name: 'GPT-4', color: 'bg-green-500', icon: Sparkles },
+  gemini: { name: 'Gemini', color: 'bg-blue-500', icon: Zap },
+  mistral: { name: 'Mistral', color: 'bg-purple-500', icon: Globe },
+  perplexity: { name: 'Perplexity', color: 'bg-cyan-500', icon: Globe },
+} as const;
+
+type ProviderName = keyof typeof PROVIDER_CONFIG;
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
   feedback?: 'good' | 'bad';
+  provider?: ProviderName;
+  latency?: number;
 }
 
 interface JavariWidgetProps {
@@ -41,164 +63,114 @@ interface JavariWidgetProps {
   primaryColor?: string;
   enableTickets?: boolean;
   enableEnhancements?: boolean;
-  context?: string; // Additional context for Javari
+  context?: string;
+  apiEndpoint?: string; // Allow custom API endpoint
 }
 
-// Simple responses based on keywords - Javari learns from these
-const getJavariResponse = (message: string, context?: string): string => {
-  const lower = message.toLowerCase();
-  
-  // Stock/Crypto related
-  if (lower.includes('stock') || lower.includes('invest') || lower.includes('buy')) {
-    return "I'm tracking market patterns and learning from each prediction! While I can share what I'm learning about stocks and crypto, remember I'm still developing my analysis skills. What specific ticker or sector interests you? I'll log this conversation to improve my knowledge.";
-  }
-  
-  if (lower.includes('crypto') || lower.includes('bitcoin') || lower.includes('ethereum')) {
-    return "Crypto markets are fascinating! I'm building my knowledge base on digital assets. I track my predictions to learn what works and what doesn't. What would you like to know? Every conversation helps me get smarter.";
-  }
-  
-  if (lower.includes('penny stock')) {
-    return "Penny stocks are high-risk, high-reward territory. I'm learning to identify patterns in this volatile space. What penny stocks are you watching? I'll add this to my learning database.";
-  }
-  
-  // Support related
-  if (lower.includes('help') || lower.includes('support') || lower.includes('problem') || lower.includes('issue')) {
-    return "I'm here to help! I can answer questions, create a support ticket, or suggest features. What's on your mind? I learn from every interaction to serve you better.";
-  }
-  
-  if (lower.includes('ticket') || lower.includes('bug') || lower.includes('broken')) {
-    return "I can help you create a support ticket. Just describe the issue in detail - what were you trying to do, what happened, and what did you expect? I'll make sure it gets to the right team.";
-  }
-  
-  if (lower.includes('feature') || lower.includes('suggestion') || lower.includes('idea') || lower.includes('enhance')) {
-    return "I love hearing new ideas! You can submit a feature request and the community can vote on it. What feature would make your experience better?";
-  }
-  
-  // Platform related
-  if (lower.includes('credit') || lower.includes('price') || lower.includes('cost') || lower.includes('subscription')) {
-    return "Credits never expire on paid plans - that's our promise! We have flexible pricing at craudiovizai.com/pricing. Is there something specific about credits or billing I can clarify?";
-  }
-  
-  if (lower.includes('cardverse') || lower.includes('card') || lower.includes('trading')) {
-    return "CardVerse is our trading card platform! You can create, collect, and trade digital cards. What would you like to know about it?";
-  }
-  
-  // Greetings
-  if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey') || lower === 'yo') {
-    return "Hey there! 👋 I'm Javari, your AI assistant. I'm always learning - from conversations, documents, market data, and more. How can I help you today?";
-  }
-  
-  if (lower.includes('thank')) {
-    return "You're welcome! Every conversation helps me learn and improve. Is there anything else I can help with?";
-  }
-  
-  // Default - encourage engagement
-  return "I'm Javari, and I'm constantly learning! I track my conversations, analyze documents, and even learn from my stock predictions (both wins and losses). Ask me about CR AudioViz AI, stocks, crypto, or submit a support ticket. What interests you?";
-};
+// Javari API URL - defaults to production
+const JAVARI_API = process.env.NEXT_PUBLIC_JAVARI_API_URL || 'https://javariai.com/api/chat';
 
 export default function JavariWidget({
-  sourceApp = 'craudiovizai.com',
+  sourceApp = 'website',
   position = 'bottom-right',
-  primaryColor = COLORS.cyan,
+  primaryColor = COLORS.navy,
   enableTickets = true,
   enableEnhancements = true,
   context,
+  apiEndpoint = JAVARI_API,
 }: JavariWidgetProps) {
-  const supabase = createClientComponentClient();
   const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
-  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentProvider, setCurrentProvider] = useState<ProviderName | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const supabase = createClientComponentClient();
 
+  // Auto scroll to bottom
   useEffect(() => {
-    checkUser();
-  }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
-  };
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, [messages, isLoading]);
 
-  // Save conversation to database for learning
-  const saveConversation = async (role: 'user' | 'assistant', content: string) => {
+  // Focus input when opened
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [isOpen]);
+
+  // Save conversation for learning
+  const saveConversation = async (role: 'user' | 'assistant', content: string, provider?: string) => {
     try {
-      // Extract topics and entities from message
-      const extractedTopics = extractTopics(content);
-      const extractedEntities = extractEntities(content);
-      
       await supabase.from('javari_conversations').insert({
-        session_id: sessionId,
-        user_id: user?.id || null,
         source_app: sourceApp,
         role,
         content,
-        extracted_topics: extractedTopics,
-        extracted_entities: extractedEntities,
+        provider,
+        context,
       });
     } catch (error) {
       console.error('Error saving conversation:', error);
     }
   };
 
-  // Simple topic extraction
-  const extractTopics = (text: string): string[] => {
-    const topics: string[] = [];
-    const lower = text.toLowerCase();
-    
-    if (lower.includes('stock') || lower.includes('invest')) topics.push('stocks');
-    if (lower.includes('crypto') || lower.includes('bitcoin')) topics.push('crypto');
-    if (lower.includes('penny')) topics.push('penny_stocks');
-    if (lower.includes('support') || lower.includes('help')) topics.push('support');
-    if (lower.includes('feature') || lower.includes('enhance')) topics.push('enhancements');
-    if (lower.includes('credit') || lower.includes('billing')) topics.push('billing');
-    
-    return topics;
-  };
-
-  // Simple entity extraction (tickers)
-  const extractEntities = (text: string): string[] => {
-    const entities: string[] = [];
-    
-    // Match common ticker patterns ($XXX or just XXX in context)
-    const tickerMatch = text.match(/\$[A-Z]{1,5}/g);
-    if (tickerMatch) {
-      entities.push(...tickerMatch.map(t => t.replace('$', '')));
-    }
-    
-    // Common cryptos
-    if (text.toLowerCase().includes('bitcoin') || text.includes('BTC')) entities.push('BTC');
-    if (text.toLowerCase().includes('ethereum') || text.includes('ETH')) entities.push('ETH');
-    
-    return [...new Set(entities)];
-  };
-
-  // Log activity for learning
-  const logActivity = async (activityType: string, description: string, relatedTicker?: string) => {
+  // Log activity for analytics
+  const logActivity = async (activityType: string, description: string) => {
     try {
       await supabase.from('javari_activity_log').insert({
         activity_type: activityType,
         description,
-        related_ticker: relatedTicker,
+        source_app: sourceApp,
       });
     } catch (error) {
       console.error('Error logging activity:', error);
     }
   };
 
+  // Call the real Javari API
+  const callJavariAPI = async (userMessage: string): Promise<{ content: string; provider?: ProviderName; latency?: number }> => {
+    try {
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [
+            ...messages.map(m => ({ role: m.role, content: m.content })),
+            { role: 'user', content: userMessage }
+          ],
+          context: context ? `Source: ${sourceApp}. Context: ${context}` : `Source: ${sourceApp}`,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      return {
+        content: data.content || "Let me help you with that! What specifically would you like to know?",
+        provider: data.provider as ProviderName,
+        latency: data.latency,
+      };
+    } catch (error) {
+      console.error('Javari API error:', error);
+      // Fallback response - NEVER SAY NO
+      return {
+        content: "I'm reconnecting right now! In the meantime, feel free to explore our tools at craudiovizai.com or try asking again in a moment. I'm here to help! 🚀",
+        provider: undefined,
+        latency: undefined,
+      };
+    }
+  };
+
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: `msg_${Date.now()}`,
@@ -209,32 +181,48 @@ export default function JavariWidget({
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
-    setIsTyping(true);
+    setIsLoading(true);
+    setShowSuggestions(false);
 
-    // Save user message for learning
+    // Save user message
     await saveConversation('user', input);
-    
-    // Log the interaction
-    const entities = extractEntities(input);
-    await logActivity('answered', `User asked: ${input.substring(0, 100)}...`, entities[0]);
+    await logActivity('chat', `User: ${input.substring(0, 100)}...`);
 
-    // Simulate response delay
-    setTimeout(async () => {
-      const response = getJavariResponse(input, context);
+    try {
+      // Call real Javari API
+      const response = await callJavariAPI(input);
       
+      setCurrentProvider(response.provider || null);
+
       const assistantMessage: Message = {
-        id: `msg_${Date.now()}`,
+        id: `msg_${Date.now() + 1}`,
         role: 'assistant',
-        content: response,
+        content: response.content,
         timestamp: new Date(),
+        provider: response.provider,
+        latency: response.latency,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-      setIsTyping(false);
+      
+      // Save assistant response
+      await saveConversation('assistant', response.content, response.provider);
 
-      // Save assistant response for learning
-      await saveConversation('assistant', response);
-    }, 1000 + Math.random() * 1000);
+    } catch (error) {
+      console.error('Error getting response:', error);
+      
+      const errorMessage: Message = {
+        id: `msg_${Date.now() + 1}`,
+        role: 'assistant',
+        content: "I'm working on reconnecting! Try again in just a moment - I'm here to help! 🔄",
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+      setCurrentProvider(null);
+    }
   };
 
   const handleFeedback = async (messageId: string, feedback: 'good' | 'bad') => {
@@ -242,11 +230,13 @@ export default function JavariWidget({
       prev.map(m => m.id === messageId ? { ...m, feedback } : m)
     );
     
-    // Log feedback for learning
-    await logActivity(
-      'learned',
-      `User rated response as ${feedback}`,
-    );
+    await logActivity('feedback', `User rated response as ${feedback}`);
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setInput(suggestion);
+    setShowSuggestions(false);
+    inputRef.current?.focus();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -256,206 +246,207 @@ export default function JavariWidget({
     }
   };
 
-  const positionClasses = position === 'bottom-right' 
-    ? 'right-4 sm:right-6' 
-    : 'left-4 sm:left-6';
+  // Quick suggestions
+  const suggestions = [
+    { icon: <Sparkles className="w-4 h-4" />, text: 'What can you build?', full: 'What kind of apps and tools can you build for me?' },
+    { icon: <TrendingUp className="w-4 h-4" />, text: 'Stock analysis', full: 'Can you help me analyze a stock?' },
+    { icon: <HelpCircle className="w-4 h-4" />, text: 'How do credits work?', full: 'How does the credit system work?' },
+    { icon: <Lightbulb className="w-4 h-4" />, text: 'Suggest a feature', full: 'I have a feature suggestion' },
+  ];
 
-  // Widget button when closed
+  // Provider badge component
+  const ProviderBadge = ({ provider, latency }: { provider?: ProviderName; latency?: number }) => {
+    if (!provider) return null;
+    const config = PROVIDER_CONFIG[provider];
+    if (!config) return null;
+    const Icon = config.icon;
+    
+    return (
+      <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
+        <span className={`w-1.5 h-1.5 rounded-full ${config.color}`} />
+        <Icon className="w-3 h-3" />
+        <span>{config.name}</span>
+        {latency && <span>• {latency}ms</span>}
+      </div>
+    );
+  };
+
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-4 sm:bottom-6 ${positionClasses} z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110`}
+        className={`fixed ${position === 'bottom-right' ? 'right-4' : 'left-4'} bottom-4 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110`}
         style={{ backgroundColor: primaryColor }}
       >
-        <Sparkles className="w-6 h-6 text-white" />
+        <MessageSquare className="w-6 h-6 text-white" />
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+          <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+        </span>
       </button>
     );
   }
 
-  // Minimized state
-  if (isMinimized) {
-    return (
-      <div
-        className={`fixed bottom-4 sm:bottom-6 ${positionClasses} z-50`}
-      >
-        <Card 
-          className="w-64 p-3 cursor-pointer hover:shadow-lg transition-shadow"
-          style={{ backgroundColor: COLORS.navy }}
-          onClick={() => setIsMinimized(false)}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5" style={{ color: primaryColor }} />
-              <span className="text-white font-medium">Javari AI</span>
-            </div>
-            <Maximize2 className="w-4 h-4 text-gray-400" />
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  // Full chat widget
   return (
-    <div
-      className={`fixed bottom-4 sm:bottom-6 ${positionClasses} z-50 w-[95vw] sm:w-96 max-w-md`}
+    <Card
+      className={`fixed ${position === 'bottom-right' ? 'right-4' : 'left-4'} bottom-4 z-50 shadow-2xl transition-all duration-300 ${
+        isExpanded ? 'w-[500px] h-[600px]' : 'w-[380px] h-[500px]'
+      }`}
     >
-      <Card className="shadow-2xl overflow-hidden" style={{ backgroundColor: '#111' }}>
-        {/* Header */}
-        <div 
-          className="p-4 flex items-center justify-between"
-          style={{ backgroundColor: COLORS.navy }}
-        >
-          <div className="flex items-center gap-3">
-            <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: `${primaryColor}30` }}
-            >
-              <Sparkles className="w-5 h-5" style={{ color: primaryColor }} />
-            </div>
-            <div>
-              <h3 className="text-white font-semibold">Javari AI</h3>
-              <p className="text-xs text-gray-400">Always learning • Here to help</p>
-            </div>
+      {/* Header */}
+      <div
+        className="flex items-center justify-between p-3 rounded-t-lg text-white"
+        style={{ backgroundColor: primaryColor }}
+      >
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Bot className="w-8 h-8" />
+            <Sparkles className="w-3 h-3 text-yellow-300 absolute -top-1 -right-1" />
           </div>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setIsMinimized(true)}
-              className="text-gray-400 hover:text-white p-1"
-            >
-              <Minimize2 className="w-4 h-4" />
-            </button>
-            <button 
-              onClick={() => setIsOpen(false)}
-              className="text-gray-400 hover:text-white p-1"
-            >
-              <X className="w-4 h-4" />
-            </button>
+          <div>
+            <h3 className="font-bold text-sm">Javari AI</h3>
+            <p className="text-xs opacity-80">Always finds a way to help</p>
           </div>
         </div>
-
-        {/* Quick Actions */}
-        <div className="p-2 border-b border-gray-800 flex gap-2 overflow-x-auto">
-          {enableTickets && (
-            <button 
-              onClick={() => setInput('I need help with an issue')}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs whitespace-nowrap bg-gray-800 text-gray-300 hover:bg-gray-700"
-            >
-              <HelpCircle className="w-3 h-3" />
-              Get Help
-            </button>
-          )}
-          {enableEnhancements && (
-            <button 
-              onClick={() => setInput('I have a feature idea')}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs whitespace-nowrap bg-gray-800 text-gray-300 hover:bg-gray-700"
-            >
-              <Lightbulb className="w-3 h-3" />
-              Suggest Feature
-            </button>
-          )}
-          <button 
-            onClick={() => setInput('Tell me about stocks')}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs whitespace-nowrap bg-gray-800 text-gray-300 hover:bg-gray-700"
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-white hover:bg-white/20"
+            onClick={() => setIsExpanded(!isExpanded)}
           >
-            <TrendingUp className="w-3 h-3" />
-            Stocks & Crypto
-          </button>
+            {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-white hover:bg-white/20"
+            onClick={() => setIsOpen(false)}
+          >
+            <X className="w-4 h-4" />
+          </Button>
         </div>
+      </div>
 
-        {/* Messages */}
-        <div className="h-80 overflow-y-auto p-4 space-y-4">
-          {messages.length === 0 && (
-            <div className="text-center py-8">
-              <Sparkles className="w-12 h-12 mx-auto mb-4" style={{ color: primaryColor }} />
-              <h4 className="text-white font-medium mb-2">Hi, I'm Javari!</h4>
-              <p className="text-gray-400 text-sm">
-                I learn from every conversation. Ask me about stocks, crypto, 
-                or anything about CR AudioViz AI!
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-3 h-[calc(100%-140px)] bg-gray-50">
+        {messages.length === 0 && showSuggestions && (
+          <div className="space-y-3">
+            <div className="text-center py-4">
+              <Bot className="w-12 h-12 text-blue-500 mx-auto mb-2" />
+              <p className="text-gray-600 text-sm">
+                Hi! I'm Javari, your AI assistant that NEVER says no. 
+                What can I build or help you with today?
               </p>
             </div>
-          )}
-          
-          {messages.map((message) => (
+            <div className="grid grid-cols-2 gap-2">
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSuggestionClick(s.full)}
+                  className="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200 text-left text-sm hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                >
+                  <span className="text-blue-500">{s.icon}</span>
+                  <span className="text-gray-700">{s.text}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`mb-3 ${message.role === 'user' ? 'text-right' : 'text-left'}`}
+          >
             <div
-              key={message.id}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`inline-block max-w-[85%] p-3 rounded-2xl ${
+                message.role === 'user'
+                  ? 'bg-blue-500 text-white rounded-br-md'
+                  : 'bg-white border border-gray-200 rounded-bl-md shadow-sm'
+              }`}
             >
-              <div
-                className={`max-w-[80%] rounded-lg p-3 ${
-                  message.role === 'user'
-                    ? 'bg-cyan-600 text-white'
-                    : 'bg-gray-800 text-gray-100'
-                }`}
-              >
-                <p className="text-sm">{message.content}</p>
-                
-                {/* Feedback buttons for assistant messages */}
-                {message.role === 'assistant' && !message.feedback && (
-                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-700">
-                    <span className="text-xs text-gray-500">Helpful?</span>
+              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              
+              {message.role === 'assistant' && (
+                <>
+                  <ProviderBadge provider={message.provider} latency={message.latency} />
+                  
+                  {/* Feedback buttons */}
+                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
+                    <span className="text-xs text-gray-400">Helpful?</span>
                     <button
                       onClick={() => handleFeedback(message.id, 'good')}
-                      className="text-gray-500 hover:text-green-400 p-1"
+                      className={`p-1 rounded transition-colors ${
+                        message.feedback === 'good' 
+                          ? 'text-green-500 bg-green-50' 
+                          : 'text-gray-400 hover:text-green-500 hover:bg-green-50'
+                      }`}
                     >
-                      <ThumbsUp className="w-3 h-3" />
+                      <ThumbsUp className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleFeedback(message.id, 'bad')}
-                      className="text-gray-500 hover:text-red-400 p-1"
+                      className={`p-1 rounded transition-colors ${
+                        message.feedback === 'bad' 
+                          ? 'text-red-500 bg-red-50' 
+                          : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+                      }`}
                     >
-                      <ThumbsDown className="w-3 h-3" />
+                      <ThumbsDown className="w-4 h-4" />
                     </button>
                   </div>
-                )}
-                
-                {message.feedback && (
-                  <div className="mt-2 pt-2 border-t border-gray-700">
-                    <span className="text-xs text-gray-500">
-                      {message.feedback === 'good' ? '✓ Thanks for the feedback!' : '✓ I\'ll learn from this!'}
-                    </span>
-                  </div>
-                )}
-              </div>
+                </>
+              )}
             </div>
-          ))}
-          
-          {isTyping && (
-            <div className="flex justify-start">
-              <div className="bg-gray-800 rounded-lg p-3">
-                <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
-              </div>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input */}
-        <div className="p-4 border-t border-gray-800">
-          <div className="flex gap-2">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask Javari anything..."
-              className="flex-1 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
-            />
-            <Button
-              onClick={handleSend}
-              disabled={!input.trim() || isTyping}
-              style={{ backgroundColor: primaryColor }}
-              className="text-white"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
           </div>
-          <p className="text-xs text-gray-500 mt-2 text-center">
-            Powered by Javari AI • Learning from {sourceApp}
-          </p>
+        ))}
+
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="flex items-center gap-2 text-gray-500 text-sm">
+            <div className="flex items-center gap-2 bg-white p-3 rounded-2xl rounded-bl-md shadow-sm">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>
+                {currentProvider 
+                  ? `${PROVIDER_CONFIG[currentProvider]?.name || 'Javari'} is thinking...`
+                  : 'Javari is working on it...'}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input */}
+      <div className="p-3 border-t bg-white rounded-b-lg">
+        <div className="flex gap-2">
+          <Input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask me anything..."
+            className="flex-1"
+            disabled={isLoading}
+          />
+          <Button
+            onClick={handleSend}
+            disabled={!input.trim() || isLoading}
+            style={{ backgroundColor: primaryColor }}
+            className="text-white"
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+          </Button>
         </div>
-      </Card>
-    </div>
+        <p className="text-xs text-center text-gray-400 mt-2">
+          Powered by Javari AI • NEVER says no
+        </p>
+      </div>
+    </Card>
   );
 }

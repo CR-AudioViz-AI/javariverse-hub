@@ -1,232 +1,192 @@
-'use client'
+// app/admin/credits/page.tsx
+// Admin Credit System Management
+// Timestamp: Dec 11, 2025 10:25 PM EST
 
-import { useEffect, useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { CreditCard, Clock, TrendingDown, TrendingUp } from 'lucide-react'
-import { loadStripe } from '@stripe/stripe-js'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { Coins, ArrowLeft, TrendingUp, TrendingDown, Users, Zap, Gift, RefreshCw } from 'lucide-react';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+async function getCreditStats() {
+  const supabase = createServerComponentClient({ cookies });
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-interface CreditPackage {
-  name: string
-  credits: number
-  price: number
-  priceId: string
-  popular?: boolean
+  // Total credits in circulation
+  const { data: totalCredits } = await supabase
+    .from('user_credits')
+    .select('balance');
+  const totalInCirculation = totalCredits?.reduce((sum, u) => sum + (u.balance || 0), 0) || 0;
+
+  // Credits used today
+  const { data: usedToday } = await supabase
+    .from('credit_transactions')
+    .select('credits')
+    .eq('type', 'deduction')
+    .gte('created_at', today.toISOString());
+  const creditsUsedToday = usedToday?.reduce((sum, t) => sum + Math.abs(t.credits || 0), 0) || 0;
+
+  // Credits purchased today
+  const { data: purchasedToday } = await supabase
+    .from('credit_transactions')
+    .select('credits')
+    .eq('type', 'purchase')
+    .gte('created_at', today.toISOString());
+  const creditsPurchasedToday = purchasedToday?.reduce((sum, t) => sum + (t.credits || 0), 0) || 0;
+
+  // Recent transactions
+  const { data: recentTransactions } = await supabase
+    .from('credit_transactions')
+    .select('*, user:users(full_name, email)')
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  return {
+    totalInCirculation,
+    creditsUsedToday,
+    creditsPurchasedToday,
+    recentTransactions: recentTransactions || [],
+  };
 }
 
-const CREDIT_PACKAGES: CreditPackage[] = [
-  { name: 'Starter', credits: 100, price: 10, priceId: 'price_starter_100' },
-  { name: 'Professional', credits: 500, price: 45, priceId: 'price_pro_500', popular: true },
-  { name: 'Business', credits: 1000, price: 80, priceId: 'price_business_1000' },
-  { name: 'Enterprise', credits: 5000, price: 350, priceId: 'price_enterprise_5000' }
-]
+export default async function AdminCreditsPage() {
+  const supabase = createServerComponentClient({ cookies });
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) redirect('/login');
 
-export default function CreditsPage() {
-  const [credits, setCredits] = useState(0)
-  const [history, setHistory] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [purchasing, setPurchasing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    fetchCreditsData()
-  }, [])
-
-  const fetchCreditsData = async () => {
-    try {
-      setLoading(true)
-      
-      // Fetch current balance
-      const balanceRes = await fetch('/api/admin/credits')
-      const balanceData = await balanceRes.json()
-      setCredits(balanceData.credits || 0)
-      
-      // Fetch transaction history
-      const historyRes = await fetch('/api/admin/credits/history?limit=20')
-      const historyData = await historyRes.json()
-      setHistory(historyData.transactions || [])
-      
-      setError(null)
-    } catch (err) {
-      console.error('Error fetching credits data:', err)
-      setError('Failed to load credits data')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handlePurchase = async (priceId: string) => {
-    try {
-      setPurchasing(true)
-      setError(null)
-
-      const response = await fetch('/api/admin/credits/purchase', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId, quantity: 1 })
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create checkout session')
-      }
-
-      // Redirect to Stripe Checkout
-      const stripe = await stripePromise
-      if (stripe && data.sessionId) {
-        await stripe.redirectToCheckout({ sessionId: data.sessionId })
-      }
-    } catch (err: any) {
-      console.error('Purchase error:', err)
-      setError(err.message || 'Failed to process purchase')
-    } finally {
-      setPurchasing(false)
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  if (loading) {
-    return (
-      <div className="p-8">
-        <h1 className="text-3xl font-bold mb-8">Credits Management</h1>
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Loading...</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-20 bg-muted animate-pulse rounded" />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    )
-  }
+  const stats = await getCreditStats();
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Credits Management</h1>
-        <p className="text-muted-foreground">Purchase and manage your credits</p>
-      </div>
-
-      {error && (
-        <Card className="mb-4 border-destructive">
-          <CardContent className="pt-6">
-            <p className="text-destructive">{error}</p>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Current Balance</CardTitle>
-          <CardDescription>Your available credits</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-4xl font-bold">{credits.toLocaleString()} Credits</div>
-          <p className="text-sm text-muted-foreground mt-2">
-            Credits never expire on paid plans
-          </p>
-        </CardContent>
-      </Card>
-
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">Purchase Credits</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {CREDIT_PACKAGES.map((pkg) => (
-            <Card key={pkg.priceId} className={pkg.popular ? 'border-primary' : ''}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>{pkg.name}</CardTitle>
-                  {pkg.popular && (
-                    <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
-                      Popular
-                    </span>
-                  )}
-                </div>
-                <CardDescription>{pkg.credits.toLocaleString()} Credits</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <div className="text-3xl font-bold">${pkg.price}</div>
-                  <div className="text-sm text-muted-foreground">
-                    ${(pkg.price / pkg.credits).toFixed(3)} per credit
-                  </div>
-                </div>
-                <Button
-                  className="w-full"
-                  onClick={() => handlePurchase(pkg.priceId)}
-                  disabled={purchasing}
-                >
-                  {purchasing ? 'Processing...' : 'Purchase'}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-yellow-600 to-yellow-500 text-white py-6">
+        <div className="container mx-auto px-4">
+          <Link href="/admin" className="inline-flex items-center gap-2 text-yellow-200 hover:text-white mb-4">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </Link>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold flex items-center gap-3">
+                <Coins className="w-8 h-8" />
+                Credit System Management
+              </h1>
+              <p className="text-yellow-200">Monitor credit usage, purchases, and distribution</p>
+            </div>
+            <div className="flex gap-3">
+              <button className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-semibold">
+                <Gift className="w-4 h-4 inline mr-2" />
+                Grant Credits
+              </button>
+              <button className="px-4 py-2 bg-white text-yellow-600 rounded-lg text-sm font-semibold hover:bg-yellow-50">
+                <RefreshCw className="w-4 h-4 inline mr-2" />
+                Process Refunds
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Transaction History</CardTitle>
-          <CardDescription>Your recent credit transactions</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {history.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
-              No transactions yet
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {history.map((transaction) => (
-                <div
-                  key={transaction.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${
-                      transaction.transaction_type === 'purchase' 
-                        ? 'bg-green-100 text-green-600' 
-                        : 'bg-red-100 text-red-600'
-                    }`}>
-                      {transaction.transaction_type === 'purchase' ? (
-                        <TrendingUp className="h-4 w-4" />
-                      ) : (
-                        <TrendingDown className="h-4 w-4" />
-                      )}
-                    </div>
-                    <div>
-                      <div className="font-medium">{transaction.description}</div>
-                      <div className="text-sm text-muted-foreground flex items-center gap-2">
-                        <Clock className="h-3 w-3" />
-                        {formatDate(transaction.created_at)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className={`text-lg font-semibold ${
-                    transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {transaction.amount > 0 ? '+' : ''}{transaction.amount}
-                  </div>
-                </div>
-              ))}
+      <div className="container mx-auto px-4 py-8">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-gray-500">Total in Circulation</p>
+              <Coins className="w-5 h-5 text-yellow-500" />
             </div>
-          )}
-        </CardContent>
-      </Card>
+            <p className="text-3xl font-bold text-gray-900">{stats.totalInCirculation.toLocaleString()}</p>
+            <p className="text-xs text-gray-400 mt-1">Across all users</p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-gray-500">Used Today</p>
+              <TrendingDown className="w-5 h-5 text-red-500" />
+            </div>
+            <p className="text-3xl font-bold text-red-600">{stats.creditsUsedToday.toLocaleString()}</p>
+            <p className="text-xs text-gray-400 mt-1">Consumed by apps</p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-gray-500">Purchased Today</p>
+              <TrendingUp className="w-5 h-5 text-green-500" />
+            </div>
+            <p className="text-3xl font-bold text-green-600">{stats.creditsPurchasedToday.toLocaleString()}</p>
+            <p className="text-xs text-gray-400 mt-1">New credits sold</p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-gray-500">Net Flow Today</p>
+              <Zap className="w-5 h-5 text-blue-500" />
+            </div>
+            <p className={`text-3xl font-bold ${stats.creditsPurchasedToday - stats.creditsUsedToday >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {stats.creditsPurchasedToday - stats.creditsUsedToday >= 0 ? '+' : ''}{(stats.creditsPurchasedToday - stats.creditsUsedToday).toLocaleString()}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">Purchased - Used</p>
+          </div>
+        </div>
+
+        {/* Credit Policy Reminder */}
+        <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
+          <h3 className="font-bold text-green-800 mb-2">✨ Credits Never Expire Policy</h3>
+          <p className="text-green-700">On paid plans, credits never expire. This is our customer promise. Free tier credits may have different policies.</p>
+        </div>
+
+        {/* Recent Transactions */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900">Recent Credit Transactions</h2>
+          </div>
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-600">User</th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-600">Type</th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-600">Credits</th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-600">Source/App</th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-600">Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.recentTransactions.length > 0 ? stats.recentTransactions.map((tx: any) => (
+                <tr key={tx.id} className="border-b border-gray-100">
+                  <td className="py-3 px-6">
+                    <p className="text-sm font-medium text-gray-900">{tx.user?.full_name || 'Unknown'}</p>
+                    <p className="text-xs text-gray-500">{tx.user?.email}</p>
+                  </td>
+                  <td className="py-3 px-6">
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      tx.type === 'purchase' ? 'bg-green-100 text-green-700' :
+                      tx.type === 'deduction' ? 'bg-red-100 text-red-700' :
+                      tx.type === 'refund' ? 'bg-blue-100 text-blue-700' :
+                      'bg-gray-100 text-gray-700'
+                    }`}>
+                      {tx.type}
+                    </span>
+                  </td>
+                  <td className="py-3 px-6">
+                    <span className={`font-bold ${tx.credits > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {tx.credits > 0 ? '+' : ''}{tx.credits}
+                    </span>
+                  </td>
+                  <td className="py-3 px-6 text-sm text-gray-500">{tx.source || tx.app_id || '-'}</td>
+                  <td className="py-3 px-6 text-sm text-gray-500">
+                    {new Date(tx.created_at).toLocaleString()}
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-gray-500">
+                    No transactions yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  )
+  );
 }

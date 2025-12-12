@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 // app/dashboard/credits/page.tsx
 // Credits Purchase Page - Buy credit packs
 // Timestamp: Dec 11, 2025 10:02 PM EST

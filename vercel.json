@@ -3,7 +3,7 @@
   "framework": "nextjs",
   "github": {
     "enabled": true,
-    "autoAlias": false,
+    "autoAlias": true,
     "silent": false
   },
   "crons": [
@@ -42,7 +42,7 @@
   ],
   "git": {
     "deploymentEnabled": {
-      "main": false
+      "main": true
     }
   }
 }

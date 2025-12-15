@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FileText, Plus, Upload, Download, Trash2, Eye, ChevronDown, ChevronUp, File, FileImage, FilePdf } from 'lucide-react';
+import { FileText, Plus, Upload, Download, Trash2, Eye, ChevronDown, ChevronUp, File, FileImage, FileType } from 'lucide-react';
 
 interface Document {
   id: string;
@@ -34,7 +34,7 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 
 const DOC_TYPE_ICONS: Record<string, any> = {
   application_draft: FileText,
-  final_submission: FilePdf,
+  final_submission: FileType,
   budget: File,
   narrative: FileText,
   default: File,

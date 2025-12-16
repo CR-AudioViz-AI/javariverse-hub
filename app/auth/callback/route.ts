@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 
 // Allowed apps for cross-app SSO redirects
 const ALLOWED_DOMAINS = [
@@ -10,21 +9,20 @@ const ALLOWED_DOMAINS = [
   'localhost:3000',
   'localhost:3001',
   'localhost:3002',
-  // Add Vercel preview URLs
   '.vercel.app',
-];
+]
 
 function isAllowedRedirect(url: string): boolean {
   try {
-    const parsed = new URL(url);
+    const parsed = new URL(url)
     return ALLOWED_DOMAINS.some(domain => {
       if (domain.startsWith('.')) {
-        return parsed.hostname.endsWith(domain);
+        return parsed.hostname.endsWith(domain)
       }
-      return parsed.hostname === domain || parsed.hostname.endsWith('.' + domain);
-    });
+      return parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
+    })
   } catch {
-    return false;
+    return false
   }
 }
 

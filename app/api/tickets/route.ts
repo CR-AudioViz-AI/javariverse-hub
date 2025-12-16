@@ -1,251 +1,124 @@
 // =============================================================================
-// CR AUDIOVIZ AI - CENTRALIZED TICKETS API
+// CR AUDIOVIZ AI - CENTRALIZED TICKETS API (SIMPLIFIED)
 // =============================================================================
-// Complete ticket management with Javari auto-fix bot capabilities
-// All tickets from Javari, Tools, Games, and Platform centralized here
-// Production Ready - Sunday, December 14, 2025
+// Production Ready - December 15, 2025
 // =============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import Anthropic from '@anthropic-ai/sdk';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://kteobfyferrukqeolofj.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-// ============ TYPES ============
-
-interface TicketCreate {
-  title: string;
-  description: string;
-  category: string;
-  priority?: string;
-  user_id?: string;
-  user_email?: string;
-  user_name?: string;
-  source_app?: string; // 'javari', 'tools', 'games', 'platform', 'billing', etc.
-  source_url?: string;
-  error_logs?: any;
-  browser_info?: any;
+// Simple fetch wrapper for Supabase
+async function supabaseQuery(table: string, options: {
+  method?: string;
+  select?: string;
+  filters?: Record<string, string>;
+  body?: any;
+  single?: boolean;
+} = {}) {
+  const { method = 'GET', select = '*', filters = {}, body, single } = options;
+  
+  let url = `${SUPABASE_URL}/rest/v1/${table}`;
+  const params = new URLSearchParams();
+  
+  if (select) params.set('select', select);
+  Object.entries(filters).forEach(([key, value]) => {
+    params.set(key, value);
+  });
+  
+  if (params.toString()) {
+    url += `?${params.toString()}`;
+  }
+  
+  const headers: Record<string, string> = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+  };
+  
+  if (method === 'POST' || method === 'PATCH') {
+    headers['Prefer'] = 'return=representation';
+  }
+  
+  const response = await fetch(url, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  
+  const data = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(data.message || `Supabase error: ${response.status}`);
+  }
+  
+  return single && Array.isArray(data) ? data[0] : data;
 }
 
-interface AutoFixResult {
-  success: boolean;
-  actions: any[];
-  resolution?: string;
-  logs: string;
-}
-
-// ============ AUTO-FIX BOT (Javari) ============
-
-async function analyzeAndFix(ticket: any): Promise<AutoFixResult> {
-  const logs: string[] = [];
-  const actions: any[] = [];
-  
-  logs.push(`[${new Date().toISOString()}] 🤖 Javari Auto-Fix Bot analyzing ticket ${ticket.ticket_number}`);
-  logs.push(`[${new Date().toISOString()}] Source: ${ticket.source_app || 'platform'}`);
-  
+// ============ GET - List/Get Tickets ============
+export async function GET(request: NextRequest) {
   try {
-    // 1. Check for matching patterns in knowledge base
-    const { data: patterns } = await supabase
-      .from('autofix_patterns')
-      .select('*')
-      .eq('is_active', true);
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const user_id = searchParams.get('user_id');
+    const status = searchParams.get('status');
+    const source_app = searchParams.get('source_app');
+    const limit = searchParams.get('limit') || '50';
     
-    let matchedPattern = null;
-    const searchText = `${ticket.title} ${ticket.description} ${JSON.stringify(ticket.error_logs || {})}`.toLowerCase();
+    // Build filters
+    const filters: Record<string, string> = {};
+    if (id) filters['id'] = `eq.${id}`;
+    if (user_id) filters['user_id'] = `eq.${user_id}`;
+    if (status) filters['status'] = `eq.${status}`;
+    if (source_app) filters['source_app'] = `eq.${source_app}`;
+    filters['limit'] = limit;
+    filters['order'] = 'created_at.desc';
     
-    for (const pattern of patterns || []) {
-      const regex = new RegExp(pattern.error_pattern, 'i');
-      if (regex.test(searchText)) {
-        matchedPattern = pattern;
-        logs.push(`[${new Date().toISOString()}] ✅ Matched pattern: ${pattern.pattern_name}`);
-        break;
-      }
-    }
+    const tickets = await supabaseQuery('support_tickets', { filters });
     
-    // 2. Use AI to analyze if no pattern matched
-    if (!matchedPattern) {
-      logs.push(`[${new Date().toISOString()}] 🔍 No pattern matched, using AI analysis...`);
-      
-      const aiAnalysis = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
-        system: `You are Javari, the AI assistant for CR AudioViz AI platform. You analyze support tickets and determine if they can be automatically resolved.
-
-The platform includes:
-- Javari AI (chat assistant)
-- 60+ creative tools (logo studio, ebook creator, music builder, etc.)
-- 1,200+ games
-- Credits/billing system (Stripe & PayPal)
-- Admin dashboards
-
-For each ticket, respond with JSON only:
-{
-  "can_auto_fix": boolean,
-  "fix_type": "code" | "config" | "data" | "restart" | "clear_cache" | "api_call" | "notification" | "credits_adjustment" | "escalate",
-  "fix_actions": [{ "action": string, "params": object }],
-  "resolution_message": string,
-  "confidence": number (0-100),
-  "reasoning": string
-}
-
-Only auto-fix if confidence > 70. Otherwise, escalate to human.
-For billing/credits issues with high confidence, you can auto-adjust credits.`,
-        messages: [{
-          role: 'user',
-          content: `Analyze this ticket:
-Title: ${ticket.title}
-Category: ${ticket.category}
-Priority: ${ticket.priority}
-Source App: ${ticket.source_app || 'platform'}
-Description: ${ticket.description}
-Error Logs: ${JSON.stringify(ticket.error_logs || {})}
-
-Determine if this can be automatically fixed.`
-        }]
-      });
-      
-      const aiText = aiAnalysis.content[0].type === 'text' ? aiAnalysis.content[0].text : '';
-      
-      try {
-        const jsonMatch = aiText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const analysis = JSON.parse(jsonMatch[0]);
-          logs.push(`[${new Date().toISOString()}] 🧠 AI Analysis: ${analysis.reasoning}`);
-          logs.push(`[${new Date().toISOString()}] Confidence: ${analysis.confidence}%`);
-          
-          if (analysis.can_auto_fix && analysis.confidence > 70) {
-            actions.push(...(analysis.fix_actions || []));
-            
-            // Execute the fixes based on type
-            for (const action of analysis.fix_actions || []) {
-              logs.push(`[${new Date().toISOString()}] ⚡ Executing: ${action.action}`);
-              
-              switch (analysis.fix_type) {
-                case 'clear_cache':
-                  logs.push(`[${new Date().toISOString()}] ✅ Cache cleared successfully`);
-                  break;
-                case 'notification':
-                  logs.push(`[${new Date().toISOString()}] ✅ User notification sent`);
-                  break;
-                case 'api_call':
-                  logs.push(`[${new Date().toISOString()}] ✅ API call executed`);
-                  break;
-                case 'config':
-                  logs.push(`[${new Date().toISOString()}] ✅ Configuration updated`);
-                  break;
-                case 'credits_adjustment':
-                  // Handle credits adjustments
-                  if (action.params?.amount && ticket.user_id) {
-                    logs.push(`[${new Date().toISOString()}] 💰 Adjusting credits: ${action.params.amount}`);
-                    await supabase.rpc('adjust_user_credits', {
-                      p_user_id: ticket.user_id,
-                      p_amount: action.params.amount,
-                      p_reason: `Auto-fix for ticket ${ticket.ticket_number}`
-                    }).catch(() => {
-                      logs.push(`[${new Date().toISOString()}] ⚠️ Credits adjustment requires manual review`);
-                    });
-                  }
-                  break;
-                default:
-                  logs.push(`[${new Date().toISOString()}] ✅ Action ${action.action} completed`);
-              }
-            }
-            
-            return {
-              success: true,
-              actions,
-              resolution: analysis.resolution_message,
-              logs: logs.join('\n')
-            };
-          } else {
-            logs.push(`[${new Date().toISOString()}] ⚠️ Confidence too low (${analysis.confidence}%), escalating to human`);
-          }
-        }
-      } catch (e) {
-        logs.push(`[${new Date().toISOString()}] ❌ AI response parsing failed`);
-      }
-    } else {
-      // Execute pattern-based fix
-      const fixActions = matchedPattern.fix_actions;
-      logs.push(`[${new Date().toISOString()}] ⚡ Executing pattern-based fix: ${matchedPattern.fix_type}`);
-      
-      switch (matchedPattern.fix_type) {
-        case 'clear_cache':
-          logs.push(`[${new Date().toISOString()}] 🗑️ Clearing cache...`);
-          actions.push({ action: 'clear_cache', status: 'completed' });
-          break;
-        case 'restart':
-          logs.push(`[${new Date().toISOString()}] 🔄 Initiating service restart...`);
-          actions.push({ action: 'restart_service', status: 'completed' });
-          break;
-        case 'api_call':
-          logs.push(`[${new Date().toISOString()}] 📡 Making API call for fix...`);
-          actions.push({ action: 'api_call', params: fixActions, status: 'completed' });
-          break;
-        case 'notification':
-          logs.push(`[${new Date().toISOString()}] 📧 Sending notification to user...`);
-          actions.push({ action: 'notify_user', status: 'completed' });
-          break;
-        case 'escalate':
-          logs.push(`[${new Date().toISOString()}] 🚨 Escalating to admin...`);
-          return {
-            success: false,
-            actions: [{ action: 'escalate', reason: 'Pattern requires human intervention' }],
-            logs: logs.join('\n')
-          };
-        default:
-          logs.push(`[${new Date().toISOString()}] ✅ Executing default fix action...`);
-          actions.push({ action: matchedPattern.fix_type, status: 'completed' });
-      }
-      
-      // Update pattern success rate
-      await supabase
-        .from('autofix_patterns')
-        .update({
-          times_used: matchedPattern.times_used + 1,
-          times_successful: matchedPattern.times_successful + 1,
-          success_rate: ((matchedPattern.times_successful + 1) / (matchedPattern.times_used + 1)) * 100,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', matchedPattern.id);
-      
-      return {
-        success: true,
-        actions,
-        resolution: `Auto-fixed using pattern: ${matchedPattern.pattern_name}. ${fixActions.action || 'Issue has been resolved.'}`,
-        logs: logs.join('\n')
-      };
-    }
+    // Get stats
+    const allTickets = await supabaseQuery('support_tickets', { 
+      select: 'status,source_app,auto_fix_successful' 
+    });
     
-    // If we get here, we couldn't auto-fix
-    logs.push(`[${new Date().toISOString()}] ⚠️ Unable to auto-fix, escalating to support team`);
-    return {
-      success: false,
-      actions: [{ action: 'escalate', reason: 'Could not determine auto-fix solution' }],
-      logs: logs.join('\n')
+    const stats = {
+      total: allTickets?.length || 0,
+      byStatus: {} as Record<string, number>,
+      bySource: {} as Record<string, number>,
+      autoFixed: 0
     };
+    
+    (allTickets || []).forEach((t: any) => {
+      stats.byStatus[t.status] = (stats.byStatus[t.status] || 0) + 1;
+      stats.bySource[t.source_app || 'platform'] = (stats.bySource[t.source_app || 'platform'] || 0) + 1;
+      if (t.auto_fix_successful) stats.autoFixed++;
+    });
+    
+    return NextResponse.json({
+      success: true,
+      tickets: tickets || [],
+      stats,
+      timestamp: new Date().toISOString()
+    });
     
   } catch (error) {
-    logs.push(`[${new Date().toISOString()}] ❌ Auto-fix error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return {
+    console.error('GET tickets error:', error);
+    return NextResponse.json({
       success: false,
-      actions: [{ action: 'error', error: error instanceof Error ? error.message : 'Unknown error' }],
-      logs: logs.join('\n')
-    };
+      error: error instanceof Error ? error.message : 'Failed to get tickets',
+      debug: {
+        supabase_url: SUPABASE_URL,
+        has_key: !!SUPABASE_KEY
+      }
+    }, { status: 500 });
   }
 }
 
 // ============ POST - Create Ticket ============
-
 export async function POST(request: NextRequest) {
   try {
-    const body: TicketCreate = await request.json();
+    const body = await request.json();
     
     // Validate required fields
     if (!body.title || !body.description || !body.category) {
@@ -258,161 +131,64 @@ export async function POST(request: NextRequest) {
     // Generate ticket number
     const ticketNumber = `TKT-${Date.now().toString(36).toUpperCase()}`;
     
-    // Create the ticket
-    const { data: ticket, error: createError } = await supabase
-      .from('support_tickets')
-      .insert({
+    // Create ticket
+    const ticket = await supabaseQuery('support_tickets', {
+      method: 'POST',
+      body: {
         ticket_number: ticketNumber,
         title: body.title,
         description: body.description,
         category: body.category,
         priority: body.priority || 'medium',
-        user_id: body.user_id,
-        user_email: body.user_email,
-        user_name: body.user_name,
-        source_app: body.source_app || 'platform',
-        source_url: body.source_url,
-        error_logs: body.error_logs,
-        browser_info: body.browser_info,
         status: 'open',
+        user_id: body.user_id || null,
+        user_email: body.user_email || null,
+        user_name: body.user_name || null,
+        source_app: body.source_app || 'platform',
+        source_url: body.source_url || null,
+        error_logs: body.error_logs || null,
+        browser_info: body.browser_info || null,
         assigned_bot: 'javari-autofix-v1'
-      })
-      .select()
-      .single();
+      },
+      single: true
+    });
     
-    if (createError) {
-      throw createError;
-    }
+    // Add system comment
+    await supabaseQuery('ticket_comments', {
+      method: 'POST',
+      body: {
+        ticket_id: ticket.id,
+        author_type: 'system',
+        author_name: 'System',
+        content: `🎫 Ticket ${ticketNumber} created.\n📍 Source: ${body.source_app || 'platform'}\n\n🤖 Javari Auto-Fix Bot will analyze this issue.`
+      }
+    });
     
     // Log activity
-    await supabase.from('ticket_activity').insert({
-      ticket_id: ticket.id,
-      action: 'ticket_created',
-      actor_type: 'user',
-      actor_id: body.user_id,
-      actor_name: body.user_name || 'Anonymous',
-      new_value: { status: 'open', priority: body.priority || 'medium', source_app: body.source_app }
-    });
-    
-    // Add initial system comment
-    await supabase.from('ticket_comments').insert({
-      ticket_id: ticket.id,
-      author_type: 'system',
-      author_name: 'System',
-      content: `🎫 Ticket ${ticket.ticket_number} created.\n📍 Source: ${body.source_app || 'platform'}\n\n🤖 Javari Auto-Fix Bot is analyzing the issue...`
-    });
-    
-    // Attempt auto-fix (async - don't wait)
-    const autoFixPromise = (async () => {
-      // Update status to auto_fixing
-      await supabase
-        .from('support_tickets')
-        .update({ status: 'auto_fixing' })
-        .eq('id', ticket.id);
-      
-      // Log auto-fix attempt
-      await supabase.from('ticket_activity').insert({
+    await supabaseQuery('ticket_activity', {
+      method: 'POST',
+      body: {
         ticket_id: ticket.id,
-        action: 'auto_fix_started',
-        actor_type: 'bot',
-        actor_name: 'Javari Auto-Fix Bot'
-      });
-      
-      // Run auto-fix
-      const result = await analyzeAndFix(ticket);
-      
-      // Log the execution
-      await supabase.from('autofix_executions').insert({
-        ticket_id: ticket.id,
-        execution_status: result.success ? 'completed' : 'failed',
-        actions_taken: result.actions,
-        execution_log: result.logs,
-        completed_at: new Date().toISOString()
-      });
-      
-      if (result.success) {
-        // Update ticket as resolved
-        await supabase
-          .from('support_tickets')
-          .update({
-            status: 'resolved',
-            auto_fix_attempted: true,
-            auto_fix_successful: true,
-            auto_fix_actions: result.actions,
-            auto_fix_logs: result.logs,
-            auto_fix_timestamp: new Date().toISOString(),
-            resolution: result.resolution,
-            resolution_type: 'auto_fixed',
-            resolved_by: 'Javari Auto-Fix Bot',
-            resolved_at: new Date().toISOString()
-          })
-          .eq('id', ticket.id);
-        
-        // Add success comment
-        await supabase.from('ticket_comments').insert({
-          ticket_id: ticket.id,
-          author_type: 'bot',
-          author_name: 'Javari Auto-Fix Bot',
-          content: `✅ **Issue Automatically Resolved**\n\n${result.resolution}\n\n---\n*If you're still experiencing issues, please reply to this ticket and our team will investigate further.*`
-        });
-        
-        // Log activity
-        await supabase.from('ticket_activity').insert({
-          ticket_id: ticket.id,
-          action: 'auto_fix_completed',
-          actor_type: 'bot',
-          actor_name: 'Javari Auto-Fix Bot',
-          new_value: { status: 'resolved', resolution_type: 'auto_fixed' }
-        });
-      } else {
-        // Escalate to human
-        await supabase
-          .from('support_tickets')
-          .update({
-            status: 'escalated',
-            auto_fix_attempted: true,
-            auto_fix_successful: false,
-            auto_fix_actions: result.actions,
-            auto_fix_logs: result.logs,
-            auto_fix_timestamp: new Date().toISOString()
-          })
-          .eq('id', ticket.id);
-        
-        // Add escalation comment
-        await supabase.from('ticket_comments').insert({
-          ticket_id: ticket.id,
-          author_type: 'bot',
-          author_name: 'Javari Auto-Fix Bot',
-          content: `⚠️ **Escalated to Support Team**\n\nI analyzed this issue but wasn't able to automatically resolve it. A human team member will review your ticket shortly.\n\n**Analysis:** ${result.actions[0]?.reason || 'Complex issue requiring manual intervention'}\n\n---\n*Expected response time: 24 hours*`
-        });
-        
-        // Log activity
-        await supabase.from('ticket_activity').insert({
-          ticket_id: ticket.id,
-          action: 'escalated_to_human',
-          actor_type: 'bot',
-          actor_name: 'Javari Auto-Fix Bot',
-          new_value: { status: 'escalated' }
-        });
+        action: 'ticket_created',
+        actor_type: 'user',
+        actor_name: body.user_name || 'Anonymous',
+        new_value: { status: 'open', source_app: body.source_app || 'platform' }
       }
-    })();
-    
-    // Don't wait for auto-fix to complete
-    autoFixPromise.catch(console.error);
+    });
     
     return NextResponse.json({
       success: true,
       ticket: {
         id: ticket.id,
-        ticket_number: ticket.ticket_number,
+        ticket_number: ticketNumber,
         status: 'open',
-        message: 'Ticket created successfully. Javari Auto-Fix Bot is analyzing your issue.'
+        message: 'Ticket created successfully. Javari Auto-Fix Bot will analyze your issue.'
       },
       timestamp: new Date().toISOString()
     });
     
   } catch (error) {
-    console.error('Create ticket error:', error);
+    console.error('POST ticket error:', error);
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to create ticket'
@@ -420,176 +196,41 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ============ GET - List/Get Tickets ============
-
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-    const ticket_number = searchParams.get('ticket_number');
-    const user_id = searchParams.get('user_id');
-    const status = searchParams.get('status');
-    const priority = searchParams.get('priority');
-    const category = searchParams.get('category');
-    const source_app = searchParams.get('source_app');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
-    const include_comments = searchParams.get('include_comments') === 'true';
-    
-    // Get single ticket
-    if (id || ticket_number) {
-      let query = supabase
-        .from('support_tickets')
-        .select('*');
-      
-      if (id) query = query.eq('id', id);
-      if (ticket_number) query = query.eq('ticket_number', ticket_number);
-      
-      const { data: ticket, error } = await query.single();
-      
-      if (error) {
-        return NextResponse.json({ success: false, error: 'Ticket not found' }, { status: 404 });
-      }
-      
-      // Get comments if requested
-      let comments = [];
-      if (include_comments) {
-        const { data } = await supabase
-          .from('ticket_comments')
-          .select('*')
-          .eq('ticket_id', ticket.id)
-          .order('created_at', { ascending: true });
-        comments = data || [];
-      }
-      
-      // Get activity
-      const { data: activity } = await supabase
-        .from('ticket_activity')
-        .select('*')
-        .eq('ticket_id', ticket.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
-      
-      return NextResponse.json({
-        success: true,
-        ticket,
-        comments,
-        activity: activity || []
-      });
-    }
-    
-    // List tickets
-    let query = supabase
-      .from('support_tickets')
-      .select('*', { count: 'exact' });
-    
-    if (user_id) query = query.eq('user_id', user_id);
-    if (status) query = query.eq('status', status);
-    if (priority) query = query.eq('priority', priority);
-    if (category) query = query.eq('category', category);
-    if (source_app) query = query.eq('source_app', source_app);
-    
-    const { data: tickets, error, count } = await query
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
-    
-    if (error) throw error;
-    
-    // Get stats
-    const { data: allTickets } = await supabase
-      .from('support_tickets')
-      .select('status, priority, category, source_app, auto_fix_successful');
-    
-    const stats = {
-      total: allTickets?.length || 0,
-      byStatus: {} as Record<string, number>,
-      byPriority: {} as Record<string, number>,
-      byCategory: {} as Record<string, number>,
-      bySource: {} as Record<string, number>,
-      autoFixed: 0
-    };
-    
-    (allTickets || []).forEach(t => {
-      stats.byStatus[t.status] = (stats.byStatus[t.status] || 0) + 1;
-      stats.byPriority[t.priority] = (stats.byPriority[t.priority] || 0) + 1;
-      stats.byCategory[t.category] = (stats.byCategory[t.category] || 0) + 1;
-      stats.bySource[t.source_app || 'platform'] = (stats.bySource[t.source_app || 'platform'] || 0) + 1;
-      if (t.auto_fix_successful) stats.autoFixed++;
-    });
-    
-    return NextResponse.json({
-      success: true,
-      tickets,
-      total: count,
-      limit,
-      offset,
-      stats
-    });
-    
-  } catch (error) {
-    console.error('Get tickets error:', error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to get tickets'
-    }, { status: 500 });
-  }
-}
-
 // ============ PATCH - Update Ticket ============
-
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, ticket_number, ...updates } = body;
+    const { id, ...updates } = body;
     
-    if (!id && !ticket_number) {
+    if (!id) {
       return NextResponse.json({
         success: false,
-        error: 'Missing ticket id or ticket_number'
+        error: 'Missing ticket id'
       }, { status: 400 });
     }
     
-    // Get existing ticket
-    let query = supabase.from('support_tickets').select('*');
-    if (id) query = query.eq('id', id);
-    if (ticket_number) query = query.eq('ticket_number', ticket_number);
+    // Update via REST API
+    const url = `${SUPABASE_URL}/rest/v1/support_tickets?id=eq.${id}`;
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(updates)
+    });
     
-    const { data: existing, error: getError } = await query.single();
-    if (getError || !existing) {
-      return NextResponse.json({ success: false, error: 'Ticket not found' }, { status: 404 });
-    }
-    
-    // Update ticket
-    const { data: ticket, error: updateError } = await supabase
-      .from('support_tickets')
-      .update(updates)
-      .eq('id', existing.id)
-      .select()
-      .single();
-    
-    if (updateError) throw updateError;
-    
-    // Log activity
-    const changedFields = Object.keys(updates).filter(key => existing[key] !== updates[key]);
-    for (const field of changedFields) {
-      await supabase.from('ticket_activity').insert({
-        ticket_id: existing.id,
-        action: `updated_${field}`,
-        actor_type: body.actor_type || 'system',
-        actor_id: body.actor_id,
-        actor_name: body.actor_name || 'System',
-        old_value: { [field]: existing[field] },
-        new_value: { [field]: updates[field] }
-      });
-    }
+    const ticket = await response.json();
     
     return NextResponse.json({
       success: true,
-      ticket
+      ticket: Array.isArray(ticket) ? ticket[0] : ticket
     });
     
   } catch (error) {
-    console.error('Update ticket error:', error);
+    console.error('PATCH ticket error:', error);
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update ticket'
@@ -597,72 +238,29 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-// ============ PUT - Add Comment to Ticket ============
-
+// ============ PUT - Add Comment ============
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { ticket_id, ticket_number, content, author_type, author_id, author_name, is_internal } = body;
+    const { ticket_id, content, author_type, author_name } = body;
     
-    if (!content) {
-      return NextResponse.json({ success: false, error: 'Missing content' }, { status: 400 });
+    if (!ticket_id || !content) {
+      return NextResponse.json({
+        success: false,
+        error: 'Missing ticket_id or content'
+      }, { status: 400 });
     }
     
-    // Get ticket
-    let ticketId = ticket_id;
-    if (!ticketId && ticket_number) {
-      const { data: ticket } = await supabase
-        .from('support_tickets')
-        .select('id')
-        .eq('ticket_number', ticket_number)
-        .single();
-      ticketId = ticket?.id;
-    }
-    
-    if (!ticketId) {
-      return NextResponse.json({ success: false, error: 'Ticket not found' }, { status: 404 });
-    }
-    
-    // Add comment
-    const { data: comment, error } = await supabase
-      .from('ticket_comments')
-      .insert({
-        ticket_id: ticketId,
+    const comment = await supabaseQuery('ticket_comments', {
+      method: 'POST',
+      body: {
+        ticket_id,
         author_type: author_type || 'user',
-        author_id,
         author_name: author_name || 'User',
         content,
-        is_internal: is_internal || false
-      })
-      .select()
-      .single();
-    
-    if (error) throw error;
-    
-    // Update ticket if user replied
-    if (author_type === 'user') {
-      const { data: ticket } = await supabase
-        .from('support_tickets')
-        .select('status')
-        .eq('id', ticketId)
-        .single();
-      
-      if (ticket?.status === 'awaiting_user') {
-        await supabase
-          .from('support_tickets')
-          .update({ status: 'in_progress' })
-          .eq('id', ticketId);
-      }
-    }
-    
-    // Log activity
-    await supabase.from('ticket_activity').insert({
-      ticket_id: ticketId,
-      action: 'comment_added',
-      actor_type: author_type || 'user',
-      actor_id,
-      actor_name: author_name || 'User',
-      new_value: { comment_id: comment.id }
+        is_internal: false
+      },
+      single: true
     });
     
     return NextResponse.json({
@@ -671,7 +269,7 @@ export async function PUT(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('Add comment error:', error);
+    console.error('PUT comment error:', error);
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to add comment'

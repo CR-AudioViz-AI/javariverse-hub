@@ -1,76 +1,95 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(request: NextRequest) {
+// Allowed apps for cross-app SSO redirects
+const ALLOWED_DOMAINS = [
+  'cravcards.com',
+  'javariai.com',
+  'craudiovizai.com',
+  'localhost:3000',
+  'localhost:3001',
+  'localhost:3002',
+  // Add Vercel preview URLs
+  '.vercel.app',
+];
+
+function isAllowedRedirect(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return ALLOWED_DOMAINS.some(domain => {
+      if (domain.startsWith('.')) {
+        return parsed.hostname.endsWith(domain);
+      }
+      return parsed.hostname === domain || parsed.hostname.endsWith('.' + domain);
+    });
+  } catch {
+    return false;
+  }
+}
+
+export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const returnUrl = requestUrl.searchParams.get('return') || '/'
-  const appId = requestUrl.searchParams.get('app') || 'main'
+  const redirect = requestUrl.searchParams.get('redirect')
+  const origin = requestUrl.origin
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies })
-    
+    const supabase = createClient()
+
     // Exchange code for session
-    const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
-    if (error) {
-      console.error('Auth callback error:', error)
-      return NextResponse.redirect(`${requestUrl.origin}/auth/error?message=${error.message}`)
-    }
-
-    if (session) {
-      // Ensure user profile exists with initial credits
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', session.user.id)
-        .single()
-
-      if (!existingProfile) {
-        // Create new profile with 1000 free credits
-        await supabase.from('profiles').insert({
-          id: session.user.id,
-          email: session.user.email,
-          name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || null,
-          avatar_url: session.user.user_metadata?.avatar_url || null,
-          credits_balance: 1000,
-          plan: 'free',
-          created_at: new Date().toISOString(),
-        })
-
-        // Record initial credit grant
-        await supabase.from('credit_transactions').insert({
-          user_id: session.user.id,
-          amount: 1000,
-          transaction_type: 'bonus',
-          description: 'Welcome bonus - 1000 free credits!',
-          app_id: appId,
-        })
-      }
-
-      // Update last login
-      await supabase
-        .from('profiles')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', session.user.id)
-
-      // Generate cross-domain token for the app
-      const token = session.access_token
-
-      // Determine redirect
-      if (returnUrl.startsWith('http')) {
-        // External app - include token in URL
-        const redirectUrl = new URL(returnUrl)
-        redirectUrl.searchParams.set('token', token)
+    if (!error && data.session) {
+      const user = data.user
+      const session = data.session
+      
+      // Check if redirect is to an external app
+      if (redirect && isAllowedRedirect(redirect)) {
+        // Build redirect URL with auth tokens for cross-app SSO
+        const redirectUrl = new URL(redirect)
+        
+        // Add tokens as URL params (the receiving app will consume these)
+        redirectUrl.searchParams.set('access_token', session.access_token)
+        redirectUrl.searchParams.set('refresh_token', session.refresh_token)
+        redirectUrl.searchParams.set('expires_at', session.expires_at?.toString() || '')
+        
         return NextResponse.redirect(redirectUrl.toString())
-      } else {
-        // Same domain - just redirect
-        return NextResponse.redirect(`${requestUrl.origin}${returnUrl}`)
       }
+      
+      // Check if user is admin for internal redirects
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin, role')
+          .eq('id', user.id)
+          .single()
+
+        // Create or update profile if it doesn't exist
+        if (!profile) {
+          await supabase.from('profiles').upsert({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || user.user_metadata?.name || '',
+            avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || '',
+            is_admin: false,
+            role: 'user',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+        }
+
+        // Redirect based on role
+        if (profile?.is_admin) {
+          return NextResponse.redirect(`${origin}/admin`)
+        }
+      }
+      
+      // Default redirect to dashboard
+      return NextResponse.redirect(`${origin}/dashboard`)
     }
   }
 
-  // No code - redirect to login
-  return NextResponse.redirect(`${requestUrl.origin}/auth/login`)
+  // Return to login on error
+  return NextResponse.redirect(`${origin}/login?error=auth_failed`)
 }

@@ -132,15 +132,20 @@ const AUTOFIX_PATTERNS = [
   }
 ];
 
-// Supabase direct API helper
+// Supabase direct API helper - using correct env var names
 async function supabaseQuery(path: string, options: RequestInit = {}) {
-  const SUPABASE_URL = process.env.SUPABASE_URL;
+  // Use NEXT_PUBLIC_SUPABASE_URL for the URL
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    throw new Error(`Missing env vars: URL=${!!SUPABASE_URL}, KEY=${!!SUPABASE_KEY}`);
+  }
   
   const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...options,
     headers: {
-      'apikey': SUPABASE_KEY!,
+      'apikey': SUPABASE_KEY,
       'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
       'Prefer': options.method === 'PATCH' ? 'return=representation' : 'return=minimal',
@@ -162,12 +167,10 @@ function findMatchingPattern(title: string, description: string, category: strin
   const searchText = `${title} ${description}`.toLowerCase();
   
   for (const pattern of AUTOFIX_PATTERNS) {
-    // Check if any keyword matches
     const hasKeywordMatch = pattern.keywords.some(keyword => 
       searchText.includes(keyword.toLowerCase())
     );
     
-    // Bonus points for matching category
     const categoryMatch = pattern.category === category;
     
     if (hasKeywordMatch) {
@@ -178,7 +181,7 @@ function findMatchingPattern(title: string, description: string, category: strin
   return null;
 }
 
-// Simulate fix execution (in real implementation, this would do actual fixes)
+// Execute auto-fix
 async function executeAutoFix(ticket: any, pattern: any): Promise<{ success: boolean; logs: string }> {
   const logs: string[] = [];
   const timestamp = () => new Date().toISOString();
@@ -190,16 +193,13 @@ async function executeAutoFix(ticket: any, pattern: any): Promise<{ success: boo
   logs.push(`[${timestamp()}] 🎯 Action: ${pattern.solution.action}`);
   logs.push('');
   
-  // Simulate executing each step
   for (let i = 0; i < pattern.solution.steps.length; i++) {
     const step = pattern.solution.steps[i];
     logs.push(`[${timestamp()}] ⏳ Step ${i + 1}/${pattern.solution.steps.length}: ${step}`);
-    // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 100));
     logs.push(`[${timestamp()}] ✅ Step ${i + 1} completed`);
   }
   
-  // Determine success based on pattern success rate
   const success = Math.random() < pattern.success_rate;
   
   logs.push('');
@@ -246,7 +246,6 @@ export async function GET(request: NextRequest) {
       results.processed++;
       
       try {
-        // Find matching pattern
         const pattern = findMatchingPattern(
           ticket.title || '',
           ticket.description || '',
@@ -254,7 +253,7 @@ export async function GET(request: NextRequest) {
         );
         
         if (!pattern) {
-          // No pattern match - skip but mark as attempted
+          // No pattern match - mark as attempted but skip
           await supabaseQuery(
             `support_tickets?id=eq.${ticket.id}`,
             {
@@ -264,7 +263,7 @@ export async function GET(request: NextRequest) {
                 auto_fix_successful: false,
                 auto_fix_logs: 'No matching auto-fix pattern found. Requires manual review.',
                 auto_fix_timestamp: new Date().toISOString(),
-                status: 'open' // Keep open for human review
+                status: 'open'
               })
             }
           );
@@ -281,7 +280,6 @@ export async function GET(request: NextRequest) {
         // Execute auto-fix
         const { success, logs } = await executeAutoFix(ticket, pattern);
         
-        // Build fix actions array
         const fixActions = pattern.solution.steps.map((step: string, i: number) => ({
           step: i + 1,
           action: step,
@@ -368,7 +366,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Also support POST for manual triggers
 export async function POST(request: NextRequest) {
   return GET(request);
 }

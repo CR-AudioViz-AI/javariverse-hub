@@ -12,7 +12,7 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, Download, AlertCircle, Check, Loader2, Lock } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { PATTERN_CREDITS } from '@/app/hobbies/crochet/page';
+import { PATTERN_CREDITS } from '@/lib/crochet/constants';
 
 // Pattern templates and generation logic
 import { 

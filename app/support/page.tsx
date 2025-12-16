@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 // ============ TYPES ============
-
 interface Ticket {
   id: string;
   ticket_number: string;
@@ -12,8 +11,19 @@ interface Ticket {
   category: string;
   priority: string;
   status: string;
-  auto_fix_successful?: boolean;
-  resolution?: string;
+  source_app: string;
+  user_email: string;
+  user_name: string;
+  auto_fix_attempted: boolean;
+  auto_fix_successful: boolean | null;
+  auto_fix_actions: any[];
+  auto_fix_logs: string;
+  auto_fix_timestamp: string;
+  assigned_bot: string;
+  resolution: string;
+  resolution_type: string;
+  resolved_by: string;
+  resolved_at: string;
   created_at: string;
   updated_at: string;
 }
@@ -23,46 +33,86 @@ interface Enhancement {
   request_number: string;
   title: string;
   description: string;
+  use_case: string;
+  expected_benefit: string;
   category: string;
   priority: string;
   status: string;
-  approval_status?: string;
+  source_app: string;
+  user_email: string;
+  user_name: string;
+  ai_analysis: any;
+  ai_implementation_plan: string;
+  ai_estimated_effort: string;
+  ai_estimated_complexity: string;
+  ai_recommendations: string;
+  approval_status: string;
   upvotes: number;
-  ai_estimated_complexity?: string;
-  ai_recommendations?: string;
+  downvotes: number;
+  view_count: number;
   created_at: string;
+  updated_at: string;
 }
 
-interface Comment {
-  id: string;
-  author_type: string;
-  author_name: string;
-  content: string;
-  created_at: string;
-}
+// ============ STATUS CONFIGURATIONS ============
+const TICKET_STATUSES = [
+  { key: 'open', label: 'Open', color: 'bg-blue-500', icon: '📥' },
+  { key: 'auto_fixing', label: 'Auto-Fixing', color: 'bg-yellow-500', icon: '🤖' },
+  { key: 'in_progress', label: 'In Progress', color: 'bg-purple-500', icon: '🔧' },
+  { key: 'awaiting_user', label: 'Awaiting User', color: 'bg-orange-500', icon: '⏳' },
+  { key: 'resolved', label: 'Resolved', color: 'bg-green-500', icon: '✅' },
+  { key: 'escalated', label: 'Escalated', color: 'bg-red-500', icon: '🚨' },
+  { key: 'closed', label: 'Closed', color: 'bg-gray-500', icon: '📁' },
+];
 
-// ============ COMPONENT ============
+const ENHANCEMENT_STATUSES = [
+  { key: 'submitted', label: 'Submitted', color: 'bg-blue-500', icon: '📝' },
+  { key: 'under_review', label: 'Under Review', color: 'bg-yellow-500', icon: '🔍' },
+  { key: 'analysis_complete', label: 'Analyzed', color: 'bg-indigo-500', icon: '🧠' },
+  { key: 'approved', label: 'Approved', color: 'bg-green-500', icon: '✅' },
+  { key: 'in_development', label: 'In Development', color: 'bg-purple-500', icon: '💻' },
+  { key: 'testing', label: 'Testing', color: 'bg-cyan-500', icon: '🧪' },
+  { key: 'deployed', label: 'Deployed', color: 'bg-emerald-500', icon: '🚀' },
+  { key: 'rejected', label: 'Rejected', color: 'bg-red-500', icon: '❌' },
+  { key: 'deferred', label: 'Deferred', color: 'bg-gray-500', icon: '⏸️' },
+];
 
+const PRIORITY_COLORS: Record<string, string> = {
+  critical: 'bg-red-600 text-white',
+  high: 'bg-orange-500 text-white',
+  medium: 'bg-yellow-500 text-black',
+  low: 'bg-gray-400 text-white',
+};
+
+const CATEGORY_ICONS: Record<string, string> = {
+  bug: '🐛',
+  error: '❌',
+  question: '❓',
+  account: '👤',
+  billing: '💳',
+  feature: '✨',
+  performance: '⚡',
+  security: '🔒',
+  improvement: '📈',
+  integration: '🔗',
+  ui_ux: '🎨',
+  automation: '🤖',
+  api: '🔌',
+  other: '📋',
+};
+
+// ============ MAIN COMPONENT ============
 export default function SupportDashboard() {
   const [activeTab, setActiveTab] = useState<'tickets' | 'enhancements'>('tickets');
+  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [enhancements, setEnhancements] = useState<Enhancement[]>([]);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: 'bug',
-    priority: 'medium',
-    use_case: '',
-    expected_benefit: ''
-  });
-  const [newComment, setNewComment] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<Ticket | Enhancement | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showNewForm, setShowNewForm] = useState(false);
+  const [stats, setStats] = useState<any>({});
 
-  // Fetch data on mount
+  // Fetch data
   useEffect(() => {
     fetchData();
   }, [activeTab]);
@@ -71,533 +121,808 @@ export default function SupportDashboard() {
     setLoading(true);
     try {
       if (activeTab === 'tickets') {
-        const res = await fetch('/api/tickets?limit=50');
+        const res = await fetch('/api/tickets');
         const data = await res.json();
-        if (data.success) setTickets(data.tickets || []);
+        if (data.success) {
+          setTickets(data.tickets || []);
+          setStats(data.stats || {});
+        }
       } else {
-        const res = await fetch('/api/enhancements?limit=50');
+        const res = await fetch('/api/enhancements');
         const data = await res.json();
-        if (data.success) setEnhancements(data.enhancements || []);
+        if (data.success) {
+          setEnhancements(data.enhancements || []);
+          setStats(data.stats || {});
+        }
       }
-    } catch (e) {
-      console.error('Fetch error:', e);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
     }
     setLoading(false);
   };
 
-  const fetchItemDetails = async (id: string, type: 'ticket' | 'enhancement') => {
-    try {
-      const endpoint = type === 'ticket' ? '/api/tickets' : '/api/enhancements';
-      const res = await fetch(`${endpoint}?id=${id}&include_comments=true`);
-      const data = await res.json();
-      if (data.success) {
-        setSelectedItem(type === 'ticket' ? data.ticket : data.enhancement);
-        setComments(data.comments || []);
-      }
-    } catch (e) {
-      console.error('Fetch details error:', e);
+  const getStatusConfig = (status: string) => {
+    const configs = activeTab === 'tickets' ? TICKET_STATUSES : ENHANCEMENT_STATUSES;
+    return configs.find(s => s.key === status) || { key: status, label: status, color: 'bg-gray-500', icon: '📋' };
+  };
+
+  const getItemsByStatus = (status: string) => {
+    if (activeTab === 'tickets') {
+      return tickets.filter(t => t.status === status);
+    } else {
+      return enhancements.filter(e => e.status === status);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-
-    try {
-      const endpoint = activeTab === 'tickets' ? '/api/tickets' : '/api/enhancements';
-      const body = activeTab === 'tickets'
-        ? {
-            title: formData.title,
-            description: formData.description,
-            category: formData.category,
-            priority: formData.priority
-          }
-        : {
-            title: formData.title,
-            description: formData.description,
-            category: formData.category,
-            priority: formData.priority,
-            use_case: formData.use_case,
-            expected_benefit: formData.expected_benefit
-          };
-
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setShowForm(false);
-        setFormData({
-          title: '',
-          description: '',
-          category: 'bug',
-          priority: 'medium',
-          use_case: '',
-          expected_benefit: ''
-        });
-        fetchData();
-        alert(`${activeTab === 'tickets' ? 'Ticket' : 'Enhancement'} submitted! ${data.ticket?.ticket_number || data.enhancement?.request_number}`);
-      } else {
-        alert('Error: ' + data.error);
-      }
-    } catch (e) {
-      alert('Failed to submit');
-    }
-    setSubmitting(false);
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleString();
   };
 
-  const handleAddComment = async () => {
-    if (!newComment.trim() || !selectedItem) return;
-    setSubmitting(true);
-
-    try {
-      const endpoint = activeTab === 'tickets' ? '/api/tickets' : '/api/enhancements';
-      const idField = activeTab === 'tickets' ? 'ticket_id' : 'enhancement_id';
-      
-      const res = await fetch(endpoint, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          [idField]: selectedItem.id,
-          action: activeTab === 'tickets' ? undefined : 'comment',
-          content: newComment,
-          author_type: 'user',
-          author_name: 'User'
-        })
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setNewComment('');
-        fetchItemDetails(selectedItem.id, activeTab === 'tickets' ? 'ticket' : 'enhancement');
-      }
-    } catch (e) {
-      console.error('Comment error:', e);
-    }
-    setSubmitting(false);
+  const getTimeAgo = (dateString: string) => {
+    if (!dateString) return '';
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
   };
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      open: 'bg-blue-100 text-blue-800',
-      in_progress: 'bg-yellow-100 text-yellow-800',
-      auto_fixing: 'bg-purple-100 text-purple-800',
-      resolved: 'bg-green-100 text-green-800',
-      closed: 'bg-gray-100 text-gray-800',
-      escalated: 'bg-red-100 text-red-800',
-      submitted: 'bg-blue-100 text-blue-800',
-      under_review: 'bg-yellow-100 text-yellow-800',
-      analysis_complete: 'bg-purple-100 text-purple-800',
-      approved: 'bg-green-100 text-green-800',
-      rejected: 'bg-red-100 text-red-800'
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-  };
-
-  const getPriorityColor = (priority: string) => {
-    const colors: Record<string, string> = {
-      critical: 'text-red-600',
-      high: 'text-orange-600',
-      medium: 'text-yellow-600',
-      low: 'text-green-600'
-    };
-    return colors[priority] || 'text-gray-600';
-  };
-
-  const ticketCategories = ['bug', 'error', 'question', 'account', 'billing', 'feature', 'performance', 'security', 'other'];
-  const enhancementCategories = ['feature', 'improvement', 'integration', 'ui_ux', 'performance', 'automation', 'api', 'other'];
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Support Center</h1>
-              <p className="text-gray-600 text-sm">Submit tickets and enhancement requests</p>
-            </div>
-            <button
-              onClick={() => setShowForm(true)}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              {activeTab === 'tickets' ? 'New Ticket' : 'New Enhancement'}
-            </button>
-          </div>
+  // ============ KANBAN CARD ============
+  const KanbanCard = ({ item }: { item: Ticket | Enhancement }) => {
+    const isTicket = 'ticket_number' in item;
+    const number = isTicket ? (item as Ticket).ticket_number : (item as Enhancement).request_number;
+    const ticket = item as Ticket;
+    
+    return (
+      <div
+        onClick={() => setSelectedItem(item)}
+        className={`bg-white rounded-lg shadow-sm border-l-4 p-3 cursor-pointer hover:shadow-md transition-all ${
+          selectedItem?.id === item.id ? 'ring-2 ring-indigo-500' : ''
+        } ${
+          item.priority === 'critical' ? 'border-l-red-600' :
+          item.priority === 'high' ? 'border-l-orange-500' :
+          item.priority === 'medium' ? 'border-l-yellow-500' : 'border-l-gray-400'
+        }`}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between mb-2">
+          <span className="text-xs font-mono text-gray-500">{number}</span>
+          <span className={`text-xs px-1.5 py-0.5 rounded ${PRIORITY_COLORS[item.priority] || 'bg-gray-400'}`}>
+            {item.priority}
+          </span>
         </div>
-      </header>
-
-      {/* Tabs */}
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex gap-2 border-b">
-          <button
-            onClick={() => { setActiveTab('tickets'); setSelectedItem(null); }}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'tickets'
-                ? 'text-indigo-600 border-b-2 border-indigo-600'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            🎫 Support Tickets
-          </button>
-          <button
-            onClick={() => { setActiveTab('enhancements'); setSelectedItem(null); }}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'enhancements'
-                ? 'text-indigo-600 border-b-2 border-indigo-600'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            💡 Enhancement Requests
-          </button>
+        
+        {/* Title */}
+        <h4 className="font-medium text-sm text-gray-900 mb-2 line-clamp-2">{item.title}</h4>
+        
+        {/* Meta */}
+        <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+          <span>{CATEGORY_ICONS[item.category] || '📋'}</span>
+          <span className="capitalize">{item.category}</span>
+          <span className="text-gray-300">•</span>
+          <span>{item.source_app}</span>
+        </div>
+        
+        {/* Bot Status (for tickets) */}
+        {isTicket && ticket.assigned_bot && (
+          <div className={`text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${
+            ticket.auto_fix_successful === true ? 'bg-green-100 text-green-700' :
+            ticket.auto_fix_successful === false ? 'bg-red-100 text-red-700' :
+            ticket.auto_fix_attempted ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'
+          }`}>
+            <span>🤖</span>
+            <span>
+              {ticket.auto_fix_successful === true ? 'Auto-Fixed' :
+               ticket.auto_fix_successful === false ? 'Fix Failed' :
+               ticket.auto_fix_attempted ? 'Fixing...' : 'Bot Assigned'}
+            </span>
+          </div>
+        )}
+        
+        {/* Enhancement votes */}
+        {!isTicket && (
+          <div className="flex items-center gap-3 text-xs">
+            <span className="text-green-600">👍 {(item as Enhancement).upvotes || 0}</span>
+            <span className="text-red-600">👎 {(item as Enhancement).downvotes || 0}</span>
+            <span className="text-gray-500">👁️ {(item as Enhancement).view_count || 0}</span>
+          </div>
+        )}
+        
+        {/* Footer */}
+        <div className="flex items-center justify-between mt-2 pt-2 border-t text-xs text-gray-400">
+          <span>{item.user_name || item.user_email || 'Anonymous'}</span>
+          <span>{getTimeAgo(item.created_at)}</span>
         </div>
       </div>
+    );
+  };
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 pb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* List */}
-          <div className="lg:col-span-1 bg-white rounded-lg shadow overflow-hidden">
-            <div className="p-4 border-b bg-gray-50">
-              <h2 className="font-semibold text-gray-900">
-                {activeTab === 'tickets' ? 'Your Tickets' : 'Your Requests'}
-              </h2>
+  // ============ LIST ROW ============
+  const ListRow = ({ item }: { item: Ticket | Enhancement }) => {
+    const isTicket = 'ticket_number' in item;
+    const number = isTicket ? (item as Ticket).ticket_number : (item as Enhancement).request_number;
+    const statusConfig = getStatusConfig(item.status);
+    const ticket = item as Ticket;
+    
+    return (
+      <tr
+        onClick={() => setSelectedItem(item)}
+        className={`cursor-pointer hover:bg-gray-50 ${selectedItem?.id === item.id ? 'bg-indigo-50' : ''}`}
+      >
+        <td className="px-4 py-3">
+          <span className="font-mono text-sm text-gray-600">{number}</span>
+        </td>
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-2">
+            <span>{CATEGORY_ICONS[item.category] || '📋'}</span>
+            <div>
+              <div className="font-medium text-gray-900 line-clamp-1">{item.title}</div>
+              <div className="text-xs text-gray-500">{item.source_app}</div>
             </div>
-            
-            {loading ? (
-              <div className="p-8 text-center text-gray-500">Loading...</div>
-            ) : (
-              <div className="divide-y max-h-[600px] overflow-y-auto">
-                {(activeTab === 'tickets' ? tickets : enhancements).map((item: any) => (
-                  <div
-                    key={item.id}
-                    onClick={() => fetchItemDetails(item.id, activeTab === 'tickets' ? 'ticket' : 'enhancement')}
-                    className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
-                      selectedItem?.id === item.id ? 'bg-indigo-50 border-l-4 border-indigo-600' : ''
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-500 font-mono">
-                          {item.ticket_number || item.request_number}
-                        </p>
-                        <p className="font-medium text-gray-900 truncate">{item.title}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(item.status)}`}>
-                            {item.status.replace(/_/g, ' ')}
-                          </span>
-                          <span className={`text-xs font-medium ${getPriorityColor(item.priority)}`}>
-                            {item.priority}
-                          </span>
-                        </div>
-                      </div>
-                      {activeTab === 'tickets' && item.auto_fix_successful && (
-                        <span className="text-green-500" title="Auto-fixed">🤖✓</span>
-                      )}
-                      {activeTab === 'enhancements' && (
-                        <span className="text-sm text-gray-500">👍 {item.upvotes}</span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                
-                {(activeTab === 'tickets' ? tickets : enhancements).length === 0 && (
-                  <div className="p-8 text-center text-gray-500">
-                    No {activeTab} yet. Create one to get started!
-                  </div>
-                )}
-              </div>
-            )}
           </div>
+        </td>
+        <td className="px-4 py-3">
+          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium text-white ${statusConfig.color}`}>
+            <span>{statusConfig.icon}</span>
+            <span>{statusConfig.label}</span>
+          </span>
+        </td>
+        <td className="px-4 py-3">
+          <span className={`px-2 py-1 rounded text-xs font-medium ${PRIORITY_COLORS[item.priority]}`}>
+            {item.priority}
+          </span>
+        </td>
+        <td className="px-4 py-3">
+          {isTicket ? (
+            <div className="flex items-center gap-1">
+              {ticket.assigned_bot && (
+                <span className={`text-xs px-2 py-0.5 rounded ${
+                  ticket.auto_fix_successful === true ? 'bg-green-100 text-green-700' :
+                  ticket.auto_fix_successful === false ? 'bg-red-100 text-red-700' :
+                  'bg-blue-100 text-blue-700'
+                }`}>
+                  🤖 {ticket.auto_fix_successful === true ? 'Fixed' : ticket.auto_fix_successful === false ? 'Failed' : 'Assigned'}
+                </span>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-green-600">👍{(item as Enhancement).upvotes}</span>
+              <span className="text-red-600">👎{(item as Enhancement).downvotes}</span>
+            </div>
+          )}
+        </td>
+        <td className="px-4 py-3 text-sm text-gray-500">
+          {getTimeAgo(item.created_at)}
+        </td>
+      </tr>
+    );
+  };
 
-          {/* Detail View */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow">
-            {selectedItem ? (
-              <div className="h-full flex flex-col">
-                {/* Header */}
-                <div className="p-4 border-b">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500 font-mono">
-                        {selectedItem.ticket_number || selectedItem.request_number}
-                      </p>
-                      <h2 className="text-xl font-bold text-gray-900">{selectedItem.title}</h2>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className={`px-2 py-1 text-sm rounded-full ${getStatusColor(selectedItem.status)}`}>
-                          {selectedItem.status.replace(/_/g, ' ')}
-                        </span>
-                        <span className={`text-sm font-medium ${getPriorityColor(selectedItem.priority)}`}>
-                          ● {selectedItem.priority}
-                        </span>
-                        <span className="text-sm text-gray-500 px-2 py-1 bg-gray-100 rounded">
-                          {selectedItem.category}
-                        </span>
-                      </div>
+  // ============ DETAIL PANEL ============
+  const DetailPanel = () => {
+    if (!selectedItem) {
+      return (
+        <div className="h-full flex items-center justify-center text-gray-400">
+          <div className="text-center">
+            <div className="text-5xl mb-4">{activeTab === 'tickets' ? '🎫' : '💡'}</div>
+            <p>Select an item to view details</p>
+          </div>
+        </div>
+      );
+    }
+
+    const isTicket = 'ticket_number' in selectedItem;
+    const number = isTicket ? (selectedItem as Ticket).ticket_number : (selectedItem as Enhancement).request_number;
+    const statusConfig = getStatusConfig(selectedItem.status);
+    const ticket = selectedItem as Ticket;
+    const enhancement = selectedItem as Enhancement;
+
+    return (
+      <div className="h-full overflow-y-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b p-4 z-10">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-mono text-sm text-gray-500">{number}</span>
+                <span className={`px-2 py-0.5 rounded text-xs font-medium ${PRIORITY_COLORS[selectedItem.priority]}`}>
+                  {selectedItem.priority}
+                </span>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900">{selectedItem.title}</h2>
+            </div>
+            <button
+              onClick={() => setSelectedItem(null)}
+              className="p-1 hover:bg-gray-100 rounded"
+            >
+              ✕
+            </button>
+          </div>
+          
+          {/* Status Badge */}
+          <div className="flex items-center gap-3 mt-3">
+            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium text-white ${statusConfig.color}`}>
+              <span>{statusConfig.icon}</span>
+              <span>{statusConfig.label}</span>
+            </span>
+            <span className="text-sm text-gray-500">
+              {CATEGORY_ICONS[selectedItem.category]} {selectedItem.category}
+            </span>
+            <span className="text-sm text-gray-500">
+              📍 {selectedItem.source_app}
+            </span>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 space-y-6">
+          {/* Description */}
+          <section>
+            <h3 className="font-semibold text-gray-700 mb-2">📝 Description</h3>
+            <div className="bg-gray-50 rounded-lg p-4 text-gray-700 whitespace-pre-wrap">
+              {selectedItem.description}
+            </div>
+          </section>
+
+          {/* Bot Status (Tickets only) */}
+          {isTicket && ticket.assigned_bot && (
+            <section>
+              <h3 className="font-semibold text-gray-700 mb-2">🤖 Javari Auto-Fix Bot</h3>
+              <div className={`rounded-lg p-4 ${
+                ticket.auto_fix_successful === true ? 'bg-green-50 border border-green-200' :
+                ticket.auto_fix_successful === false ? 'bg-red-50 border border-red-200' :
+                'bg-blue-50 border border-blue-200'
+              }`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-2xl">
+                    {ticket.auto_fix_successful === true ? '✅' :
+                     ticket.auto_fix_successful === false ? '❌' : '🔄'}
+                  </span>
+                  <div>
+                    <div className="font-medium">
+                      {ticket.auto_fix_successful === true ? 'Successfully Auto-Fixed!' :
+                       ticket.auto_fix_successful === false ? 'Auto-Fix Failed - Escalated' :
+                       ticket.auto_fix_attempted ? 'Auto-Fix In Progress...' : 'Bot Assigned'}
                     </div>
-                    <button
-                      onClick={() => setSelectedItem(null)}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      ✕
-                    </button>
+                    <div className="text-sm text-gray-600">
+                      Bot: {ticket.assigned_bot}
+                    </div>
                   </div>
                 </div>
-
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {/* Description */}
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
-                    <p className="text-gray-700 whitespace-pre-wrap">{selectedItem.description}</p>
+                
+                {/* Resolution */}
+                {ticket.resolution && (
+                  <div className="mt-3 pt-3 border-t">
+                    <div className="text-sm font-medium text-gray-700 mb-1">Resolution:</div>
+                    <div className="text-sm text-gray-600">{ticket.resolution}</div>
                   </div>
-
-                  {/* Enhancement-specific fields */}
-                  {activeTab === 'enhancements' && (
-                    <>
-                      {selectedItem.use_case && (
-                        <div>
-                          <h3 className="font-semibold text-gray-900 mb-2">Use Case</h3>
-                          <p className="text-gray-700">{selectedItem.use_case}</p>
-                        </div>
-                      )}
-                      {selectedItem.expected_benefit && (
-                        <div>
-                          <h3 className="font-semibold text-gray-900 mb-2">Expected Benefit</h3>
-                          <p className="text-gray-700">{selectedItem.expected_benefit}</p>
-                        </div>
-                      )}
-                      {selectedItem.ai_recommendations && (
-                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                          <h3 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
-                            <span>🤖</span> Javari AI Analysis
-                          </h3>
-                          <p className="text-purple-800 text-sm">{selectedItem.ai_recommendations}</p>
-                          {selectedItem.ai_estimated_complexity && (
-                            <p className="text-purple-700 text-sm mt-2">
-                              <strong>Complexity:</strong> {selectedItem.ai_estimated_complexity}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {/* Resolution (for tickets) */}
-                  {activeTab === 'tickets' && selectedItem.resolution && (
-                    <div className={`p-4 rounded-lg ${selectedItem.auto_fix_successful ? 'bg-green-50 border border-green-200' : 'bg-blue-50 border border-blue-200'}`}>
-                      <h3 className="font-semibold mb-2 flex items-center gap-2">
-                        {selectedItem.auto_fix_successful ? '🤖 Auto-Fixed' : '✅ Resolution'}
-                      </h3>
-                      <p className="text-gray-700">{selectedItem.resolution}</p>
-                    </div>
-                  )}
-
-                  {/* Comments */}
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-3">Activity & Comments</h3>
-                    <div className="space-y-3">
-                      {comments.map((comment) => (
-                        <div
-                          key={comment.id}
-                          className={`p-3 rounded-lg ${
-                            comment.author_type === 'bot'
-                              ? 'bg-purple-50 border border-purple-200'
-                              : comment.author_type === 'admin'
-                              ? 'bg-blue-50 border border-blue-200'
-                              : comment.author_type === 'system'
-                              ? 'bg-gray-50 border border-gray-200'
-                              : 'bg-white border border-gray-200'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="font-medium text-sm">
-                              {comment.author_type === 'bot' && '🤖 '}
-                              {comment.author_type === 'admin' && '👤 '}
-                              {comment.author_type === 'system' && '⚙️ '}
-                              {comment.author_name}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              {new Date(comment.created_at).toLocaleString()}
-                            </span>
-                          </div>
-                          <div className="text-sm text-gray-700 whitespace-pre-wrap prose prose-sm max-w-none">
-                            {comment.content}
-                          </div>
+                )}
+                
+                {/* Actions Taken */}
+                {ticket.auto_fix_actions && ticket.auto_fix_actions.length > 0 && (
+                  <div className="mt-3 pt-3 border-t">
+                    <div className="text-sm font-medium text-gray-700 mb-2">Actions Taken:</div>
+                    <div className="space-y-1">
+                      {ticket.auto_fix_actions.map((action: any, i: number) => (
+                        <div key={i} className="flex items-center gap-2 text-sm">
+                          <span className={action.status === 'completed' ? 'text-green-600' : 'text-yellow-600'}>
+                            {action.status === 'completed' ? '✓' : '○'}
+                          </span>
+                          <span>{action.action}</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
-
-                {/* Add Comment */}
-                <div className="p-4 border-t bg-gray-50">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Add a comment..."
-                      className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-                    />
-                    <button
-                      onClick={handleAddComment}
-                      disabled={submitting || !newComment.trim()}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Send
-                    </button>
+                )}
+                
+                {/* Logs */}
+                {ticket.auto_fix_logs && (
+                  <div className="mt-3 pt-3 border-t">
+                    <details>
+                      <summary className="text-sm font-medium text-gray-700 cursor-pointer">
+                        View Bot Logs
+                      </summary>
+                      <pre className="mt-2 text-xs bg-gray-900 text-green-400 p-3 rounded overflow-x-auto max-h-48">
+                        {ticket.auto_fix_logs}
+                      </pre>
+                    </details>
                   </div>
-                </div>
+                )}
+                
+                {ticket.auto_fix_timestamp && (
+                  <div className="mt-2 text-xs text-gray-500">
+                    Last action: {formatDate(ticket.auto_fix_timestamp)}
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="h-full flex items-center justify-center text-gray-500 p-8">
+            </section>
+          )}
+
+          {/* AI Analysis (Enhancements only) */}
+          {!isTicket && enhancement.ai_implementation_plan && (
+            <section>
+              <h3 className="font-semibold text-gray-700 mb-2">🧠 Javari AI Analysis</h3>
+              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                {enhancement.ai_estimated_complexity && (
+                  <div className="flex items-center gap-4 mb-3">
+                    <div>
+                      <span className="text-xs text-gray-500">Complexity</span>
+                      <div className="font-medium capitalize">{enhancement.ai_estimated_complexity}</div>
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-500">Effort</span>
+                      <div className="font-medium">{enhancement.ai_estimated_effort || 'TBD'}</div>
+                    </div>
+                  </div>
+                )}
+                
+                {enhancement.ai_implementation_plan && (
+                  <div className="mb-3">
+                    <div className="text-sm font-medium text-gray-700 mb-1">Implementation Plan:</div>
+                    <div className="text-sm text-gray-600 whitespace-pre-wrap">
+                      {enhancement.ai_implementation_plan}
+                    </div>
+                  </div>
+                )}
+                
+                {enhancement.ai_recommendations && (
+                  <div>
+                    <div className="text-sm font-medium text-gray-700 mb-1">Recommendations:</div>
+                    <div className="text-sm text-gray-600">{enhancement.ai_recommendations}</div>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Use Case (Enhancements only) */}
+          {!isTicket && enhancement.use_case && (
+            <section>
+              <h3 className="font-semibold text-gray-700 mb-2">💼 Use Case</h3>
+              <div className="bg-gray-50 rounded-lg p-4 text-gray-700">
+                {enhancement.use_case}
+              </div>
+            </section>
+          )}
+
+          {/* Voting (Enhancements only) */}
+          {!isTicket && (
+            <section>
+              <h3 className="font-semibold text-gray-700 mb-2">📊 Community Feedback</h3>
+              <div className="flex items-center gap-6">
                 <div className="text-center">
-                  <div className="text-4xl mb-4">{activeTab === 'tickets' ? '🎫' : '💡'}</div>
-                  <p>Select a {activeTab === 'tickets' ? 'ticket' : 'request'} to view details</p>
+                  <div className="text-3xl">👍</div>
+                  <div className="font-bold text-green-600">{enhancement.upvotes || 0}</div>
+                  <div className="text-xs text-gray-500">upvotes</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl">👎</div>
+                  <div className="font-bold text-red-600">{enhancement.downvotes || 0}</div>
+                  <div className="text-xs text-gray-500">downvotes</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl">👁️</div>
+                  <div className="font-bold text-gray-600">{enhancement.view_count || 0}</div>
+                  <div className="text-xs text-gray-500">views</div>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
+            </section>
+          )}
 
-      {/* Create Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold">
-                  {activeTab === 'tickets' ? '🎫 Create Support Ticket' : '💡 Request Enhancement'}
-                </h2>
-                <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600">
-                  ✕
-                </button>
-              </div>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Metadata */}
+          <section>
+            <h3 className="font-semibold text-gray-700 mb-2">📋 Details</h3>
+            <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-2 gap-4 text-sm">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder={activeTab === 'tickets' ? 'Brief description of the issue' : 'What would you like to see?'}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                />
+                <span className="text-gray-500">Submitted by:</span>
+                <div className="font-medium">{selectedItem.user_name || selectedItem.user_email || 'Anonymous'}</div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  >
-                    {(activeTab === 'tickets' ? ticketCategories : enhancementCategories).map(cat => (
-                      <option key={cat} value={cat}>{cat.replace(/_/g, ' ')}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                  <select
-                    value={formData.priority}
-                    onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
-                  </select>
-                </div>
-              </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-                <textarea
-                  required
-                  rows={4}
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder={activeTab === 'tickets' 
-                    ? 'Describe the issue in detail. Include steps to reproduce if applicable.'
-                    : 'Describe the enhancement in detail. What problem does it solve?'
-                  }
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                />
+                <span className="text-gray-500">Email:</span>
+                <div className="font-medium">{selectedItem.user_email || 'N/A'}</div>
               </div>
-
-              {activeTab === 'enhancements' && (
+              <div>
+                <span className="text-gray-500">Created:</span>
+                <div className="font-medium">{formatDate(selectedItem.created_at)}</div>
+              </div>
+              <div>
+                <span className="text-gray-500">Updated:</span>
+                <div className="font-medium">{formatDate(selectedItem.updated_at)}</div>
+              </div>
+              {isTicket && ticket.resolved_at && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Use Case</label>
-                    <textarea
-                      rows={2}
-                      value={formData.use_case}
-                      onChange={(e) => setFormData({ ...formData, use_case: e.target.value })}
-                      placeholder="How would you use this feature?"
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                    />
+                    <span className="text-gray-500">Resolved at:</span>
+                    <div className="font-medium">{formatDate(ticket.resolved_at)}</div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Expected Benefit</label>
-                    <textarea
-                      rows={2}
-                      value={formData.expected_benefit}
-                      onChange={(e) => setFormData({ ...formData, expected_benefit: e.target.value })}
-                      placeholder="What benefit would this provide?"
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                    />
+                    <span className="text-gray-500">Resolved by:</span>
+                    <div className="font-medium">{ticket.resolved_by || 'N/A'}</div>
                   </div>
                 </>
               )}
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  };
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
-                {activeTab === 'tickets' ? (
+  // ============ NEW ITEM FORM ============
+  const NewItemForm = () => {
+    const [formData, setFormData] = useState({
+      title: '',
+      description: '',
+      category: 'other',
+      priority: 'medium',
+      use_case: '',
+      source_app: 'platform',
+      user_email: '',
+      user_name: '',
+    });
+    const [submitting, setSubmitting] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setSubmitting(true);
+      
+      try {
+        const endpoint = activeTab === 'tickets' ? '/api/tickets' : '/api/enhancements';
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+        
+        const data = await res.json();
+        if (data.success) {
+          setShowNewForm(false);
+          fetchData();
+          alert(`${activeTab === 'tickets' ? 'Ticket' : 'Enhancement'} created: ${data.ticket?.ticket_number || data.enhancement?.request_number}`);
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (error) {
+        alert('Failed to submit');
+      }
+      setSubmitting(false);
+    };
+
+    const categories = activeTab === 'tickets' 
+      ? ['bug', 'error', 'question', 'account', 'billing', 'feature', 'performance', 'security', 'other']
+      : ['feature', 'improvement', 'integration', 'ui_ux', 'performance', 'automation', 'api', 'other'];
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+            <h2 className="text-xl font-bold">
+              {activeTab === 'tickets' ? '🎫 New Ticket' : '💡 New Enhancement Request'}
+            </h2>
+            <button onClick={() => setShowNewForm(false)} className="p-2 hover:bg-gray-100 rounded">✕</button>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+              <input
+                type="text"
+                required
+                value={formData.title}
+                onChange={e => setFormData({...formData, title: e.target.value})}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                placeholder={activeTab === 'tickets' ? 'Brief description of the issue' : 'What feature would you like?'}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+              <textarea
+                required
+                rows={4}
+                value={formData.description}
+                onChange={e => setFormData({...formData, description: e.target.value})}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                placeholder={activeTab === 'tickets' ? 'Detailed description of what happened...' : 'Describe the feature in detail...'}
+              />
+            </div>
+            
+            {activeTab === 'enhancements' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Use Case</label>
+                <textarea
+                  rows={2}
+                  value={formData.use_case}
+                  onChange={e => setFormData({...formData, use_case: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  placeholder="How would you use this feature?"
+                />
+              </div>
+            )}
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                <select
+                  value={formData.category}
+                  onChange={e => setFormData({...formData, category: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                >
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{CATEGORY_ICONS[cat]} {cat}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                <select
+                  value={formData.priority}
+                  onChange={e => setFormData({...formData, priority: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="low">🟢 Low</option>
+                  <option value="medium">🟡 Medium</option>
+                  <option value="high">🟠 High</option>
+                  <option value="critical">🔴 Critical</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                <input
+                  type="text"
+                  value={formData.user_name}
+                  onChange={e => setFormData({...formData, user_name: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  placeholder="John Doe"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
+                <input
+                  type="email"
+                  value={formData.user_email}
+                  onChange={e => setFormData({...formData, user_email: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  placeholder="john@example.com"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Source App</label>
+              <select
+                value={formData.source_app}
+                onChange={e => setFormData({...formData, source_app: e.target.value})}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="platform">🌐 Platform</option>
+                <option value="javari">🤖 Javari AI</option>
+                <option value="tools">🛠️ Tools</option>
+                <option value="games">🎮 Games</option>
+                <option value="billing">💳 Billing</option>
+              </select>
+            </div>
+            
+            <div className="pt-4 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowNewForm(false)}
+                className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {submitting ? 'Submitting...' : 'Submit'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+  // ============ MAIN RENDER ============
+  const statuses = activeTab === 'tickets' ? TICKET_STATUSES : ENHANCEMENT_STATUSES;
+  const items = activeTab === 'tickets' ? tickets : enhancements;
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-20">
+        <div className="max-w-[1800px] mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Support Center</h1>
+              <p className="text-gray-500 text-sm">Track tickets and enhancement requests</p>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              {/* Stats */}
+              <div className="hidden md:flex items-center gap-4 text-sm">
+                <div className="text-center px-3">
+                  <div className="font-bold text-xl">{stats.total || 0}</div>
+                  <div className="text-gray-500">Total</div>
+                </div>
+                {activeTab === 'tickets' && (
                   <>
-                    <strong>🤖 Auto-Fix Enabled:</strong> Javari will automatically attempt to resolve your issue.
-                    If it can't be auto-fixed, it will be escalated to our team.
-                  </>
-                ) : (
-                  <>
-                    <strong>🤖 AI Analysis:</strong> Javari will analyze your request and provide a detailed
-                    implementation plan, estimated effort, and potential impacts for review.
+                    <div className="text-center px-3 border-l">
+                      <div className="font-bold text-xl text-green-600">{stats.autoFixed || 0}</div>
+                      <div className="text-gray-500">Auto-Fixed</div>
+                    </div>
+                    <div className="text-center px-3 border-l">
+                      <div className="font-bold text-xl text-blue-600">{stats.byStatus?.open || 0}</div>
+                      <div className="text-gray-500">Open</div>
+                    </div>
                   </>
                 )}
               </div>
-
-              <div className="flex justify-end gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-                >
-                  {submitting ? 'Submitting...' : 'Submit'}
-                </button>
-              </div>
-            </form>
+              
+              <button
+                onClick={() => setShowNewForm(true)}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
+              >
+                <span>+</span>
+                <span>New {activeTab === 'tickets' ? 'Ticket' : 'Enhancement'}</span>
+              </button>
+            </div>
+          </div>
+          
+          {/* Tabs and View Toggle */}
+          <div className="flex items-center justify-between mt-4">
+            <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+              <button
+                onClick={() => { setActiveTab('tickets'); setSelectedItem(null); }}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  activeTab === 'tickets' ? 'bg-white shadow text-indigo-600' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                🎫 Tickets
+              </button>
+              <button
+                onClick={() => { setActiveTab('enhancements'); setSelectedItem(null); }}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  activeTab === 'enhancements' ? 'bg-white shadow text-indigo-600' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                💡 Enhancements
+              </button>
+            </div>
+            
+            <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+              <button
+                onClick={() => setViewMode('kanban')}
+                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                  viewMode === 'kanban' ? 'bg-white shadow' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                📋 Kanban
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                  viewMode === 'list' ? 'bg-white shadow' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                📝 List
+              </button>
+            </div>
           </div>
         </div>
-      )}
+      </header>
+
+      {/* Main Content */}
+      <div className="max-w-[1800px] mx-auto p-4">
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-500">Loading...</p>
+            </div>
+          </div>
+        ) : viewMode === 'kanban' ? (
+          /* KANBAN VIEW */
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {/* Kanban Columns */}
+            <div className="flex gap-4 min-w-max">
+              {statuses.map(status => {
+                const statusItems = getItemsByStatus(status.key);
+                return (
+                  <div key={status.key} className="w-80 flex-shrink-0">
+                    {/* Column Header */}
+                    <div className={`${status.color} text-white rounded-t-lg px-4 py-3 flex items-center justify-between`}>
+                      <div className="flex items-center gap-2">
+                        <span>{status.icon}</span>
+                        <span className="font-medium">{status.label}</span>
+                      </div>
+                      <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">
+                        {statusItems.length}
+                      </span>
+                    </div>
+                    
+                    {/* Column Content */}
+                    <div className="bg-gray-200/50 rounded-b-lg p-2 min-h-[500px] space-y-2">
+                      {statusItems.length === 0 ? (
+                        <div className="text-center py-8 text-gray-400 text-sm">
+                          No items
+                        </div>
+                      ) : (
+                        statusItems.map((item: any) => (
+                          <KanbanCard key={item.id} item={item} />
+                        ))
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Detail Panel (Fixed on right) */}
+            {selectedItem && (
+              <div className="w-[500px] flex-shrink-0 bg-white rounded-lg shadow-lg sticky top-24 h-[calc(100vh-120px)] overflow-hidden">
+                <DetailPanel />
+              </div>
+            )}
+          </div>
+        ) : (
+          /* LIST VIEW */
+          <div className="flex gap-4">
+            {/* Table */}
+            <div className={`bg-white rounded-lg shadow overflow-hidden ${selectedItem ? 'flex-1' : 'w-full'}`}>
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ID</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Title</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Priority</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                      {activeTab === 'tickets' ? 'Bot' : 'Votes'}
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Created</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {items.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-12 text-center text-gray-500">
+                        No {activeTab} yet. Create one to get started!
+                      </td>
+                    </tr>
+                  ) : (
+                    items.map((item: any) => <ListRow key={item.id} item={item} />)
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Detail Panel */}
+            {selectedItem && (
+              <div className="w-[500px] flex-shrink-0 bg-white rounded-lg shadow-lg h-[calc(100vh-200px)] overflow-hidden">
+                <DetailPanel />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* New Item Form Modal */}
+      {showNewForm && <NewItemForm />}
     </div>
   );
 }

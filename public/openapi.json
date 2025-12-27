@@ -1,0 +1,214 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CRAIverse API",
+    "description": "API documentation for CR AudioViz AI ecosystem - Your Story. Our Design.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "CR AudioViz AI Support",
+      "email": "support@craudiovizai.com",
+      "url": "https://craudiovizai.com"
+    }
+  },
+  "servers": [
+    { "url": "https://craudiovizai.com/api", "description": "Production" },
+    { "url": "https://crav-javari.vercel.app/api", "description": "Javari AI" }
+  ],
+  "tags": [
+    { "name": "Authentication", "description": "User authentication endpoints" },
+    { "name": "Credits", "description": "Credit management and purchases" },
+    { "name": "Subscriptions", "description": "Subscription management" },
+    { "name": "Javari AI", "description": "AI assistant endpoints" },
+    { "name": "Market Oracle", "description": "Stock analysis and predictions" },
+    { "name": "Marketplace", "description": "CravBarrels/CardVerse marketplaces" }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 8 }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/credits/balance": {
+      "get": {
+        "tags": ["Credits"],
+        "summary": "Get user credit balance",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Credit balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "balance": { "type": "integer" },
+                    "lifetimeEarned": { "type": "integer" },
+                    "lifetimeSpent": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credits/purchase": {
+      "post": {
+        "tags": ["Credits"],
+        "summary": "Purchase credits",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "packageId": { "type": "string", "enum": ["small", "medium", "large", "xlarge"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Checkout URL returned" }
+        }
+      }
+    },
+    "/javari/chat": {
+      "post": {
+        "tags": ["Javari AI"],
+        "summary": "Send message to Javari AI",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": { "type": "string" },
+                  "conversationId": { "type": "string" },
+                  "context": { "type": "object" }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "response": { "type": "string" },
+                    "conversationId": { "type": "string" },
+                    "creditsUsed": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/market-oracle/analyze": {
+      "post": {
+        "tags": ["Market Oracle"],
+        "summary": "AI stock analysis",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "symbol": { "type": "string" },
+                  "analysisType": { "type": "string", "enum": ["quick", "detailed", "comprehensive", "prediction"] }
+                },
+                "required": ["symbol"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Analysis result" },
+          "402": { "description": "Insufficient credits" },
+          "403": { "description": "Premium feature - upgrade required" }
+        }
+      }
+    },
+    "/marketplace/listings": {
+      "get": {
+        "tags": ["Marketplace"],
+        "summary": "Get marketplace listings",
+        "parameters": [
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "minPrice", "in": "query", "schema": { "type": "integer" } },
+          { "name": "maxPrice", "in": "query", "schema": { "type": "integer" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } }
+        ],
+        "responses": {
+          "200": { "description": "List of marketplace items" }
+        }
+      },
+      "post": {
+        "tags": ["Marketplace"],
+        "summary": "Create listing",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": { "type": "string" },
+                  "price": { "type": "integer" },
+                  "listingType": { "type": "string", "enum": ["standard", "featured", "auction"] },
+                  "description": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Listing created" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

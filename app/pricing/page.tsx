@@ -100,11 +100,11 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">10 creative tools</span>
+                    <span className="text-gray-700">Essential creative tools</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">50 games</span>
+                    <span className="text-gray-700">Games arcade access</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
@@ -112,7 +112,7 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Basic templates (500+)</span>
+                    <span className="text-gray-700">Starter templates</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
@@ -167,11 +167,11 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">ALL 60+ creative tools</span>
+                    <span className="text-gray-700">Full creative suite access</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">1,000+ games library</span>
+                    <span className="text-gray-700">Full games library</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
@@ -179,7 +179,7 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Premium templates (5,000+)</span>
+                    <span className="text-gray-700">Premium templates</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
@@ -550,3 +550,4 @@ export default function PricingPage() {
     </div>
   );
 }
+

@@ -1,8 +1,10 @@
+'use client';
+
 // /app/finance/page.tsx
-// Finance Hub - CR AudioViz AI
 export const dynamic = 'force-dynamic';
 
-'use client';
+
+
 
 import React from 'react';
 import Link from 'next/link';

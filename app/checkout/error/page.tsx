@@ -1,7 +1,7 @@
+'use client';
+
 // /app/checkout/error/page.tsx
 export const dynamic = 'force-dynamic';
-
-'use client';
 
 import React from 'react';
 import Link from 'next/link';

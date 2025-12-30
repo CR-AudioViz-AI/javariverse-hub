@@ -1,137 +1,152 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { MobileButton } from '@/components/mobile';
-import { FileText, Scale, AlertTriangle, CheckCircle, Mail } from 'lucide-react';
+// /app/terms/page.tsx
+// Terms of Service - CR AudioViz AI
+
 import Link from 'next/link';
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white px-4 py-12 md:py-16 lg:py-20">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <FileText className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
-              Terms of Service
-            </h1>
-            <p className="text-base md:text-lg lg:text-xl text-gray-300 mb-3">
-              Please read these terms carefully before using our platform
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="max-w-4xl mx-auto px-4 py-16">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">Terms of Service</h1>
+        <p className="text-gray-500 mb-8">Last updated: December 30, 2025</p>
+
+        <div className="prose dark:prose-invert max-w-none">
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Acceptance of Terms</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              By accessing or using CR AudioViz AI's services, including Javari AI, you agree to be bound by these 
+              Terms of Service. If you do not agree to these terms, please do not use our services.
             </p>
-            <p className="text-xs md:text-sm text-gray-400">
-              Last Updated: October 22, 2025
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. Description of Service</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              CR AudioViz AI provides AI-powered creative tools, including but not limited to:
             </p>
-          </div>
+            <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 space-y-2">
+              <li>Javari AI assistant for conversations and creative tasks</li>
+              <li>Logo creation and graphic design tools</li>
+              <li>Document and content generation</li>
+              <li>Creator Marketplace for buying and selling digital products</li>
+              <li>Games and entertainment</li>
+              <li>Various productivity and business tools</li>
+            </ul>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. Account Registration</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              To use our services, you must create an account. You agree to:
+            </p>
+            <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 space-y-2">
+              <li>Provide accurate and complete information</li>
+              <li>Maintain the security of your account credentials</li>
+              <li>Notify us immediately of any unauthorized access</li>
+              <li>Accept responsibility for all activities under your account</li>
+            </ul>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. Credits and Payments</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              Our services use a credit-based system:
+            </p>
+            <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 space-y-2">
+              <li>Credits are required for certain AI features</li>
+              <li>Free accounts receive 50 credits monthly (expire monthly)</li>
+              <li>Paid plans include credits that never expire</li>
+              <li>One-time credit purchases are available</li>
+              <li>Refunds are available within 7 days, no questions asked</li>
+              <li>Automatic error refunds are provided</li>
+            </ul>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Content Ownership</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              <strong>You own what you create.</strong> All content generated using our tools belongs to you. 
+              You retain full rights to use, modify, sell, or distribute your creations commercially.
+            </p>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              We claim no ownership over your content. You can export your work at any time and use it anywhere.
+            </p>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">6. Acceptable Use</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              You agree not to use our services to:
+            </p>
+            <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 space-y-2">
+              <li>Generate illegal, harmful, or abusive content</li>
+              <li>Violate intellectual property rights</li>
+              <li>Attempt to circumvent security measures</li>
+              <li>Distribute malware or spam</li>
+              <li>Harass, threaten, or impersonate others</li>
+              <li>Scrape or mine data without permission</li>
+            </ul>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">7. Creator Marketplace</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              If you sell products on our marketplace:
+            </p>
+            <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 space-y-2">
+              <li>You retain 70% of each sale; we retain 30%</li>
+              <li>Payouts are processed weekly</li>
+              <li>You must own rights to products you sell</li>
+              <li>You are responsible for customer support for your products</li>
+              <li>We reserve the right to remove content that violates our policies</li>
+            </ul>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">8. Limitation of Liability</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              CR AudioViz AI provides services "as is" without warranties. We are not liable for any indirect, 
+              incidental, or consequential damages arising from your use of our services.
+            </p>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">9. Termination</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              We may suspend or terminate your account for violations of these terms. You may cancel your 
+              account at any time from your settings. Upon termination, you may export your data.
+            </p>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">10. Changes to Terms</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              We may update these terms periodically. We will notify you of material changes via email or 
+              in-app notification. Continued use constitutes acceptance of updated terms.
+            </p>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">11. Contact</h2>
+            <p className="text-gray-600 dark:text-gray-300">
+              Questions about these terms? Contact us at{' '}
+              <a href="mailto:support@craudiovizai.com" className="text-blue-600 hover:underline">
+                support@craudiovizai.com
+              </a>
+            </p>
+          </section>
         </div>
-      </section>
 
-      {/* Key Points */}
-      <section className="px-4 py-12 md:py-16 bg-white">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 md:mb-8">Key Points</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              <Card className="border-green-200">
-                <CardContent className="p-4 md:p-6">
-                  <CheckCircle className="w-8 h-8 text-green-600 mb-3" />
-                  <h3 className="font-bold text-gray-900 mb-2 text-sm md:text-base">You Own Your Content</h3>
-                  <p className="text-xs md:text-sm text-gray-600">
-                    All content you create using our tools belongs to you. Export anytime.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-blue-200">
-                <CardContent className="p-4 md:p-6">
-                  <Scale className="w-8 h-8 text-blue-600 mb-3" />
-                  <h3 className="font-bold text-gray-900 mb-2 text-sm md:text-base">Fair Usage Policy</h3>
-                  <p className="text-xs md:text-sm text-gray-600">
-                    Credits are subject to fair use. No automated abuse or reselling.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Terms Content */}
-      <section className="px-4 py-12 md:py-16 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
-            
-            <Card>
-              <CardContent className="p-4 md:p-6">
-                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">1. Acceptance of Terms</h2>
-                <p className="text-sm md:text-base text-gray-600">
-                  By accessing or using CR AudioViz AI, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4 md:p-6">
-                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">2. Account Registration</h2>
-                <p className="text-sm md:text-base text-gray-600">
-                  You must provide accurate information when creating an account. You are responsible for maintaining the security of your account and all activities under it.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4 md:p-6">
-                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">3. Credits and Payments</h2>
-                <p className="text-sm md:text-base text-gray-600">
-                  Credits are non-refundable except as required by law. Unused credits on paid plans never expire. Free tier credits reset monthly. We reserve the right to modify pricing with 30 days notice.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4 md:p-6">
-                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">4. Content Ownership</h2>
-                <p className="text-sm md:text-base text-gray-600">
-                  You retain full ownership of all content you create using our platform. We claim no intellectual property rights over your creations. You grant us a limited license only to provide our services.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4 md:p-6">
-                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">5. Prohibited Uses</h2>
-                <p className="text-sm md:text-base text-gray-600">
-                  You may not use our services for illegal activities, harassment, spam, malware distribution, or any purpose that violates these terms or applicable laws.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4 md:p-6">
-                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">6. Termination</h2>
-                <p className="text-sm md:text-base text-gray-600">
-                  We may suspend or terminate your account for violations of these terms. You may cancel your account at any time. Upon termination, you may export your content within 30 days.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-gray-800 to-gray-900 text-white">
-        <div className="container mx-auto text-center">
-          <Mail className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Questions About Terms?</h2>
-          <p className="text-base md:text-lg text-gray-300 mb-6 md:mb-8 max-w-2xl mx-auto">
-            Contact our legal team for any questions about these terms
+        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+          <p className="text-gray-500 text-sm">
+            CR AudioViz AI, LLC • Fort Myers, Florida • EIN: 93-4520864
           </p>
-          <Link href="/contact?subject=Legal" className="inline-block">
-            <MobileButton size="lg" className="bg-white text-gray-900 hover:bg-gray-100">
-              Contact Legal Team
-            </MobileButton>
-          </Link>
+          <div className="flex gap-4 mt-4">
+            <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>
+            <Link href="/support" className="text-blue-600 hover:underline">Support</Link>
+          </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

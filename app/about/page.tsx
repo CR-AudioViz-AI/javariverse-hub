@@ -1,143 +1,182 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { MobileButton } from '@/components/mobile';
-import { Users, Target, Heart, Zap } from 'lucide-react';
+// /app/about/page.tsx
+// About Page - CR AudioViz AI
+
+'use client';
+
+import React from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function AboutPage() {
+  const team = [
+    { name: 'Roy Henderson', role: 'CEO & Co-Founder', emoji: '👨‍💼', bio: 'Technical visionary building the future of AI-powered creativity' },
+    { name: 'Cindy Henderson', role: 'CMO & Co-Founder', emoji: '👩‍💼', bio: 'Marketing strategist driving brand growth and community' },
+    { name: 'Javari', role: 'AI Assistant', emoji: '🤖', bio: 'Your friendly AI companion for all creative tasks' }
+  ];
+
+  const values = [
+    { icon: '🎯', title: 'Quality First', desc: 'Fortune 50 standards in everything we build' },
+    { icon: '💡', title: 'Innovation', desc: 'Pushing boundaries with AI-powered tools' },
+    { icon: '🤝', title: 'Customer Success', desc: 'Your success is our success' },
+    { icon: '🔒', title: 'Trust & Security', desc: 'Your data stays yours, always' },
+    { icon: '🌍', title: 'Social Impact', desc: 'Building for communities that need it most' },
+    { icon: '🚀', title: 'Accessibility', desc: 'Powerful tools for everyone, everywhere' }
+  ];
+
+  const milestones = [
+    { year: '2024', event: 'CR AudioViz AI founded in Fort Myers, Florida' },
+    { year: '2024', event: 'Launched Javari AI assistant' },
+    { year: '2025', event: 'Expanded to comprehensive creative platform' },
+    { year: '2025', event: 'Launched Creator Marketplace' },
+    { year: 'Future', event: 'Social impact modules for underserved communities' }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-purple-600 text-white px-4 py-12 md:py-16 lg:py-20">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6">
-              About CR AudioViz AI
-            </h1>
-            <p className="text-lg md:text-xl text-blue-100 mb-6 md:mb-8">
-              Empowering creators to build amazing things with AI
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      {/* Hero */}
+      <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white py-24 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl font-bold mb-6"
+          >
+            Your Story. Our Design.
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-xl text-blue-100 max-w-2xl mx-auto"
+          >
+            We're building the future of AI-powered creativity. A platform where everyone connects and everyone wins.
+          </motion.p>
+        </div>
+      </div>
+
+      {/* Mission */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Our Mission</h2>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8">
+            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+              CR AudioViz AI exists to democratize creative power. We believe everyone deserves access to professional-grade 
+              AI tools, regardless of technical skill or budget. From entrepreneurs to artists, students to seasoned professionals, 
+              our platform empowers creators to bring their visions to life.
+            </p>
+            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mt-4">
+              Beyond creativity, we're committed to social impact. A portion of our revenue funds modules for first responders, 
+              veterans, faith communities, and animal rescue organizations. Technology should lift everyone.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section className="px-4 py-12 md:py-16 bg-white">
-        <div className="container mx-auto">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center mb-12 md:mb-16">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                  Our Mission
-                </h2>
-                <p className="text-base md:text-lg text-gray-600 mb-4">
-                  At CR AudioViz AI, we believe that everyone should have the power to create amazing digital experiences, 
-                  regardless of their technical expertise. We're on a mission to democratize creativity through AI-powered tools.
-                </p>
-                <p className="text-base md:text-lg text-gray-600">
-                  Founded in 2024, we've built a comprehensive platform that combines 60+ creative tools, AI assistance, 
-                  and a thriving marketplace to help creators bring their ideas to life.
-                </p>
-              </div>
-              
-              {/* Placeholder for image/visual */}
-              <div className="bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl h-48 md:h-64 lg:h-80 flex items-center justify-center">
-                <p className="text-white text-lg font-semibold">Our Story</p>
-              </div>
-            </div>
-
-            {/* Stats Grid - Responsive */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
-              <Card>
-                <CardContent className="p-4 md:p-6 text-center">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 md:mb-4">
-                    <Users className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-bold text-xl md:text-2xl text-gray-900 mb-1 md:mb-2">
-                    100K+
-                  </h3>
-                  <p className="text-xs md:text-sm text-gray-600">Active Creators</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4 md:p-6 text-center">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 md:mb-4">
-                    <Target className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                  </div>
-                  <h3 className="font-bold text-xl md:text-2xl text-gray-900 mb-1 md:mb-2">
-                    60+
-                  </h3>
-                  <p className="text-xs md:text-sm text-gray-600">Creative Tools</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4 md:p-6 text-center">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3 md:mb-4">
-                    <Zap className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
-                  </div>
-                  <h3 className="font-bold text-xl md:text-2xl text-gray-900 mb-1 md:mb-2">
-                    1200+
-                  </h3>
-                  <p className="text-xs md:text-sm text-gray-600">Games Available</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4 md:p-6 text-center">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-pink-100 rounded-lg flex items-center justify-center mx-auto mb-3 md:mb-4">
-                    <Heart className="w-5 h-5 md:w-6 md:h-6 text-pink-600" />
-                  </div>
-                  <h3 className="font-bold text-xl md:text-2xl text-gray-900 mb-1 md:mb-2">
-                    $2.4M
-                  </h3>
-                  <p className="text-xs md:text-sm text-gray-600">Creator Earnings</p>
-                </CardContent>
-              </Card>
-            </div>
+      {/* Values */}
+      <section className="py-20 px-4 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">Our Values</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {values.map((value, idx) => (
+              <motion.div
+                key={value.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="bg-white dark:bg-gray-900 rounded-xl p-6 text-center shadow-lg"
+              >
+                <div className="text-4xl mb-4">{value.icon}</div>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">{value.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400">{value.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Our Story Section */}
-      <section className="px-4 py-12 md:py-16 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 md:mb-6">
-              Your Story. Our Design.
-            </h2>
-            <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8">
-              We started CR AudioViz AI with a simple vision: make professional-grade creative tools accessible to everyone. 
-              Today, we're proud to serve over 100,000 creators worldwide, helping them bring their ideas to life through 
-              the power of AI.
-            </p>
-            <p className="text-base md:text-lg text-gray-600">
-              From small business owners to enterprise teams, from hobbyists to professional creators—we're here to help 
-              you tell your story, your way.
-            </p>
+      {/* Team */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">Meet the Team</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {team.map((member, idx) => (
+              <motion.div
+                key={member.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.1 }}
+                className="text-center"
+              >
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
+                  {member.emoji}
+                </div>
+                <h3 className="font-bold text-gray-900 dark:text-white">{member.name}</h3>
+                <p className="text-blue-600 dark:text-blue-400 text-sm mb-2">{member.role}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">{member.bio}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-purple-600 to-pink-600 text-white">
-        <div className="container mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-            Join Our Team
-          </h2>
-          <p className="text-lg md:text-xl text-purple-100 mb-6 md:mb-8 max-w-2xl mx-auto">
-            We're always looking for talented people to join our mission
+      {/* Timeline */}
+      <section className="py-20 px-4 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">Our Journey</h2>
+          <div className="space-y-6">
+            {milestones.map((milestone, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="flex gap-6"
+              >
+                <div className="w-20 flex-shrink-0 text-right">
+                  <span className="font-bold text-blue-600 dark:text-blue-400">{milestone.year}</span>
+                </div>
+                <div className="flex-1 pb-6 border-l-2 border-blue-500 pl-6 relative">
+                  <div className="absolute w-4 h-4 bg-blue-500 rounded-full -left-[9px] top-1" />
+                  <p className="text-gray-700 dark:text-gray-300">{milestone.event}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Ready to Create?</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
+            Join our growing community of creators and start building something amazing today.
           </p>
-          <Link href="/careers" className="inline-block w-full sm:w-auto">
-            <MobileButton 
-              size="lg" 
-              fullWidth
-              className="bg-white text-purple-600 hover:bg-purple-50 sm:w-auto"
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/signup"
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-purple-700"
             >
-              View Open Positions
-            </MobileButton>
-          </Link>
+              Get Started Free →
+            </Link>
+            <Link
+              href="/socials"
+              className="px-8 py-3 border border-gray-300 dark:border-gray-600 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              Follow Us
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer Info */}
+      <section className="bg-gray-900 text-gray-400 py-12 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="font-medium text-white mb-2">CR AudioViz AI, LLC</p>
+          <p>Fort Myers, Florida 🌴</p>
+          <p className="mt-4 text-sm">
+            A Florida S-Corporation | EIN: 93-4520864
+          </p>
         </div>
       </section>
     </div>

@@ -1,8 +1,10 @@
+'use client';
+
 // /app/insurance/page.tsx
-// Insurance Hub - CR AudioViz AI
 export const dynamic = 'force-dynamic';
 
-'use client';
+
+
 
 import React from 'react';
 import Link from 'next/link';

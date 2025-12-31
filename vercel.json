@@ -5,17 +5,16 @@
   },
   "crons": [
     {
-      "path": "/api/cron/health-check",
+      "path": "/api/cron/process-knowledge",
       "schedule": "*/5 * * * *"
     }
   ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" }
-      ]
+  "functions": {
+    "app/api/digital-products/upload/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/cron/process-knowledge/route.ts": {
+      "maxDuration": 300
     }
-  ]
+  }
 }

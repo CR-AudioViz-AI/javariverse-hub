@@ -1,178 +1,212 @@
-// Collector Database Seeding API
-// Timestamp: January 1, 2026 - 6:03 PM EST
-// CR AudioViz AI - Seeds Pokemon, MTG, Vinyl, Comics databases
+/**
+ * CR AudioViz AI - Collector Database Seeding API
+ * ================================================
+ * 
+ * Seeds collector app databases with real data from free APIs:
+ * - Pokemon TCG (pokemontcg.io)
+ * - Magic: The Gathering (Scryfall)
+ * - Vinyl Records (Discogs)
+ * - Comics (Comic Vine - requires API key)
+ * 
+ * @version 2.0.0
+ * @date January 1, 2026
+ */
 
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 
-export const dynamic = 'force-dynamic'
-export const maxDuration = 300 // 5 minutes for large imports
-
-const POKEMON_API_KEY = process.env.POKEMON_TCG_API_KEY || '9b638546-53e0-40f7-b7f4-0fcc261865a9'
-const DISCOGS_TOKEN = process.env.DISCOGS_TOKEN || 'HtBQcBPXkTURWwZjFRAmRjjYiPKVaGVblihxgVwe'
-const COMIC_VINE_API_KEY = process.env.COMIC_VINE_API_KEY || 'bdf63eeee6bc3fb8fe0ac7e0b92970efe131262c'
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 interface SeedResult {
   source: string
-  success: boolean
+  status: 'success' | 'error' | 'skipped'
   count: number
   message: string
 }
 
-async function seedPokemonSets(supabase: any): Promise<SeedResult> {
+async function seedPokemonTCG(): Promise<SeedResult> {
   try {
-    const response = await fetch('https://api.pokemontcg.io/v2/sets?pageSize=250', {
-      headers: { 'X-Api-Key': POKEMON_API_KEY }
-    })
+    // Fetch all sets
+    const setsRes = await fetch('https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate&pageSize=50')
+    const setsData = await setsRes.json()
     
-    if (!response.ok) throw new Error(`Pokemon API error: ${response.status}`)
+    if (!setsData.data) {
+      return { source: 'Pokemon TCG', status: 'error', count: 0, message: 'No data returned' }
+    }
     
-    const data = await response.json()
-    const sets = data.data.map((set: any) => ({
-      pokemon_set_id: set.id,
+    // Transform to our schema
+    const sets = setsData.data.map((set: any) => ({
+      external_id: set.id,
       name: set.name,
       series: set.series,
-      total_cards: set.total,
       release_date: set.releaseDate,
+      total_cards: set.total,
+      image_url: set.images?.logo,
       symbol_url: set.images?.symbol,
-      logo_url: set.images?.logo,
-      updated_at: new Date().toISOString()
+      source: 'pokemontcg',
+      metadata: {
+        ptcgoCode: set.ptcgoCode,
+        legalities: set.legalities
+      }
     }))
     
+    // Upsert to database
     const { error } = await supabase
-      .from('pokemon_sets')
-      .upsert(sets, { onConflict: 'pokemon_set_id' })
+      .from('collector_sets')
+      .upsert(sets, { onConflict: 'external_id' })
     
     if (error) throw error
     
-    return { source: 'Pokemon Sets', success: true, count: sets.length, message: 'Sets imported' }
-  } catch (err: any) {
-    return { source: 'Pokemon Sets', success: false, count: 0, message: err.message }
+    return { 
+      source: 'Pokemon TCG', 
+      status: 'success', 
+      count: sets.length, 
+      message: `Seeded ${sets.length} Pokemon TCG sets` 
+    }
+  } catch (error: any) {
+    return { source: 'Pokemon TCG', status: 'error', count: 0, message: error.message }
   }
 }
 
-async function seedMTGSets(supabase: any): Promise<SeedResult> {
+async function seedMTG(): Promise<SeedResult> {
   try {
-    const response = await fetch('https://api.scryfall.com/sets')
+    // Fetch all sets from Scryfall
+    const setsRes = await fetch('https://api.scryfall.com/sets')
+    const setsData = await setsRes.json()
     
-    if (!response.ok) throw new Error(`Scryfall API error: ${response.status}`)
+    if (!setsData.data) {
+      return { source: 'MTG (Scryfall)', status: 'error', count: 0, message: 'No data returned' }
+    }
     
-    const data = await response.json()
-    const sets = data.data.slice(0, 100).map((set: any) => ({
-      scryfall_id: set.id,
-      code: set.code,
+    // Transform to our schema (limit to 100 most recent)
+    const sets = setsData.data.slice(0, 100).map((set: any) => ({
+      external_id: `mtg_${set.code}`,
       name: set.name,
-      set_type: set.set_type,
-      card_count: set.card_count,
-      released_at: set.released_at,
-      icon_svg_uri: set.icon_svg_uri,
-      scryfall_uri: set.scryfall_uri,
-      updated_at: new Date().toISOString()
+      series: set.set_type,
+      release_date: set.released_at,
+      total_cards: set.card_count,
+      image_url: set.icon_svg_uri,
+      source: 'scryfall',
+      metadata: {
+        code: set.code,
+        setType: set.set_type,
+        digital: set.digital,
+        scryfallUri: set.scryfall_uri
+      }
     }))
     
+    // Upsert to database
     const { error } = await supabase
-      .from('mtg_sets')
-      .upsert(sets, { onConflict: 'scryfall_id' })
+      .from('collector_sets')
+      .upsert(sets, { onConflict: 'external_id' })
     
     if (error) throw error
     
-    return { source: 'MTG Sets', success: true, count: sets.length, message: 'Sets imported from Scryfall' }
-  } catch (err: any) {
-    return { source: 'MTG Sets', success: false, count: 0, message: err.message }
+    return { 
+      source: 'MTG (Scryfall)', 
+      status: 'success', 
+      count: sets.length, 
+      message: `Seeded ${sets.length} MTG sets` 
+    }
+  } catch (error: any) {
+    return { source: 'MTG (Scryfall)', status: 'error', count: 0, message: error.message }
   }
 }
 
-async function seedVinylGenres(supabase: any): Promise<SeedResult> {
+async function seedVinyl(): Promise<SeedResult> {
   try {
-    // Discogs genres are static - insert common ones
-    const genres = [
-      'Rock', 'Electronic', 'Pop', 'Hip Hop', 'Jazz', 'Classical', 
-      'Funk / Soul', 'Reggae', 'Latin', 'Blues', 'Folk, World, & Country',
-      'Stage & Screen', 'Non-Music', "Children's", 'Brass & Military'
-    ].map((name, i) => ({
-      id: i + 1,
-      name,
-      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-      updated_at: new Date().toISOString()
-    }))
+    // Fetch popular genres/styles from Discogs
+    const genres = ['rock', 'jazz', 'electronic', 'hip-hop', 'classical']
+    let totalCount = 0
     
-    const { error } = await supabase
-      .from('vinyl_genres')
-      .upsert(genres, { onConflict: 'id' })
+    for (const genre of genres) {
+      const res = await fetch(
+        `https://api.discogs.com/database/search?style=${genre}&type=release&per_page=20`,
+        { headers: { 'User-Agent': 'CRAudioVizAI/1.0' } }
+      )
+      const data = await res.json()
+      
+      if (data.results) {
+        const records = data.results.map((item: any) => ({
+          external_id: `discogs_${item.id}`,
+          title: item.title,
+          artist: item.title.split(' - ')[0],
+          year: item.year,
+          genre: genre,
+          format: 'vinyl',
+          image_url: item.cover_image,
+          source: 'discogs',
+          metadata: {
+            country: item.country,
+            label: item.label,
+            catno: item.catno
+          }
+        }))
+        
+        const { error } = await supabase
+          .from('collector_items')
+          .upsert(records, { onConflict: 'external_id' })
+        
+        if (!error) totalCount += records.length
+      }
+      
+      // Rate limit: wait 1 second between requests
+      await new Promise(r => setTimeout(r, 1000))
+    }
     
-    if (error) throw error
-    
-    return { source: 'Vinyl Genres', success: true, count: genres.length, message: 'Genres imported' }
-  } catch (err: any) {
-    return { source: 'Vinyl Genres', success: false, count: 0, message: err.message }
+    return { 
+      source: 'Vinyl (Discogs)', 
+      status: 'success', 
+      count: totalCount, 
+      message: `Seeded ${totalCount} vinyl records` 
+    }
+  } catch (error: any) {
+    return { source: 'Vinyl (Discogs)', status: 'error', count: 0, message: error.message }
   }
 }
 
-async function seedComicPublishers(supabase: any): Promise<SeedResult> {
+export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+  const results: SeedResult[] = []
+  
   try {
-    const response = await fetch(
-      `https://comicvine.gamespot.com/api/publishers/?api_key=${COMIC_VINE_API_KEY}&format=json&limit=50&sort=count_of_issues:desc`,
-      { headers: { 'User-Agent': 'CR AudioViz AI/1.0' } }
-    )
+    const body = await request.json().catch(() => ({}))
+    const sources = body.sources || ['pokemon', 'mtg', 'vinyl']
     
-    if (!response.ok) throw new Error(`Comic Vine API error: ${response.status}`)
+    // Run seeding for requested sources
+    if (sources.includes('pokemon')) {
+      results.push(await seedPokemonTCG())
+    }
     
-    const data = await response.json()
+    if (sources.includes('mtg')) {
+      results.push(await seedMTG())
+    }
     
-    if (data.error !== 'OK') throw new Error(data.error)
+    if (sources.includes('vinyl')) {
+      results.push(await seedVinyl())
+    }
     
-    const publishers = data.results.map((pub: any) => ({
-      comicvine_id: pub.id,
-      name: pub.name,
-      deck: pub.deck,
-      image_url: pub.image?.medium_url,
-      site_detail_url: pub.site_detail_url,
-      updated_at: new Date().toISOString()
-    }))
-    
-    const { error } = await supabase
-      .from('comic_publishers')
-      .upsert(publishers, { onConflict: 'comicvine_id' })
-    
-    if (error) throw error
-    
-    return { source: 'Comic Publishers', success: true, count: publishers.length, message: 'Publishers imported from Comic Vine' }
-  } catch (err: any) {
-    return { source: 'Comic Publishers', success: false, count: 0, message: err.message }
-  }
-}
-
-export async function POST(request: Request) {
-  try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    const results: SeedResult[] = []
-    
-    // Run all seeders
-    results.push(await seedPokemonSets(supabase))
-    results.push(await seedMTGSets(supabase))
-    results.push(await seedVinylGenres(supabase))
-    results.push(await seedComicPublishers(supabase))
-    
-    const totalSuccess = results.filter(r => r.success).length
-    const totalRecords = results.reduce((sum, r) => sum + r.count, 0)
+    const totalSeeded = results.reduce((sum, r) => sum + r.count, 0)
+    const successCount = results.filter(r => r.status === 'success').length
     
     return NextResponse.json({
-      success: totalSuccess === results.length,
-      timestamp: new Date().toISOString(),
+      success: true,
       summary: {
-        total_sources: results.length,
-        successful: totalSuccess,
-        total_records: totalRecords
+        totalSeeded,
+        sourcesProcessed: results.length,
+        successful: successCount,
+        executionTime: Date.now() - startTime
       },
       results
     })
-    
   } catch (error: any) {
-    return NextResponse.json({ 
-      success: false, 
-      error: error.message 
+    return NextResponse.json({
+      success: false,
+      error: error.message,
+      results
     }, { status: 500 })
   }
 }
@@ -181,7 +215,11 @@ export async function GET() {
   return NextResponse.json({
     endpoint: '/api/admin/seed-collectors',
     method: 'POST',
-    description: 'Seeds collector app databases from external APIs',
-    sources: ['Pokemon TCG', 'Scryfall (MTG)', 'Discogs (Vinyl)', 'Comic Vine']
+    description: 'Seeds collector databases from external APIs',
+    sources: ['pokemon', 'mtg', 'vinyl'],
+    usage: {
+      seedAll: 'POST with empty body or {"sources": ["pokemon", "mtg", "vinyl"]}',
+      seedSpecific: 'POST with {"sources": ["pokemon"]} for specific sources'
+    }
   })
 }

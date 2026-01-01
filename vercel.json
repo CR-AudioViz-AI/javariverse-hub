@@ -1,20 +1,55 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "fluid": true,
   "github": {
     "autoAlias": false
+  },
+  "regions": ["iad1", "sfo1"],
+  "functions": {
+    "app/api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "app/api/digital-products/upload/route.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "app/api/cron/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 300
+    },
+    "app/api/admin/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "app/api/chat/**/*.ts": {
+      "memory": 2048,
+      "maxDuration": 120
+    },
+    "app/api/ai/**/*.ts": {
+      "memory": 2048,
+      "maxDuration": 120
+    }
   },
   "crons": [
     {
       "path": "/api/cron/process-knowledge",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/warmup",
+      "schedule": "*/3 * * * *"
     }
   ],
-  "functions": {
-    "app/api/digital-products/upload/route.ts": {
-      "maxDuration": 60
-    },
-    "app/api/cron/process-knowledge/route.ts": {
-      "maxDuration": 300
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=0, stale-while-revalidate=59"
+        }
+      ]
     }
-  }
+  ]
 }

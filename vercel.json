@@ -2,9 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "fluid": true,
   "github": {
-    "autoAlias": false
+    "autoAlias": true
   },
-  "regions": ["iad1", "sfo1"],
+  "regions": [
+    "iad1",
+    "sfo1"
+  ],
   "functions": {
     "app/api/**/*.ts": {
       "memory": 1024,

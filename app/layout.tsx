@@ -47,6 +47,7 @@ export const metadata: Metadata = {
   description: "Empower your creativity with AI-powered creative tools, games, and Javari AI assistant. Build apps, websites, games, and digital content with no coding required.",
   keywords: "AI tools, app builder, game creator, website builder, Javari AI, no-code platform, creative tools, CR AudioViz AI",
   authors: [{ name: "CR AudioViz AI, LLC" }],
+  metadataBase: new URL('https://craudiovizai.com'),
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -55,7 +56,7 @@ export const metadata: Metadata = {
     description: 'Create apps, games, and websites with AI-powered tools',
     images: [
       {
-        url: '/og-image.png',
+        url: '/craudiovizailogo.png',
         width: 1200,
         height: 630,
         alt: 'CR AudioViz AI Platform',
@@ -66,7 +67,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'CR AudioViz AI',
     description: 'Create apps, games, and websites with AI-powered tools',
-    images: ['/twitter-image.png'],
+    images: ['/craudiovizailogo.png'],
     creator: '@craudiovizai',
   },
   robots: {

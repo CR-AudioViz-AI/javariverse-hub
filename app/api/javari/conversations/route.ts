@@ -1,6 +1,6 @@
 // ================================================================================
 // JAVARI CONVERSATIONS API - /api/javari/conversations
-// Conversation management with rollover support
+// UPDATED to work with existing schema
 // ================================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -25,12 +25,10 @@ export async function GET(request: NextRequest) {
   
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
-  const tenantId = searchParams.get('tenant_id') || '00000000-0000-0000-0000-000000000000';
   const userId = searchParams.get('user_id');
-  const status = searchParams.get('status');
   
   if (id) {
-    // Get single conversation with thread history
+    // Get single conversation
     const { data: conv, error } = await supabase
       .from('javari_conversations')
       .select('*')
@@ -41,29 +39,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message, request_id: requestId }, { status: 404 });
     }
     
-    // Get thread chain
-    let threadChain = null;
-    if (conv.root_conversation_id) {
-      const { data: threads } = await supabase
-        .from('javari_conversations')
-        .select('id, title, thread_number, status, created_at, message_count')
-        .eq('root_conversation_id', conv.root_conversation_id)
-        .order('thread_number', { ascending: true });
-      threadChain = threads;
-    }
-    
-    // Get last capsule
-    let lastCapsule = null;
-    if (conv.last_capsule_id) {
-      const { data: capsule } = await supabase
-        .from('javari_memory_capsules')
-        .select('*')
-        .eq('id', conv.last_capsule_id)
-        .single();
-      lastCapsule = capsule;
-    }
-    
-    // Get recent messages
+    // Get messages
     const { data: messages } = await supabase
       .from('javari_messages')
       .select('*')
@@ -71,31 +47,28 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: true })
       .limit(50);
     
+    // Get thread chain from metadata
+    const metadata = conv.metadata || {};
+    
     return NextResponse.json({
       request_id: requestId,
       conversation: conv,
-      thread_chain: threadChain,
-      thread_position: `Thread ${conv.thread_number} of ${threadChain?.length || 1}`,
-      last_capsule: lastCapsule,
-      messages: messages,
+      thread_number: metadata.thread_number || 1,
+      rollover_from: metadata.rollover_from_conversation_id || null,
+      rollover_to: metadata.rollover_to_conversation_id || null,
+      messages: messages || [],
       message_count: messages?.length || 0,
-      rollover_links: {
-        previous: conv.rollover_from_conversation_id,
-        next: conv.rollover_to_conversation_id,
-      },
     });
   }
   
   // List conversations
   let query = supabase
     .from('javari_conversations')
-    .select('id, title, status, thread_number, message_count, token_estimate, created_at, updated_at')
-    .eq('tenant_id', tenantId);
+    .select('*');
   
   if (userId) query = query.eq('user_id', userId);
-  if (status) query = query.eq('status', status);
   
-  const { data, error } = await query.order('updated_at', { ascending: false }).limit(50);
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(50);
   
   if (error) {
     return NextResponse.json({ error: error.message, request_id: requestId }, { status: 500 });
@@ -103,7 +76,7 @@ export async function GET(request: NextRequest) {
   
   return NextResponse.json({
     request_id: requestId,
-    conversations: data,
+    conversations: data || [],
     count: data?.length || 0,
   });
 }
@@ -116,21 +89,21 @@ export async function POST(request: NextRequest) {
   
   try {
     const body = await request.json();
-    const {
-      tenant_id = '00000000-0000-0000-0000-000000000000',
-      user_id,
-      title = 'New Conversation',
-    } = body;
+    const { user_id, title = 'New Conversation' } = body;
     
-    // Create conversation
+    // Create conversation using existing schema (role is required)
     const { data: conv, error } = await supabase
       .from('javari_conversations')
       .insert({
-        tenant_id,
         user_id,
-        title,
-        status: 'active',
-        thread_number: 1,
+        role: 'user',  // Required field in existing schema
+        metadata: { 
+          title,
+          thread_number: 1,
+          message_count: 0,
+          token_estimate: 0,
+          status: 'active'
+        }
       })
       .select()
       .single();
@@ -139,25 +112,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message, request_id: requestId }, { status: 500 });
     }
     
-    // Set root_conversation_id to self
-    await supabase
-      .from('javari_conversations')
-      .update({ root_conversation_id: conv.id })
-      .eq('id', conv.id);
-    
-    // Log event
-    await supabase.from('javari_memory_events').insert({
-      tenant_id,
-      user_id,
-      conversation_id: conv.id,
-      event_type: 'conversation_created',
-      payload: { title },
-      request_id: requestId,
-    });
-    
     return NextResponse.json({
       request_id: requestId,
-      conversation: { ...conv, root_conversation_id: conv.id },
+      conversation: conv,
+      title,
     });
     
   } catch (error: any) {

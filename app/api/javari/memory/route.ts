@@ -1,6 +1,5 @@
 // ================================================================================
-// JAVARI MEMORY API - /api/javari/memory
-// Returns capsule + current state snapshot + pinned memories + CAR docs
+// JAVARI MEMORY API - /api/javari/memory (FINAL - SESSION_ID UNIFIED)
 // ================================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -15,7 +14,6 @@ const getSupabase = () => {
   return createClient(url, key);
 };
 
-// Generate request ID for tracing
 const generateRequestId = () => `req_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
 export async function GET(request: NextRequest) {
@@ -29,122 +27,90 @@ export async function GET(request: NextRequest) {
     }
     
     const { searchParams } = new URL(request.url);
-    const conversationId = searchParams.get('conversation_id');
+    const sessionId = searchParams.get('session_id') || searchParams.get('conversation_id');
     const userId = searchParams.get('user_id');
-    const tenantId = searchParams.get('tenant_id') || '00000000-0000-0000-0000-000000000000';
     
-    // Fetch current capsule
-    const { data: capsule } = await supabase
-      .from('javari_memory_capsules')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .eq('is_current', true)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+    // Get capsule for session (system message with thread info)
+    let capsule = null;
+    let threadInfo = null;
     
-    // Fetch pinned memories
-    const { data: pinnedMemories } = await supabase
-      .from('javari_memory_items')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .eq('is_pinned', true)
-      .eq('is_active', true)
-      .order('importance', { ascending: false });
-    
-    // Fetch recent memories (top 20 by last_used)
-    const { data: recentMemories } = await supabase
-      .from('javari_memory_items')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .eq('is_active', true)
-      .order('last_used_at', { ascending: false, nullsFirst: false })
-      .limit(20);
-    
-    // Fetch current state snapshot
-    const { data: stateSnapshot } = await supabase
-      .from('javari_state_snapshots')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .eq('snapshot_type', 'current_state')
-      .eq('is_current', true)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-    
-    // Fetch conversation context if provided
-    let conversation = null;
-    let threadHistory = null;
-    if (conversationId) {
-      const { data: conv } = await supabase
-        .from('javari_conversations')
-        .select('*')
-        .eq('id', conversationId)
-        .single();
-      conversation = conv;
+    if (sessionId) {
+      const { data: systemMsgs } = await supabase
+        .from('javari_conversation_memory')
+        .select('content, extracted_facts, created_at')
+        .eq('session_id', sessionId)
+        .eq('role', 'system')
+        .order('created_at', { ascending: false })
+        .limit(1);
       
-      // Get thread chain if this is part of a rollover series
-      if (conv?.root_conversation_id) {
-        const { data: threads } = await supabase
-          .from('javari_conversations')
-          .select('id, title, thread_number, created_at, status')
-          .eq('root_conversation_id', conv.root_conversation_id)
-          .order('thread_number', { ascending: true });
-        threadHistory = threads;
+      if (systemMsgs && systemMsgs[0]) {
+        const sys = systemMsgs[0];
+        capsule = {
+          text: sys.content,
+          created_at: sys.created_at,
+          thread_number: sys.extracted_facts?.thread_number || 1,
+          rollover_from: sys.extracted_facts?.rollover_from || null,
+        };
+        threadInfo = sys.extracted_facts;
       }
     }
     
-    // Fetch feature flags
-    const { data: flags } = await supabase
-      .from('javari_feature_flags')
-      .select('flag_name, flag_value')
-      .eq('tenant_id', tenantId);
+    // Get user memories (if any pinned items exist)
+    const { data: userMemories } = await supabase
+      .from('javari_user_memory')
+      .select('*')
+      .eq('user_id', userId || '00000000-0000-0000-0000-000000000000')
+      .limit(20);
     
-    const featureFlags = flags?.reduce((acc, f) => {
+    // Get feature flags
+    const { data: flags } = await supabase
+      .from('feature_flags')
+      .select('flag_name, flag_value')
+      .limit(20);
+    
+    const featureFlags = flags?.reduce((acc: any, f: any) => {
       acc[f.flag_name] = f.flag_value;
       return acc;
-    }, {} as Record<string, boolean>) || {};
+    }, {}) || {
+      MEMORY_ENABLED: true,
+      AUTO_THREAD_ROLLOVER_ENABLED: true,
+      MEMORY_SUMMARIZATION_ENABLED: true,
+    };
+    
+    // Get Operating Bible and Current State from evidence_artifacts
+    const { data: carDocs } = await supabase
+      .from('evidence_artifacts')
+      .select('artifact_type, file_path, metadata')
+      .in('artifact_type', ['operating_bible', 'current_state']);
+    
+    const carLinks: any = {
+      operating_bible: null,
+      current_state: null,
+    };
+    
+    carDocs?.forEach((doc: any) => {
+      if (doc.artifact_type === 'operating_bible') {
+        carLinks.operating_bible = doc.file_path;
+      }
+      if (doc.artifact_type === 'current_state') {
+        carLinks.current_state = doc.file_path;
+      }
+    });
     
     return NextResponse.json({
       request_id: requestId,
       timestamp: new Date().toISOString(),
       latency_ms: Date.now() - startTime,
       
-      // Core memory state
-      capsule: capsule ? {
-        id: capsule.id,
-        text: capsule.capsule_text,
-        token_count: capsule.token_count,
-        version: capsule.version,
-        created_at: capsule.created_at,
-        car_path: capsule.car_path,
-      } : null,
+      session_id: sessionId,
+      capsule,
+      thread_info: threadInfo,
       
-      // Memory items
-      pinned_memories: pinnedMemories || [],
-      recent_memories: recentMemories || [],
-      memory_count: {
-        pinned: pinnedMemories?.length || 0,
-        recent: recentMemories?.length || 0,
-      },
+      user_memories: userMemories || [],
+      memory_count: userMemories?.length || 0,
       
-      // State snapshot
-      state_snapshot: stateSnapshot?.content || null,
-      state_car_path: stateSnapshot?.car_path || null,
-      
-      // Conversation context
-      conversation,
-      thread_history: threadHistory,
-      
-      // Feature flags
       feature_flags: featureFlags,
-      
-      // CAR document links
-      car_links: {
-        operating_bible: 'memory/OPERATING_BIBLE.md',
-        current_state: 'memory/CURRENT_STATE.json',
-        latest_capsule: capsule?.car_path || null,
-      },
+      car_links: carLinks,
     });
     
   } catch (error: any) {

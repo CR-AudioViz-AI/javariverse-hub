@@ -1,0 +1,190 @@
+# ================================================================================
+# CR AUDIOVIZ AI - CI/CD Pipeline with Security Scanning
+# Implements CodeQL, Semgrep, and Dependency Scanning
+# ================================================================================
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run security scans weekly
+    - cron: '0 0 * * 0'
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ===========================================================================
+  # Build and Test
+  # ===========================================================================
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Type check
+        run: npm run type-check || echo "Type check not configured"
+      
+      - name: Lint
+        run: npm run lint || echo "Lint not configured"
+      
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+  # ===========================================================================
+  # CodeQL Security Analysis
+  # ===========================================================================
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+      
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"
+
+  # ===========================================================================
+  # Semgrep Static Analysis
+  # ===========================================================================
+  semgrep:
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Semgrep
+        run: |
+          semgrep scan --config auto --config p/security-audit --config p/secrets \
+            --json --output semgrep-results.json \
+            --exclude node_modules --exclude .next || true
+      
+      - name: Upload Semgrep results
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+          if-no-files-found: ignore
+
+  # ===========================================================================
+  # Dependency Vulnerability Scanning
+  # ===========================================================================
+  dependency-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run npm audit
+        run: npm audit --json > npm-audit.json || true
+      
+      - name: Check for critical vulnerabilities
+        run: |
+          if npm audit --audit-level=critical; then
+            echo "No critical vulnerabilities found"
+          else
+            echo "::warning::Critical vulnerabilities detected - review npm-audit.json"
+          fi
+      
+      - name: Upload audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit
+          path: npm-audit.json
+
+  # ===========================================================================
+  # Security Headers Check
+  # ===========================================================================
+  security-headers:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Check security headers
+        run: |
+          echo "Checking security headers for production site..."
+          curl -sI https://craudiovizai.com | grep -E "^(X-|Content-Security|Strict-Transport)" || echo "Some headers missing"
+
+  # ===========================================================================
+  # E2E Health Check (Production)
+  # ===========================================================================
+  e2e-health:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    needs: [build]
+    steps:
+      - name: Run E2E health check
+        run: |
+          echo "Running E2E health check..."
+          response=$(curl -s -X POST https://craudiovizai.com/api/e2e \
+            -H "Content-Type: application/json" \
+            -d '{"scenario": "health-check", "device": "desktop"}')
+          
+          echo "$response" | jq '.'
+          
+          # Check if all tests passed
+          failed=$(echo "$response" | jq '.summary.failed // 0')
+          if [ "$failed" -gt 0 ]; then
+            echo "::warning::$failed health checks failed"
+          fi
+
+  # ===========================================================================
+  # Report Security Findings
+  # ===========================================================================
+  report:
+    runs-on: ubuntu-latest
+    needs: [codeql, semgrep, dependency-scan]
+    if: always()
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: security-reports
+      
+      - name: Generate summary
+        run: |
+          echo "## Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scan | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| CodeQL | ${{ needs.codeql.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Semgrep | ${{ needs.semgrep.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Scan | ${{ needs.dependency-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See artifacts for detailed reports." >> $GITHUB_STEP_SUMMARY

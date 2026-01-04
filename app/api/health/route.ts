@@ -1,125 +1,90 @@
-import { createClient } from '@supabase/supabase-js'
-import { NextResponse } from 'next/server'
+// ================================================================================
+// CR AUDIOVIZ AI - HEALTH API (NEVER 503)
+// Returns 200 + x-cr-degraded header on failure
+// ================================================================================
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-export async function GET() {
+export const runtime = 'nodejs'; // Force Node.js runtime for stability
+
+const getSupabase = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+};
+
+export async function GET(request: NextRequest) {
   const startTime = Date.now();
+  const checks: Record<string, { status: string; latency_ms?: number; error?: string }> = {};
+  let isDegraded = false;
+  let errorId: string | undefined;
   
+  // Check database
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    )
-
-    const checks = {
-      timestamp: new Date().toISOString(),
-      status: 'healthy' as 'healthy' | 'degraded' | 'unhealthy',
-      responseTime: 0,
-      services: {
-        supabase: false,
-        legalease_table: false,
-        authentication: false,
-        profiles: false
-      },
-      database: {
-        connection: false,
-        tables: {
-          profiles: false,
-          legalease_documents: false
-        }
-      }
-    }
-
-    // Check Supabase connection via profiles table
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .limit(1)
-      
-      if (!error) {
-        checks.services.supabase = true
-        checks.services.profiles = true
-        checks.database.connection = true
-        checks.database.tables.profiles = true
-      }
-    } catch (err: unknown) {
-      console.error('Supabase connection check failed:', err)
-    }
-
-    // Check legalease_documents table
-    try {
-      const { data, error } = await supabase
-        .from('legalease_documents')
-        .select('id')
-        .limit(1)
-      
-      if (!error) {
-        checks.services.legalease_table = true
-        checks.database.tables.legalease_documents = true
-      } else {
-        console.error('Legalease check error:', error.message)
-      }
-    } catch (err: unknown) {
-      console.error('Legalease table check failed:', err)
-    }
-
-    // Check auth service
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession()
-      // Even without a session, if no error then auth service is up
-      if (!error) {
-        checks.services.authentication = true
-      }
-    } catch (err: unknown) {
-      console.error('Auth check failed:', err)
-    }
-
-    // Calculate response time
-    checks.responseTime = Date.now() - startTime;
-
-    // Determine overall status
-    const criticalServices = [checks.services.supabase, checks.database.connection]
-    const allServices = Object.values(checks.services)
-    
-    if (criticalServices.every(s => s)) {
-      if (allServices.every(s => s)) {
-        checks.status = 'healthy'
-      } else {
-        checks.status = 'degraded'
-      }
+    const supabase = getSupabase();
+    if (supabase) {
+      const dbStart = Date.now();
+      const { error } = await supabase.from('apps').select('id').limit(1);
+      checks.database = {
+        status: error ? 'degraded' : 'healthy',
+        latency_ms: Date.now() - dbStart,
+        error: error?.message,
+      };
+      if (error) isDegraded = true;
     } else {
-      checks.status = 'unhealthy'
+      checks.database = { status: 'unconfigured' };
     }
-
-    return NextResponse.json(checks, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-        'Surrogate-Control': 'no-store'
-      }
-    })
-  } catch (error) {
-    console.error('Health check error:', error)
-    return NextResponse.json({
-      timestamp: new Date().toISOString(),
-      status: 'unhealthy',
-      responseTime: Date.now() - startTime,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, { 
-      status: 500,
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate'
-      }
-    })
+  } catch (error: any) {
+    checks.database = { status: 'degraded', error: error.message };
+    isDegraded = true;
   }
+  
+  // Check API endpoints
+  const apiChecks = [
+    { name: 'apps_api', url: `${new URL(request.url).origin}/api/apps` },
+    { name: 'credits_api', url: `${new URL(request.url).origin}/api/credits` },
+  ];
+  
+  for (const check of apiChecks) {
+    try {
+      const checkStart = Date.now();
+      const res = await fetch(check.url, { 
+        method: 'GET',
+        signal: AbortSignal.timeout(5000),
+      });
+      checks[check.name] = {
+        status: res.ok ? 'healthy' : 'degraded',
+        latency_ms: Date.now() - checkStart,
+      };
+      if (!res.ok) isDegraded = true;
+    } catch (error: any) {
+      checks[check.name] = { status: 'degraded', error: error.message };
+      isDegraded = true;
+    }
+  }
+  
+  if (isDegraded) {
+    errorId = crypto.randomUUID().slice(0, 8);
+  }
+  
+  const response = NextResponse.json({
+    status: isDegraded ? 'degraded' : 'healthy',
+    timestamp: new Date().toISOString(),
+    latency_ms: Date.now() - startTime,
+    checks,
+    error_id: errorId,
+  });
+  
+  // Always return 200, but set degraded headers
+  if (isDegraded) {
+    response.headers.set('x-cr-degraded', 'true');
+    response.headers.set('x-cr-error-id', errorId!);
+  }
+  
+  // Caching headers for stability
+  response.headers.set('Cache-Control', 'public, s-maxage=5, stale-while-revalidate=30');
+  
+  return response;
 }

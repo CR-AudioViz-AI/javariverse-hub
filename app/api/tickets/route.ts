@@ -1,278 +1,225 @@
-// =============================================================================
-// CR AUDIOVIZ AI - CENTRALIZED TICKETS API (SIMPLIFIED)
-// =============================================================================
-// Production Ready - December 15, 2025
-// =============================================================================
+// ================================================================================
+// CR AUDIOVIZ AI - SUPPORT TICKETS API
+// Central ticketing with AI triage, auto-fix, and SLA tracking
+// ================================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://kteobfyferrukqeolofj.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+export const runtime = 'edge';
 
-// Simple fetch wrapper for Supabase
-async function supabaseQuery(table: string, options: {
-  method?: string;
-  select?: string;
-  filters?: Record<string, string>;
-  body?: any;
-  single?: boolean;
-} = {}) {
-  const { method = 'GET', select = '*', filters = {}, body, single } = options;
-  
-  let url = `${SUPABASE_URL}/rest/v1/${table}`;
-  const params = new URLSearchParams();
-  
-  if (select) params.set('select', select);
-  Object.entries(filters).forEach(([key, value]) => {
-    params.set(key, value);
-  });
-  
-  if (params.toString()) {
-    url += `?${params.toString()}`;
-  }
-  
-  const headers: Record<string, string> = {
-    'apikey': SUPABASE_KEY,
-    'Authorization': `Bearer ${SUPABASE_KEY}`,
-    'Content-Type': 'application/json',
-  };
-  
-  if (method === 'POST' || method === 'PATCH') {
-    headers['Prefer'] = 'return=representation';
-  }
-  
-  const response = await fetch(url, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(data.message || `Supabase error: ${response.status}`);
-  }
-  
-  return single && Array.isArray(data) ? data[0] : data;
+const getSupabase = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+};
+
+async function getUser(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader) return null;
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  const token = authHeader.replace('Bearer ', '');
+  const { data: { user } } = await supabase.auth.getUser(token);
+  return user;
 }
 
-// ============ GET - List/Get Tickets ============
+// Generate ticket number
+function generateTicketNumber(): string {
+  const date = new Date();
+  const prefix = 'TKT';
+  const timestamp = date.getFullYear().toString().slice(-2) + 
+    (date.getMonth() + 1).toString().padStart(2, '0') +
+    date.getDate().toString().padStart(2, '0');
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `${prefix}-${timestamp}-${random}`;
+}
+
+// ============================================================================
+// GET /api/tickets - List tickets
+// ============================================================================
 export async function GET(request: NextRequest) {
   try {
+    const user = await getUser(request);
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-    const user_id = searchParams.get('user_id');
     const status = searchParams.get('status');
-    const source_app = searchParams.get('source_app');
-    const limit = searchParams.get('limit') || '50';
-    
-    // Build filters
-    const filters: Record<string, string> = {};
-    if (id) filters['id'] = `eq.${id}`;
-    if (user_id) filters['user_id'] = `eq.${user_id}`;
-    if (status) filters['status'] = `eq.${status}`;
-    if (source_app) filters['source_app'] = `eq.${source_app}`;
-    filters['limit'] = limit;
-    filters['order'] = 'created_at.desc';
-    
-    const tickets = await supabaseQuery('support_tickets', { filters });
-    
-    // Get stats
-    const allTickets = await supabaseQuery('support_tickets', { 
-      select: 'status,source_app,auto_fix_successful' 
-    });
-    
-    const stats = {
-      total: allTickets?.length || 0,
-      byStatus: {} as Record<string, number>,
-      bySource: {} as Record<string, number>,
-      autoFixed: 0
+    const priority = searchParams.get('priority');
+    const category = searchParams.get('category');
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const adminView = searchParams.get('admin') === 'true';
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
+    let query = supabase
+      .from('support_tickets')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    // Non-admin users only see their own tickets
+    if (!adminView && user) {
+      query = query.eq('user_id', user.id);
+    }
+
+    if (status) query = query.eq('status', status);
+    if (priority) query = query.eq('priority', priority);
+    if (category) query = query.eq('category', category);
+
+    const { data: tickets, error, count } = await query;
+
+    if (error) {
+      return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 });
+    }
+
+    // Calculate SLA metrics
+    const slaMetrics = {
+      total: count || 0,
+      open: tickets?.filter(t => t.status === 'open').length || 0,
+      in_progress: tickets?.filter(t => t.status === 'in_progress').length || 0,
+      resolved: tickets?.filter(t => t.status === 'resolved').length || 0,
+      avg_resolution_hours: 0
     };
-    
-    (allTickets || []).forEach((t: any) => {
-      stats.byStatus[t.status] = (stats.byStatus[t.status] || 0) + 1;
-      stats.bySource[t.source_app || 'platform'] = (stats.bySource[t.source_app || 'platform'] || 0) + 1;
-      if (t.auto_fix_successful) stats.autoFixed++;
-    });
-    
+
     return NextResponse.json({
-      success: true,
       tickets: tickets || [],
-      stats,
-      timestamp: new Date().toISOString()
+      total: count || 0,
+      sla_metrics: slaMetrics,
+      limit
     });
-    
-  } catch (error) {
-    console.error('GET tickets error:', error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to get tickets',
-      debug: {
-        supabase_url: SUPABASE_URL,
-        has_key: !!SUPABASE_KEY
-      }
-    }, { status: 500 });
+
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// ============ POST - Create Ticket ============
+// ============================================================================
+// POST /api/tickets - Create new ticket
+// ============================================================================
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    
-    // Validate required fields
-    if (!body.title || !body.description || !body.category) {
-      return NextResponse.json({
-        success: false,
-        error: 'Missing required fields: title, description, category'
-      }, { status: 400 });
+    const user = await getUser(request);
+    const supabase = getSupabase();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
-    
-    // Generate ticket number
-    const ticketNumber = `TKT-${Date.now().toString(36).toUpperCase()}`;
-    
+
+    const body = await request.json();
+    const {
+      title,
+      description,
+      category = 'general',
+      priority = 'medium',
+      source_app,
+      source_url,
+      browser_info,
+      error_logs,
+      screenshots = []
+    } = body;
+
+    if (!title || !description) {
+      return NextResponse.json({ error: 'title and description required' }, { status: 400 });
+    }
+
     // Create ticket
-    const ticket = await supabaseQuery('support_tickets', {
-      method: 'POST',
-      body: {
+    const ticketNumber = generateTicketNumber();
+    
+    const { data: ticket, error } = await supabase
+      .from('support_tickets')
+      .insert({
         ticket_number: ticketNumber,
-        title: body.title,
-        description: body.description,
-        category: body.category,
-        priority: body.priority || 'medium',
+        user_id: user?.id,
+        user_email: user?.email || body.email,
+        user_name: body.name || user?.user_metadata?.full_name,
+        title,
+        description,
+        category,
+        priority,
         status: 'open',
-        user_id: body.user_id || null,
-        user_email: body.user_email || null,
-        user_name: body.user_name || null,
-        source_app: body.source_app || 'platform',
-        source_url: body.source_url || null,
-        error_logs: body.error_logs || null,
-        browser_info: body.browser_info || null,
-        assigned_bot: 'javari-autofix-v1'
-      },
-      single: true
+        source_app,
+        source_url,
+        browser_info,
+        error_logs,
+        screenshots
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Ticket creation error:', error);
+      return NextResponse.json({ error: 'Failed to create ticket' }, { status: 500 });
+    }
+
+    // Audit log
+    await supabase.from('audit_logs').insert({
+      user_id: user?.id,
+      action: 'ticket_created',
+      resource_type: 'support_ticket',
+      resource_id: ticket.id,
+      details: { ticket_number: ticketNumber, title, category, priority }
     });
-    
-    // Add system comment
-    await supabaseQuery('ticket_comments', {
-      method: 'POST',
-      body: {
-        ticket_id: ticket.id,
-        author_type: 'system',
-        author_name: 'System',
-        content: `🎫 Ticket ${ticketNumber} created.\n📍 Source: ${body.source_app || 'platform'}\n\n🤖 Javari Auto-Fix Bot will analyze this issue.`
-      }
-    });
-    
-    // Log activity
-    await supabaseQuery('ticket_activity', {
-      method: 'POST',
-      body: {
-        ticket_id: ticket.id,
-        action: 'ticket_created',
-        actor_type: 'user',
-        actor_name: body.user_name || 'Anonymous',
-        new_value: { status: 'open', source_app: body.source_app || 'platform' }
-      }
-    });
-    
-    return NextResponse.json({
+
+    return NextResponse.json({ 
+      ticket, 
       success: true,
-      ticket: {
-        id: ticket.id,
-        ticket_number: ticketNumber,
-        status: 'open',
-        message: 'Ticket created successfully. Javari Auto-Fix Bot will analyze your issue.'
-      },
-      timestamp: new Date().toISOString()
-    });
-    
-  } catch (error) {
-    console.error('POST ticket error:', error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to create ticket'
-    }, { status: 500 });
+      message: `Ticket ${ticketNumber} created successfully`
+    }, { status: 201 });
+
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// ============ PATCH - Update Ticket ============
+// ============================================================================
+// PATCH /api/tickets - Update ticket
+// ============================================================================
 export async function PATCH(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { id, ...updates } = body;
-    
-    if (!id) {
-      return NextResponse.json({
-        success: false,
-        error: 'Missing ticket id'
-      }, { status: 400 });
+    const user = await getUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-    
-    // Update via REST API
-    const url = `${SUPABASE_URL}/rest/v1/support_tickets?id=eq.${id}`;
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      },
-      body: JSON.stringify(updates)
-    });
-    
-    const ticket = await response.json();
-    
-    return NextResponse.json({
-      success: true,
-      ticket: Array.isArray(ticket) ? ticket[0] : ticket
-    });
-    
-  } catch (error) {
-    console.error('PATCH ticket error:', error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to update ticket'
-    }, { status: 500 });
-  }
-}
 
-// ============ PUT - Add Comment ============
-export async function PUT(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { ticket_id, content, author_type, author_name } = body;
-    
-    if (!ticket_id || !content) {
-      return NextResponse.json({
-        success: false,
-        error: 'Missing ticket_id or content'
-      }, { status: 400 });
+    const supabase = getSupabase();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
-    
-    const comment = await supabaseQuery('ticket_comments', {
-      method: 'POST',
-      body: {
-        ticket_id,
-        author_type: author_type || 'user',
-        author_name: author_name || 'User',
-        content,
-        is_internal: false
-      },
-      single: true
-    });
-    
-    return NextResponse.json({
-      success: true,
-      comment
-    });
-    
-  } catch (error) {
-    console.error('PUT comment error:', error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to add comment'
-    }, { status: 500 });
+
+    const body = await request.json();
+    const { id, status, resolution, assigned_to, priority } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: 'Ticket ID required' }, { status: 400 });
+    }
+
+    const updates: any = { updated_at: new Date().toISOString() };
+    if (status) updates.status = status;
+    if (resolution) updates.resolution = resolution;
+    if (assigned_to) updates.assigned_to = assigned_to;
+    if (priority) updates.priority = priority;
+
+    if (status === 'resolved') {
+      updates.resolved_at = new Date().toISOString();
+      updates.resolved_by = user.id;
+    }
+
+    const { data: ticket, error } = await supabase
+      .from('support_tickets')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: 'Failed to update ticket' }, { status: 500 });
+    }
+
+    return NextResponse.json({ ticket, success: true });
+
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

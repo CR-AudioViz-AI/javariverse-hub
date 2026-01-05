@@ -1,6 +1,6 @@
 // /app/page.tsx
 // CR AudioViz AI - Main Landing Page
-// Features real Javari and CRAI avatars with proper intros
+// Features Javari as the sole spokesperson with proper intros
 
 'use client';
 
@@ -10,7 +10,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 // =============================================================================
-// HERO SECTION WITH JAVARI & CRAI
+// HERO SECTION WITH JAVARI
 // =============================================================================
 
 export default function LandingPage() {
@@ -32,7 +32,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-6">
             <Link href="/apps" className="text-gray-300 hover:text-white">Apps</Link>
             <Link href="/games" className="text-gray-300 hover:text-white">Games</Link>
-            <Link href="/craiverse" className="text-gray-300 hover:text-white">CRAIverse</Link>
+            <Link href="/javariverse" className="text-gray-300 hover:text-white">Javariverse</Link>
             <Link href="/pricing" className="text-gray-300 hover:text-white">Pricing</Link>
           </div>
           <div className="flex items-center gap-3">
@@ -44,11 +44,11 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section - CRAI Introduction */}
+      {/* Hero Section - Javari Introduction */}
       <section className="pt-32 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* CRAI Avatar */}
+            {/* Javari Avatar */}
             <motion.div 
               className="flex justify-center"
               initial={{ opacity: 0, x: -50 }}
@@ -56,31 +56,31 @@ export default function LandingPage() {
               transition={{ duration: 0.6 }}
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-full blur-3xl opacity-30 scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full blur-3xl opacity-30 scale-110" />
                 <Image
-                  src="/avatars/craiavatar.png"
-                  alt="CRAI - Your AI Guide"
+                  src="/avatars/javariavatar.png"
+                  alt="Javari - Your AI Assistant"
                   width={300}
                   height={300}
-                  className="relative rounded-full border-4 border-red-500 shadow-2xl shadow-red-500/30"
+                  className="relative rounded-full border-4 border-cyan-500 shadow-2xl shadow-cyan-500/30"
                 />
-                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-full font-bold">
-                  CRAI
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-white px-4 py-2 rounded-full font-bold">
+                  Javari
                 </div>
               </div>
             </motion.div>
 
-            {/* CRAI Introduction */}
+            {/* Javari Introduction */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">CR AudioViz AI</span>
+                Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-600">CR AudioViz AI</span>
               </h1>
               <p className="text-xl text-gray-300 mb-6 leading-relaxed">
-                Hi, I'm <strong className="text-red-400">CRAI</strong> - your guide to the CR AudioViz AI ecosystem. 
+                Hi, I'm <strong className="text-cyan-400">Javari</strong> - your guide to the CR AudioViz AI ecosystem. 
                 We've built the most comprehensive AI-powered creative platform on the web.
               </p>
               <ul className="space-y-3 text-gray-300 mb-8">
@@ -90,11 +90,11 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="text-green-400">✓</span>
-                  <span><strong>1000+ Games</strong> - Take a break and have fun</span>
+                  <span><strong>Fun Games</strong> - Take a break and have fun</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="text-green-400">✓</span>
-                  <span><strong>CRAIverse</strong> - Our 2D social world coming soon</span>
+                  <span><strong>Javariverse</strong> - Our 2D social world coming soon</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="text-green-400">✓</span>
@@ -103,7 +103,7 @@ export default function LandingPage() {
               </ul>
               <Link 
                 href="/apps"
-                className="inline-block px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white text-lg font-medium rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-lg"
+                className="inline-block px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 text-white text-lg font-medium rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-lg"
               >
                 Explore Our Apps →
               </Link>
@@ -315,49 +315,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 border-t border-gray-800 text-gray-400 py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Image src="/craudiovizailogo.png" alt="CR AudioViz AI" width={32} height={32} className="rounded" />
-                <span className="text-lg font-bold text-white">CR AudioViz AI</span>
-              </div>
-              <p className="text-sm">AI-powered creative tools for everyone.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/apps" className="hover:text-white">Apps</Link></li>
-                <li><Link href="/games" className="hover:text-white">Games</Link></li>
-                <li><Link href="/javari" className="hover:text-white">Javari AI</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/about" className="hover:text-white">About</Link></li>
-                <li><Link href="/team" className="hover:text-white">Team</Link></li>
-                <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
-                <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/privacy" className="hover:text-white">Privacy</Link></li>
-                <li><Link href="/terms" className="hover:text-white">Terms</Link></li>
-                <li><Link href="/cookies" className="hover:text-white">Cookies</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>© 2025 CR AudioViz AI, LLC. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
+

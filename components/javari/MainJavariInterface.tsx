@@ -460,23 +460,23 @@ export function MainJavariInterface() {
       
       if (hasCanonicalSpecs) {
         // SET FLAG: This enables operator intent routing in sendMessage
+        // But do NOT auto-execute or auto-clear - let user choose what to do
         setCanonicalSpecsLoaded(true);
         
-        // Generate and display Operator Output immediately
-        const operatorOutput = generateOperatorResponse(processedDocs);
+        // Show a notification that specs were detected, but don't auto-execute
         setMessages(prev => [...prev, {
-          id: `msg_operator_${Date.now()}`,
+          id: `msg_spec_detected_${Date.now()}`,
           role: 'assistant',
-          content: operatorOutput,
+          content: `📋 **Spec documents detected!**\n\n` +
+            `I found ${processedDocs.filter(d => isSpecDocument(d.name, d.content)).length} spec document(s).\n\n` +
+            `**Options:**\n` +
+            `- Type **"summarize"** for an AI summary of all documents\n` +
+            `- Type **"status"** or **"tickets"** for Operator Mode task list\n` +
+            `- Ask any question about the documents`,
           timestamp: new Date()
         }]);
         
-        // AUTO-CLEAR docs after Operator output (specs were processed)
-        // This prevents the citations pipeline from seeing stale docs
-        if (DOCS_AUTO_CLEAR_AFTER_SEND) {
-          setDocuments([]);
-          setIsDragging(false);
-        }
+        // DO NOT auto-clear docs - user may want to summarize or ask questions
       }
     }
   };
@@ -551,9 +551,18 @@ export function MainJavariInterface() {
       
       const readyDocsForSummary = documents.filter(d => d.status === 'ready');
       
+      // DEBUG: Log intent detection
+      console.log('[JAVARI DEBUG] Question:', question);
+      console.log('[JAVARI DEBUG] isSummaryIntent:', isSummaryIntent);
+      console.log('[JAVARI DEBUG] readyDocsForSummary:', readyDocsForSummary.length);
+      console.log('[JAVARI DEBUG] operatorMode:', operatorMode);
+      console.log('[JAVARI DEBUG] canonicalSpecsLoaded:', canonicalSpecsLoaded);
+      
       if (isSummaryIntent) {
+        console.log('[JAVARI DEBUG] ✅ Entering summary handler');
         // Check if docs are uploaded
         if (readyDocsForSummary.length === 0) {
+          console.log('[JAVARI DEBUG] ❌ No docs - showing message');
           setMessages(prev => [...prev, {
             id: `msg_${Date.now()}`,
             role: 'assistant',
@@ -564,6 +573,7 @@ export function MainJavariInterface() {
           return;
         }
         
+        console.log('[JAVARI DEBUG] ✅ Calling summarize API with', readyDocsForSummary.length, 'docs');
         // Call the summarize API
         try {
           const docsPayload = readyDocsForSummary.map(d => ({

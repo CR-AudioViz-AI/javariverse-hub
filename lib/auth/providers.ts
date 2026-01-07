@@ -6,7 +6,7 @@
  * 
  * Supabase OAuth providers: https://supabase.com/docs/guides/auth/social-login
  * 
- * @timestamp January 7, 2026 - 11:28 AM EST
+ * @timestamp January 7, 2026 - 11:43 AM EST
  * @author Claude (for Roy Henderson)
  */
 
@@ -42,7 +42,7 @@ export interface AuthProviderConfig {
 }
 
 // ============================================================================
-// OAUTH PROVIDERS
+// OAUTH PROVIDERS - ALL ENABLED
 // ============================================================================
 
 export const OAUTH_PROVIDERS: AuthProviderConfig[] = [
@@ -59,7 +59,7 @@ export const OAUTH_PROVIDERS: AuthProviderConfig[] = [
       text: 'text-gray-700',
       border: 'border-gray-300',
     },
-    enabled: true, // Will be validated at runtime
+    enabled: true,
     order: 1,
   },
   {
@@ -89,7 +89,7 @@ export const OAUTH_PROVIDERS: AuthProviderConfig[] = [
       bgHover: 'hover:bg-gray-900',
       text: 'text-white',
     },
-    enabled: false, // Not yet configured
+    enabled: true,
     order: 3,
   },
   {
@@ -104,7 +104,7 @@ export const OAUTH_PROVIDERS: AuthProviderConfig[] = [
       bgHover: 'hover:bg-[#1F1F1F]',
       text: 'text-white',
     },
-    enabled: false,
+    enabled: true,
     order: 4,
   },
   {
@@ -119,7 +119,7 @@ export const OAUTH_PROVIDERS: AuthProviderConfig[] = [
       bgHover: 'hover:bg-[#4752C4]',
       text: 'text-white',
     },
-    enabled: false,
+    enabled: true,
     order: 5,
   },
   {
@@ -134,7 +134,7 @@ export const OAUTH_PROVIDERS: AuthProviderConfig[] = [
       bgHover: 'hover:bg-gray-900',
       text: 'text-white',
     },
-    enabled: false,
+    enabled: true,
     order: 6,
   },
   {
@@ -149,7 +149,7 @@ export const OAUTH_PROVIDERS: AuthProviderConfig[] = [
       bgHover: 'hover:bg-[#166FE5]',
       text: 'text-white',
     },
-    enabled: false,
+    enabled: true,
     order: 7,
   },
   {
@@ -164,7 +164,7 @@ export const OAUTH_PROVIDERS: AuthProviderConfig[] = [
       bgHover: 'hover:bg-[#004182]',
       text: 'text-white',
     },
-    enabled: false,
+    enabled: true,
     order: 8,
   },
 ];
@@ -183,7 +183,7 @@ export const EMAIL_PASSWORD_CONFIG: AuthProviderConfig = {
     bgHover: 'hover:bg-cyan-700',
     text: 'text-white',
   },
-  enabled: true, // Always enabled
+  enabled: true,
   order: 100,
 };
 
@@ -201,12 +201,12 @@ export const MAGIC_LINK_CONFIG: AuthProviderConfig = {
     bgHover: 'hover:bg-purple-700',
     text: 'text-white',
   },
-  enabled: true, // Supabase supports this by default
+  enabled: true,
   order: 101,
 };
 
 // ============================================================================
-// PHONE/SMS AUTH (Optional)
+// PHONE/SMS AUTH
 // ============================================================================
 
 export const PHONE_CONFIG: AuthProviderConfig = {
@@ -214,18 +214,18 @@ export const PHONE_CONFIG: AuthProviderConfig = {
   name: 'Phone',
   type: 'phone',
   icon: 'phone',
-  envKey: 'TWILIO_ACCOUNT_SID', // Or your SMS provider
+  envKey: 'TWILIO_ACCOUNT_SID',
   colors: {
     bg: 'bg-green-600',
     bgHover: 'hover:bg-green-700',
     text: 'text-white',
   },
-  enabled: false, // Not yet configured
+  enabled: true,
   order: 102,
 };
 
 // ============================================================================
-// ENTERPRISE SSO (Optional)
+// ENTERPRISE SSO
 // ============================================================================
 
 export const SSO_CONFIG: AuthProviderConfig = {
@@ -239,12 +239,12 @@ export const SSO_CONFIG: AuthProviderConfig = {
     bgHover: 'hover:bg-indigo-700',
     text: 'text-white',
   },
-  enabled: false, // Enterprise feature
+  enabled: true,
   order: 200,
 };
 
 // ============================================================================
-// FEATURE FLAGS
+// FEATURE FLAGS - ALL ENABLED
 // ============================================================================
 
 export interface AuthFeatureFlags {
@@ -259,8 +259,8 @@ export interface AuthFeatureFlags {
 export const AUTH_FEATURES: AuthFeatureFlags = {
   emailPasswordEnabled: true,
   magicLinkEnabled: true,
-  phoneEnabled: false,
-  ssoEnabled: false,
+  phoneEnabled: true,
+  ssoEnabled: true,
   forgotPasswordEnabled: true,
   signupEnabled: true,
 };
@@ -312,7 +312,7 @@ export function getProviderById(id: string): AuthProviderConfig | undefined {
 }
 
 /**
- * Export list for testing
+ * Export list for testing - ALL PROVIDERS
  */
 export const ENABLED_PROVIDER_IDS = [
   ...getEnabledOAuthProviders().map(p => p.id),

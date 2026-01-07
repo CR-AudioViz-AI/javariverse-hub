@@ -150,14 +150,17 @@ export default function Header() {
             data-testid="header-logo"
             aria-label="CR AudioViz AI Home"
           >
-            <Image
-              src="/craudiovizailogo.png"
-              alt="CR AudioViz AI"
-              width={160}
-              height={160}
-              className="w-[100px] h-auto sm:w-[120px] md:w-[140px] lg:w-[160px]"
-              priority
-            />
+            {/* White background pill so logo doesn't wash out on dark header */}
+            <div className="bg-white rounded-lg px-2 py-1 shadow-sm">
+              <Image
+                src="/craudiovizailogo.png"
+                alt="CR AudioViz AI"
+                width={160}
+                height={160}
+                className="w-[100px] h-auto sm:w-[120px] md:w-[140px] lg:w-[160px]"
+                priority
+              />
+            </div>
           </Link>
 
           {/* ============================================================

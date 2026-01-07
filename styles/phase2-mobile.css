@@ -1,0 +1,645 @@
+/* ==========================================================================
+   CraudioVizAI — Phase 2 Mobile-First CSS (v1.2 Compliance)
+   File: src/styles/phase2-mobile.css
+
+   Scope: Compliance-only styling to satisfy Phase 2 Exit Validation Checklist v1.2
+   Constraints:
+   - No redesign intent
+   - No animations
+   - Vanilla CSS only
+   - Mobile-first (375px baseline)
+   - Tap targets >= 44x44
+   - Prevent horizontal scroll on all pages
+   ========================================================================== */
+
+/* ==========================================================================
+   [GATE 6] No horizontal scroll (global)
+   [GATE 1] 375px baseline readability + minimum 14px
+   ========================================================================== */
+
+:root {
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+
+  /* Typography */
+  --font-size-base: 14px; /* minimum */
+  --line-height-base: 1.45;
+
+  /* Layout */
+  --container-max: 1100px;
+  --radius: 12px;
+
+  /* Touch */
+  --tap-min: 44px;
+
+  /* Borders */
+  --border: 1px solid rgba(0, 0, 0, 0.12);
+
+  /* Focus */
+  --focus: 2px solid rgba(0, 0, 0, 0.6);
+  --focus-offset: 2px;
+}
+
+html {
+  font-size: var(--font-size-base);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-size: 1rem; /* 14px minimum */
+  line-height: var(--line-height-base);
+  overflow-x: hidden; /* prevents accidental horizontal scroll */
+  max-width: 100%;
+}
+
+/* Prevent common overflow sources */
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+pre,
+code {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+/* Safer wrapping for long strings/URLs */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li,
+a,
+span,
+div {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* ==========================================================================
+   [GATE 7] Tap target compliance (>= 44x44)
+   Applies to links, buttons, inputs, pill filters, and icon buttons
+   ========================================================================== */
+
+a,
+button,
+input,
+select,
+textarea,
+[role="button"],
+[tabindex]:not([tabindex="-1"]) {
+  touch-action: manipulation;
+}
+
+button,
+[role="button"],
+a.btn,
+.button,
+.app-card__cta,
+.hero-section__cta,
+.category-filters__pill,
+.back-button,
+.learn-more-link {
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+}
+
+/* Inputs: ensure comfortable height */
+input[type="search"],
+input[type="text"],
+input[type="email"],
+input[type="password"],
+.search-bar__input {
+  min-height: var(--tap-min);
+}
+
+/* Focus visibility (keyboard + accessibility) */
+:focus-visible {
+  outline: var(--focus);
+  outline-offset: var(--focus-offset);
+}
+
+/* ==========================================================================
+   Container utilities (safe defaults)
+   ========================================================================== */
+
+.container,
+.page-container,
+.apps-container,
+.app-page-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+/* Give sections breathing room on mobile */
+.section,
+.apps-section,
+.hero-section,
+.features-section,
+.use-cases-section,
+.related-apps-section {
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-6);
+}
+
+/* ==========================================================================
+   /apps Directory
+   Components: app-grid, app-card, category-filters, search-bar
+   [GATE 6,7] No horizontal scroll + tap targets
+   [GATE 3] Mobile-first single column
+   ========================================================================== */
+
+/* Directory layout wrapper */
+.apps-directory,
+.apps-directory__inner,
+.app-directory {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Search Bar */
+.search-bar,
+.search-bar__form,
+.search-bar__wrapper {
+  width: 100%;
+  max-width: 100%;
+}
+
+.search-bar__input,
+.search-input {
+  width: 100%;
+  max-width: 100%;
+  padding: 0 var(--space-4);
+  border: var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+/* Provide spacing around search */
+.search-bar {
+  margin-bottom: var(--space-4);
+}
+
+/* Category Filters: allow wrap OR horizontal scroll without cramping */
+.category-filters,
+.category-filters__list,
+.category-filters__row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  max-width: 100%;
+}
+
+/* Default: horizontal scrolling pills (safe at 375px) */
+.category-filters__list,
+.category-filters__row {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--space-2);
+  scrollbar-width: none;
+}
+
+.category-filters__list::-webkit-scrollbar,
+.category-filters__row::-webkit-scrollbar {
+  display: none;
+}
+
+.category-filters__pill,
+.category-pill,
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-3);
+  border: var(--border);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 1rem;
+  line-height: 1;
+  white-space: nowrap;
+  min-height: var(--tap-min);
+}
+
+/* Active state (non-animated) */
+.category-filters__pill--active,
+.category-pill.is-active,
+.filter-pill.is-active {
+  border-color: rgba(0, 0, 0, 0.35);
+  font-weight: 600;
+}
+
+/* App Grid: single column on mobile */
+.app-grid,
+.apps-grid,
+.app-directory__grid {
+  display: grid;
+  grid-template-columns: 1fr; /* mobile single column */
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 100%;
+}
+
+/* App Card */
+.app-card {
+  width: 100%;
+  max-width: 100%;
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  overflow: hidden; /* prevents internal overflow causing horizontal scroll */
+}
+
+.app-card__header,
+.app-card__body,
+.app-card__footer {
+  width: 100%;
+  max-width: 100%;
+}
+
+.app-card__name {
+  margin: 0 0 var(--space-2) 0;
+  font-size: 1.1rem; /* still readable on mobile */
+  line-height: 1.25;
+}
+
+.app-card__tagline {
+  margin: 0 0 var(--space-3) 0;
+  font-size: 1rem;
+}
+
+.app-card__description {
+  margin: 0 0 var(--space-4) 0;
+  font-size: 1rem;
+}
+
+/* Card actions: stacked on mobile to guarantee tap target spacing */
+.app-card__actions,
+.app-card__ctas {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.app-card__cta,
+.app-card a,
+.app-card button {
+  width: 100%;
+}
+
+/* Generic button/link styling hooks (if used) */
+.btn,
+.button,
+.app-card__cta,
+.hero-section__cta,
+.learn-more-link,
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-4);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  text-decoration: none;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.btn:disabled,
+.button:disabled,
+.btn[aria-disabled="true"],
+.button[aria-disabled="true"],
+.app-card__cta[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   App Landing Pages
+   Components: hero-section, features-list, use-cases-grid, related-apps-grid
+   [GATE 6,7] No horizontal scroll + tap targets
+   [GATE 3] Hero CTA full width on mobile
+   [GATE 3] Related apps stack vertically on mobile
+   ========================================================================== */
+
+.app-landing,
+.app-landing__inner,
+.app-landing-page {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Hero section */
+.hero-section {
+  width: 100%;
+  max-width: 100%;
+}
+
+.hero-section__title {
+  margin: 0 0 var(--space-2) 0;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.hero-section__tagline {
+  margin: 0 0 var(--space-3) 0;
+  font-size: 1rem;
+}
+
+.hero-section__description {
+  margin: 0 0 var(--space-4) 0;
+  font-size: 1rem;
+}
+
+/* Hero CTA: full-width on mobile */
+.hero-section__cta-row,
+.hero-section__actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 100%;
+}
+
+.hero-section__cta,
+.hero-section__actions .btn,
+.hero-section__actions a,
+.hero-section__actions button {
+  width: 100%;
+  min-height: var(--tap-min);
+}
+
+/* Back to Apps navigation */
+.back-button,
+.back-to-apps,
+.nav-back {
+  width: 100%;
+  margin-top: var(--space-3);
+}
+
+/* Features list: safe stacking */
+.features-list,
+.feature-list,
+.features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+  padding: 0;
+  margin: var(--space-3) 0 0 0;
+  list-style: none;
+}
+
+.features-list__item,
+.feature-item {
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+}
+
+/* Use cases grid: stack on mobile */
+.use-cases-grid,
+.use-cases,
+.usecases-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 100%;
+}
+
+.use-case-card,
+.usecase-card {
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+
+/* Related apps: stacked on mobile */
+.related-apps-grid,
+.related-grid,
+.related-apps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   Badges
+   Components: PricingBadge, AIBadge, MobileBadge, BetaBadge, ComingSoonBadge
+   [GATE 1] Readability
+   [GATE 6] No overflow (badge wrap)
+   ========================================================================== */
+
+.badges,
+.badge-row,
+.app-card__badges,
+.hero-section__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-width: 100%;
+}
+
+.badge,
+.pricing-badge,
+.ai-badge,
+.mobile-badge,
+.beta-badge,
+.coming-soon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-3);
+  min-height: 28px; /* badges are not required to be 44px; not primary tap targets */
+  border: var(--border);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  line-height: 1;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Badge variants (neutral, no redesign colors) */
+.badge--beta,
+.beta-badge {
+  font-weight: 600;
+}
+
+.badge--coming-soon,
+.coming-soon-badge {
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Footer + Global nav (compliance only)
+   [GATE 6] Footer no horizontal scroll
+   [GATE 7] Footer tap targets >=44
+   ========================================================================== */
+
+.site-footer,
+.footer,
+footer {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.site-footer a,
+.footer a,
+footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+}
+
+/* If footer links are in a grid/list */
+.footer-links,
+.site-footer__links,
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   Tablet breakpoint: >=768px
+   Requirement: 2-column app grid
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .container,
+  .page-container,
+  .apps-container,
+  .app-page-container {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+
+  /* /apps grid: 2 columns */
+  .app-grid,
+  .apps-grid,
+  .app-directory__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Use cases: 2 columns */
+  .use-cases-grid,
+  .use-cases,
+  .usecases-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Related apps: 2 columns */
+  .related-apps-grid,
+  .related-grid,
+  .related-apps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Hero actions can become 2-up if space allows */
+  .hero-section__cta-row,
+  .hero-section__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .back-button,
+  .back-to-apps,
+  .nav-back {
+    width: auto;
+    justify-content: flex-start;
+  }
+}
+
+/* ==========================================================================
+   Desktop breakpoint: >=1024px
+   Requirement: 3-column app grid + max-width containers
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+  /* /apps grid: 3 columns */
+  .app-grid,
+  .apps-grid,
+  .app-directory__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Related apps: 3 columns */
+  .related-apps-grid,
+  .related-grid,
+  .related-apps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Optional: category pills can wrap instead of scroll on wider screens */
+  .category-filters__list,
+  .category-filters__row {
+    overflow-x: visible;
+    flex-wrap: wrap;
+  }
+}
+
+/* ==========================================================================
+   Safety nets (common overflow culprits in app UIs)
+   [GATE 6] Prevent horizontal scroll regressions
+   ========================================================================== */
+
+/* If any component uses wide wrappers */
+.row,
+.columns,
+.grid,
+.stack {
+  max-width: 100%;
+}
+
+/* Ensure any accidental fixed-width elements don't exceed viewport */
+[class*="__container"],
+[class*="container"],
+[class*="wrapper"] {
+  max-width: 100%;
+}
+
+/* Avoid full-bleed elements forcing overflow */
+.full-bleed,
+.hero-image,
+.banner {
+  max-width: 100%;
+  overflow-x: clip;
+}

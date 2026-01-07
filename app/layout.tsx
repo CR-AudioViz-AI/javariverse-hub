@@ -11,6 +11,7 @@ import type { Metadata, Viewport } from "next";
 import Script from 'next/script';
 import { Inter } from "next/font/google";
 import "./globals.css";
+import '@/styles/phase2-mobile.css';
 import Header from "@/components/layout/Header";
 import CRBar from "@/components/layout/CRBar";
 import CreditsBar from "@/components/layout/CreditsBar";

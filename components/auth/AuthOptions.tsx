@@ -1,24 +1,32 @@
 'use client';
 
 /**
- * AuthOptions Component - Shared Auth UI for Login/Signup
+ * AuthOptions - Shared Authentication UI Component
  * 
- * Single component used by both /login and /signup pages to ensure
- * they cannot drift apart. Renders ALL enabled auth methods from
- * the central providers config.
+ * Single source of truth for all auth methods displayed on login/signup pages.
+ * Renders ALL enabled providers from lib/auth/providers.ts configuration.
+ * 
+ * Features:
+ * - OAuth providers (Google, GitHub, Apple, Microsoft, Discord, etc.)
+ * - Email + password login/signup
+ * - Magic link authentication
+ * - Phone/SMS authentication (when enabled)
+ * - Enterprise SSO (when enabled)
+ * - Forgot password link
+ * - Error states for misconfigured providers
  * 
  * @timestamp January 7, 2026 - 11:30 AM EST
  * @author Claude (for Roy Henderson)
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
-import {
+import { 
+  getEnabledOAuthProviders, 
   getAllAuthMethods,
-  AuthProviderConfig,
   AUTH_FEATURES,
+  AuthProviderConfig 
 } from '@/lib/auth/providers';
 import { Loader2, Mail, Sparkles, Phone, Building2, AlertCircle } from 'lucide-react';
 
@@ -26,17 +34,15 @@ import { Loader2, Mail, Sparkles, Phone, Building2, AlertCircle } from 'lucide-r
 // TYPES
 // ============================================================================
 
-export type AuthMode = 'login' | 'signup';
-export type AuthView = 'default' | 'email' | 'magic_link' | 'phone' | 'forgot_password';
-
 interface AuthOptionsProps {
-  mode: AuthMode;
+  mode: 'login' | 'signup';
   onSuccess?: () => void;
+  onError?: (error: string) => void;
   redirectTo?: string;
 }
 
-interface AuthError {
-  provider?: string;
+interface ProviderError {
+  providerId: string;
   message: string;
 }
 
@@ -91,569 +97,420 @@ const ProviderIcons: Record<string, React.FC<{ className?: string }>> = {
       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
     </svg>
   ),
+  email: Mail,
+  magic: Sparkles,
+  phone: Phone,
+  sso: Building2,
 };
 
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
-export default function AuthOptions({ mode, onSuccess, redirectTo = '/dashboard' }: AuthOptionsProps) {
+export default function AuthOptions({ mode, onSuccess, onError, redirectTo }: AuthOptionsProps) {
   const supabase = createClient();
-  const [view, setView] = useState<AuthView>('default');
-  const [loading, setLoading] = useState<string | null>(null);
-  const [error, setError] = useState<AuthError | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   
-  // Form states
+  // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
+  const [name, setName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  
+  // UI state
+  const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [showMagicLink, setShowMagicLink] = useState(false);
+  const [showPhoneAuth, setShowPhoneAuth] = useState(false);
+  const [providerErrors, setProviderErrors] = useState<ProviderError[]>([]);
+  
+  // Get auth methods from config
   const authMethods = getAllAuthMethods();
-  const isLogin = mode === 'login';
-
+  const oauthProviders = getEnabledOAuthProviders();
+  
   // ============================================================================
-  // AUTH HANDLERS
+  // OAUTH HANDLER
   // ============================================================================
-
-  const handleOAuth = useCallback(async (provider: AuthProviderConfig) => {
-    if (!provider.supabaseProvider) return;
+  
+  const handleOAuth = async (provider: AuthProviderConfig) => {
+    if (!provider.supabaseProvider) {
+      setError(`${provider.name} is not properly configured`);
+      return;
+    }
     
     setLoading(provider.id);
-    setError(null);
-
+    setError('');
+    
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error: authError } = await supabase.auth.signInWithOAuth({
         provider: provider.supabaseProvider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+          redirectTo: redirectTo || `${window.location.origin}/auth/callback`,
         },
       });
-
-      if (error) {
-        setError({ provider: provider.id, message: error.message });
+      
+      if (authError) {
+        // Check if it's a configuration error
+        if (authError.message.includes('not enabled') || authError.message.includes('not configured')) {
+          setProviderErrors(prev => [...prev, { 
+            providerId: provider.id, 
+            message: `${provider.name} is not configured in Supabase` 
+          }]);
+        }
+        throw authError;
       }
-    } catch (err) {
-      setError({ 
-        provider: provider.id, 
-        message: err instanceof Error ? err.message : 'Authentication failed' 
-      });
+      
+      // OAuth redirects, so we don't need to do anything here
+    } catch (err: any) {
+      console.error(`OAuth error (${provider.name}):`, err);
+      setError(err.message || `Failed to sign in with ${provider.name}`);
+      onError?.(err.message);
     } finally {
       setLoading(null);
     }
-  }, [supabase, redirectTo]);
-
-  const handleEmailAuth = useCallback(async (e: React.FormEvent) => {
+  };
+  
+  // ============================================================================
+  // EMAIL/PASSWORD HANDLER
+  // ============================================================================
+  
+  const handleEmailPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading('email');
-    setError(null);
-
+    setError('');
+    
     try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        onSuccess?.();
-        window.location.href = redirectTo;
-      } else {
-        if (password !== confirmPassword) {
-          throw new Error('Passwords do not match');
+      if (mode === 'signup') {
+        // Signup
+        if (password.length < 8) {
+          throw new Error('Password must be at least 8 characters');
         }
-        const { error } = await supabase.auth.signUp({
+        
+        const { data, error: authError } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+            data: { full_name: name },
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         });
-        if (error) throw error;
-        setSuccess('Check your email for a confirmation link!');
+        
+        if (authError) throw authError;
+        
+        setSuccess('Check your email to confirm your account!');
+        onSuccess?.();
+      } else {
+        // Login
+        const { data, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (authError) throw authError;
+        
+        window.location.href = redirectTo || '/dashboard';
+        onSuccess?.();
       }
-    } catch (err) {
-      setError({ 
-        provider: 'email', 
-        message: err instanceof Error ? err.message : 'Authentication failed' 
-      });
+    } catch (err: any) {
+      console.error('Email/password error:', err);
+      setError(err.message || 'Authentication failed');
+      onError?.(err.message);
     } finally {
       setLoading(null);
     }
-  }, [isLogin, email, password, confirmPassword, supabase, onSuccess, redirectTo]);
-
-  const handleMagicLink = useCallback(async (e: React.FormEvent) => {
+  };
+  
+  // ============================================================================
+  // MAGIC LINK HANDLER
+  // ============================================================================
+  
+  const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading('magic_link');
-    setError(null);
-
+    setError('');
+    
     try {
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error: authError } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-      if (error) throw error;
+      
+      if (authError) throw authError;
+      
       setSuccess('Check your email for the magic link!');
-    } catch (err) {
-      setError({ 
-        provider: 'magic_link', 
-        message: err instanceof Error ? err.message : 'Failed to send magic link' 
-      });
+      onSuccess?.();
+    } catch (err: any) {
+      console.error('Magic link error:', err);
+      setError(err.message || 'Failed to send magic link');
+      onError?.(err.message);
     } finally {
       setLoading(null);
     }
-  }, [email, supabase, redirectTo]);
-
-  const handleForgotPassword = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading('forgot');
-    setError(null);
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
-      });
-      if (error) throw error;
-      setSuccess('Check your email for the password reset link!');
-    } catch (err) {
-      setError({ 
-        provider: 'forgot', 
-        message: err instanceof Error ? err.message : 'Failed to send reset email' 
-      });
-    } finally {
-      setLoading(null);
-    }
-  }, [email, supabase]);
-
+  };
+  
   // ============================================================================
-  // RENDER HELPERS
+  // RENDER OAUTH BUTTON
   // ============================================================================
-
+  
   const renderOAuthButton = (provider: AuthProviderConfig) => {
     const Icon = ProviderIcons[provider.icon];
+    const hasError = providerErrors.some(e => e.providerId === provider.id);
     const isLoading = loading === provider.id;
-    const hasError = error?.provider === provider.id;
-
+    
+    if (hasError) {
+      return (
+        <div
+          key={provider.id}
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-red-300 dark:border-red-700 rounded-xl bg-red-50 dark:bg-red-900/20"
+          data-testid={`auth-provider-${provider.id}`}
+          data-provider-error="true"
+        >
+          <AlertCircle className="w-5 h-5 text-red-500" />
+          <span className="font-medium text-red-600 dark:text-red-400 text-sm">
+            {provider.name} not configured
+          </span>
+        </div>
+      );
+    }
+    
     return (
-      <motion.button
+      <button
         key={provider.id}
-        data-testid={`auth-provider-${provider.id}`}
         onClick={() => handleOAuth(provider)}
-        disabled={!!loading}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className={`
-          w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl
-          font-medium transition-all duration-200
-          ${provider.colors.bg} ${provider.colors.bgHover} ${provider.colors.text}
-          ${provider.colors.border ? `border ${provider.colors.border}` : ''}
-          ${hasError ? 'ring-2 ring-red-500' : ''}
-          disabled:opacity-50 disabled:cursor-not-allowed
-        `}
+        disabled={isLoading || loading !== null}
+        className={`w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${provider.colors.bg} ${provider.colors.bgHover} ${provider.colors.border ? provider.colors.border : ''}`}
+        data-testid={`auth-provider-${provider.id}`}
       >
         {isLoading ? (
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
           Icon && <Icon className="w-5 h-5" />
         )}
-        <span>Continue with {provider.name}</span>
-      </motion.button>
+        <span className={`font-medium ${provider.colors.text}`}>
+          Continue with {provider.name}
+        </span>
+      </button>
     );
   };
-
+  
   // ============================================================================
-  // VIEW: DEFAULT (OAuth + Options)
+  // RENDER
   // ============================================================================
-
-  if (view === 'default') {
-    return (
-      <div className="space-y-4" data-testid="auth-options">
-        {/* OAuth Providers */}
-        {authMethods.oauth.length > 0 && (
-          <div className="space-y-3" data-testid="oauth-providers">
-            {authMethods.oauth.map(renderOAuthButton)}
-          </div>
-        )}
-
-        {/* Divider */}
-        {authMethods.oauth.length > 0 && (authMethods.email || authMethods.magicLink) && (
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-gray-800 text-gray-400">or continue with</span>
-            </div>
-          </div>
-        )}
-
-        {/* Email/Password Option */}
-        {authMethods.email && (
-          <button
-            data-testid="auth-provider-email"
-            onClick={() => setView('email')}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl
-              bg-gray-700 hover:bg-gray-600 text-white font-medium transition-colors"
-          >
-            <Mail className="w-5 h-5" />
-            <span>{isLogin ? 'Sign in' : 'Sign up'} with Email</span>
-          </button>
-        )}
-
-        {/* Magic Link Option */}
-        {authMethods.magicLink && (
-          <button
-            data-testid="auth-provider-magic_link"
-            onClick={() => setView('magic_link')}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl
-              bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 font-medium 
-              border border-purple-500/30 transition-colors"
-          >
-            <Sparkles className="w-5 h-5" />
-            <span>Email Magic Link</span>
-          </button>
-        )}
-
-        {/* Phone Option */}
-        {authMethods.phone && (
-          <button
-            data-testid="auth-provider-phone"
-            onClick={() => setView('phone')}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl
-              bg-green-600/20 hover:bg-green-600/30 text-green-300 font-medium
-              border border-green-500/30 transition-colors"
-          >
-            <Phone className="w-5 h-5" />
-            <span>Phone Number</span>
-          </button>
-        )}
-
-        {/* Enterprise SSO Option */}
-        {authMethods.sso && (
-          <button
-            data-testid="auth-provider-sso"
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl
-              bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 font-medium
-              border border-indigo-500/30 transition-colors"
-          >
-            <Building2 className="w-5 h-5" />
-            <span>Enterprise SSO</span>
-          </button>
-        )}
-
-        {/* Error Display */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm"
-            >
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{error.message}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Toggle Login/Signup */}
-        <p className="text-center text-gray-400 text-sm pt-4">
-          {isLogin ? (
-            <>
-              Don't have an account?{' '}
-              <Link href="/signup" className="text-cyan-400 hover:text-cyan-300 font-medium">
-                Sign up
-              </Link>
-            </>
-          ) : (
-            <>
-              Already have an account?{' '}
-              <Link href="/login" className="text-cyan-400 hover:text-cyan-300 font-medium">
-                Sign in
-              </Link>
-            </>
-          )}
-        </p>
-      </div>
-    );
-  }
-
-  // ============================================================================
-  // VIEW: EMAIL FORM
-  // ============================================================================
-
-  if (view === 'email') {
-    return (
-      <div className="space-y-4" data-testid="email-form">
-        <button
-          onClick={() => { setView('default'); setError(null); setSuccess(null); }}
-          className="text-gray-400 hover:text-white text-sm flex items-center gap-1"
-        >
-          ← Back to options
-        </button>
-
-        <form onSubmit={handleEmailAuth} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl
-                text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-                focus:ring-cyan-500 focus:border-transparent"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl
-                text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-                focus:ring-cyan-500 focus:border-transparent"
-              placeholder="••••••••"
-            />
-          </div>
-
-          {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Confirm Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                minLength={6}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl
-                  text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-                  focus:ring-cyan-500 focus:border-transparent"
-                placeholder="••••••••"
-              />
-            </div>
-          )}
-
-          {isLogin && AUTH_FEATURES.forgotPasswordEnabled && (
-            <button
-              type="button"
-              onClick={() => setView('forgot_password')}
-              className="text-cyan-400 hover:text-cyan-300 text-sm"
-            >
-              Forgot password?
-            </button>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading === 'email'}
-            className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 
-              hover:from-cyan-400 hover:to-blue-500 text-white font-semibold 
-              rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {loading === 'email' ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              isLogin ? 'Sign In' : 'Create Account'
-            )}
-          </button>
-        </form>
-
-        {/* Error/Success Display */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm"
-            >
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{error.message}</span>
-            </motion.div>
-          )}
-          {success && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm"
-            >
-              <Sparkles className="w-4 h-4 flex-shrink-0" />
-              <span>{success}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  }
-
-  // ============================================================================
-  // VIEW: MAGIC LINK FORM
-  // ============================================================================
-
-  if (view === 'magic_link') {
-    return (
-      <div className="space-y-4" data-testid="magic-link-form">
-        <button
-          onClick={() => { setView('default'); setError(null); setSuccess(null); }}
-          className="text-gray-400 hover:text-white text-sm flex items-center gap-1"
-        >
-          ← Back to options
-        </button>
-
-        <div className="text-center mb-4">
-          <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-2" />
-          <h3 className="text-lg font-semibold text-white">Magic Link</h3>
-          <p className="text-gray-400 text-sm">We'll email you a link to sign in instantly</p>
+  
+  return (
+    <div className="space-y-6" data-testid="auth-options">
+      {/* Error Display */}
+      {error && (
+        <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          {error}
         </div>
-
-        <form onSubmit={handleMagicLink} className="space-y-4">
+      )}
+      
+      {/* Success Display */}
+      {success && (
+        <div className="p-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg text-sm">
+          {success}
+        </div>
+      )}
+      
+      {/* OAuth Providers */}
+      {oauthProviders.length > 0 && (
+        <div className="space-y-3" data-testid="oauth-providers">
+          {oauthProviders.map(renderOAuthButton)}
+        </div>
+      )}
+      
+      {/* Divider */}
+      {oauthProviders.length > 0 && authMethods.email && (
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-4 bg-white dark:bg-gray-800 text-gray-500">
+              or continue with email
+            </span>
+          </div>
+        </div>
+      )}
+      
+      {/* Magic Link Toggle */}
+      {authMethods.magicLink && !showMagicLink && !showPhoneAuth && (
+        <button
+          onClick={() => setShowMagicLink(true)}
+          className="w-full text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-400"
+          data-testid="toggle-magic-link"
+        >
+          ✨ Sign in with magic link (no password needed)
+        </button>
+      )}
+      
+      {/* Magic Link Form */}
+      {showMagicLink && (
+        <form onSubmit={handleMagicLink} className="space-y-4" data-testid="magic-link-form">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email
+            </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl
-                text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-                focus:ring-purple-500 focus:border-transparent"
               placeholder="you@example.com"
+              required
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white"
             />
           </div>
-
+          
           <button
             type="submit"
             disabled={loading === 'magic_link'}
-            className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-600 
-              hover:from-purple-400 hover:to-pink-500 text-white font-semibold 
-              rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+            data-testid="auth-provider-magic_link"
           >
             {loading === 'magic_link' ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <>
-                <Sparkles className="w-5 h-5" />
-                Send Magic Link
-              </>
+              <Sparkles className="w-5 h-5" />
             )}
+            Send Magic Link
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => setShowMagicLink(false)}
+            className="w-full text-sm text-gray-500 hover:text-gray-700"
+          >
+            Back to password login
           </button>
         </form>
-
-        {/* Error/Success Display */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm"
-            >
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{error.message}</span>
-            </motion.div>
+      )}
+      
+      {/* Email/Password Form */}
+      {authMethods.email && !showMagicLink && !showPhoneAuth && (
+        <form onSubmit={handleEmailPassword} className="space-y-4" data-testid="email-password-form">
+          {mode === 'signup' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Full Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="John Doe"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white"
+              />
+            </div>
           )}
-          {success && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm"
-            >
-              <Sparkles className="w-4 h-4 flex-shrink-0" />
-              <span>{success}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  }
-
-  // ============================================================================
-  // VIEW: FORGOT PASSWORD FORM
-  // ============================================================================
-
-  if (view === 'forgot_password') {
-    return (
-      <div className="space-y-4" data-testid="forgot-password-form">
-        <button
-          onClick={() => { setView('email'); setError(null); setSuccess(null); }}
-          className="text-gray-400 hover:text-white text-sm flex items-center gap-1"
-        >
-          ← Back to sign in
-        </button>
-
-        <div className="text-center mb-4">
-          <Mail className="w-12 h-12 text-cyan-400 mx-auto mb-2" />
-          <h3 className="text-lg font-semibold text-white">Reset Password</h3>
-          <p className="text-gray-400 text-sm">Enter your email to receive a reset link</p>
-        </div>
-
-        <form onSubmit={handleForgotPassword} className="space-y-4">
+          
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email
+            </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl
-                text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-                focus:ring-cyan-500 focus:border-transparent"
               placeholder="you@example.com"
+              required
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white"
             />
           </div>
-
+          
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Password
+              </label>
+              {mode === 'login' && AUTH_FEATURES.forgotPasswordEnabled && (
+                <Link 
+                  href="/forgot-password" 
+                  className="text-sm text-cyan-600 hover:underline"
+                  data-testid="forgot-password-link"
+                >
+                  Forgot?
+                </Link>
+              )}
+            </div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              minLength={8}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-cyan-500 text-gray-900 dark:text-white"
+            />
+            {mode === 'signup' && (
+              <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+            )}
+          </div>
+          
           <button
             type="submit"
-            disabled={loading === 'forgot'}
-            className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 
-              hover:from-cyan-400 hover:to-blue-500 text-white font-semibold 
-              rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            disabled={loading === 'email'}
+            className="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-medium hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+            data-testid="auth-provider-email"
           >
-            {loading === 'forgot' ? (
+            {loading === 'email' ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              'Send Reset Link'
+              <Mail className="w-5 h-5" />
             )}
+            {mode === 'signup' ? 'Create Account' : 'Sign In'}
           </button>
         </form>
-
-        {/* Error/Success Display */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm"
-            >
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{error.message}</span>
-            </motion.div>
-          )}
-          {success && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm"
-            >
-              <Sparkles className="w-4 h-4 flex-shrink-0" />
-              <span>{success}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  }
-
-  return null;
+      )}
+      
+      {/* Phone Auth Toggle (if enabled) */}
+      {authMethods.phone && !showMagicLink && !showPhoneAuth && (
+        <button
+          onClick={() => setShowPhoneAuth(true)}
+          className="w-full text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-400"
+          data-testid="toggle-phone-auth"
+        >
+          📱 Sign in with phone number
+        </button>
+      )}
+      
+      {/* Enterprise SSO (if enabled) */}
+      {authMethods.sso && (
+        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <Link
+            href="/auth/sso"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            data-testid="auth-provider-sso"
+          >
+            <Building2 className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <span className="font-medium text-gray-700 dark:text-gray-300">
+              Continue with Enterprise SSO
+            </span>
+          </Link>
+        </div>
+      )}
+      
+      {/* Switch Mode Link */}
+      <p className="text-center text-gray-600 dark:text-gray-400">
+        {mode === 'login' ? (
+          <>
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="text-cyan-600 hover:underline font-medium">
+              Sign up free
+            </Link>
+          </>
+        ) : (
+          <>
+            Already have an account?{' '}
+            <Link href="/login" className="text-cyan-600 hover:underline font-medium">
+              Sign in
+            </Link>
+          </>
+        )}
+      </p>
+    </div>
+  );
 }

@@ -1,6 +1,7 @@
 // /app/page.tsx
 // CR AudioViz AI - Main Landing Page
 // Features Javari as the sole spokesperson with proper intros
+// 🔒 USES SHARED HEADER/FOOTER FROM LAYOUT - NO DUPLICATE NAV
 
 'use client';
 
@@ -16,36 +17,10 @@ import Image from 'next/image';
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/90 backdrop-blur-lg border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <Image 
-              src="/craudiovizailogo.png" 
-              alt="CR AudioViz AI" 
-              width={40} 
-              height={40}
-              className="rounded-lg"
-            />
-            <span className="text-xl font-bold text-white">CR AudioViz AI</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/apps" className="text-gray-300 hover:text-white">Apps</Link>
-            <Link href="/games" className="text-gray-300 hover:text-white">Games</Link>
-            <Link href="/javariverse" className="text-gray-300 hover:text-white">Javariverse</Link>
-            <Link href="/pricing" className="text-gray-300 hover:text-white">Pricing</Link>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="text-gray-300 hover:text-white">Log In</Link>
-            <Link href="/signup" className="px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors">
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </nav>
-
+      {/* 🔒 NO DUPLICATE NAV - Header comes from root layout.tsx */}
+      
       {/* Hero Section - Javari Introduction */}
-      <section className="hero-section pt-32 pb-16 px-4">
+      <section className="hero-section pt-8 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Javari Avatar */}
@@ -80,13 +55,13 @@ export default function LandingPage() {
                 Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-600">CR AudioViz AI</span>
               </h1>
               <p className="text-xl text-gray-300 mb-6 leading-relaxed">
-                Hi, I'm <strong className="text-cyan-400">Javari</strong> - your guide to the CR AudioViz AI ecosystem. 
-                We've built the most comprehensive AI-powered creative platform on the web.
+                Hi, I&apos;m <strong className="text-cyan-400">Javari</strong> - your guide to the CR AudioViz AI ecosystem. 
+                We&apos;ve built the most comprehensive AI-powered creative platform on the web.
               </p>
               <ul className="space-y-3 text-gray-300 mb-8">
                 <li className="flex items-center gap-3">
                   <span className="text-green-400">✓</span>
-                  <span><strong>50+ AI-Powered Apps</strong> - Logos, documents, social media, invoices & more</span>
+                  <span><strong>AI-Powered Apps</strong> - Logos, documents, social media, invoices & more</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="text-green-400">✓</span>
@@ -94,7 +69,7 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="text-green-400">✓</span>
-                  <span><strong>Javariverse</strong> - Our 2D social world coming soon</span>
+                  <span><strong>JavariVerse</strong> - Our virtual world coming soon</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="text-green-400">✓</span>
@@ -132,8 +107,8 @@ export default function LandingPage() {
                 Meet <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Javari</span>
               </h2>
               <p className="text-xl text-gray-300 mb-6 leading-relaxed">
-                I'm <strong className="text-cyan-400">Javari</strong> - your personal AI assistant who actually remembers you. 
-                I'm here to help you create, build, learn, and accomplish amazing things.
+                I&apos;m <strong className="text-cyan-400">Javari</strong> - your personal AI assistant who actually remembers you. 
+                I&apos;m here to help you create, build, learn, and accomplish amazing things.
               </p>
               <div className="space-y-4 mb-8">
                 <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
@@ -142,7 +117,7 @@ export default function LandingPage() {
                 </div>
                 <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
                   <h3 className="text-cyan-400 font-bold mb-2">🎨 Creative Partner</h3>
-                  <p className="text-gray-400">Need a logo? Document? Social post? I'll help you create professional content in minutes.</p>
+                  <p className="text-gray-400">Need a logo? Document? Social post? I&apos;ll help you create professional content in minutes.</p>
                 </div>
                 <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
                   <h3 className="text-cyan-400 font-bold mb-2">🤖 Multiple AI Models</h3>
@@ -150,7 +125,7 @@ export default function LandingPage() {
                 </div>
                 <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
                   <h3 className="text-cyan-400 font-bold mb-2">🎥 Voice & Video</h3>
-                  <p className="text-gray-400">Talk to me with voice commands or join a video call. I'm here 24/7.</p>
+                  <p className="text-gray-400">Talk to me with voice commands or join a video call. I&apos;m here 24/7.</p>
                 </div>
               </div>
               <Link 
@@ -224,7 +199,7 @@ export default function LandingPage() {
           </div>
           <div className="text-center mt-8">
             <Link href="/apps" className="text-cyan-400 font-medium hover:underline">
-              See All 50+ Apps →
+              See All Apps →
             </Link>
           </div>
         </div>
@@ -318,4 +293,3 @@ export default function LandingPage() {
     </div>
   );
 }
-

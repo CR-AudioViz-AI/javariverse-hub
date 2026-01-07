@@ -33,7 +33,7 @@ function AppCard({ app }: { app: typeof FALLBACK_APPS[0] }) {
   return (
     <Link
       href={app.route_path || '#'}
-      className="block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all border border-gray-200 dark:border-gray-700"
+      className="app-card block bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all border border-gray-200 dark:border-gray-700"
     >
       <div className="text-4xl mb-4">{app.icon || '📱'}</div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{app.name}</h3>
@@ -95,7 +95,7 @@ export default function AppsPage() {
           Our Apps
         </h1>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="apps-grid grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {apps.map(app => (
             <AppCard key={app.id} app={app} />
           ))}

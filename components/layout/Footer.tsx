@@ -3,12 +3,12 @@
 /**
  * CR AudioViz AI - FOOTER COMPONENT
  * 
- * COMPACT footer with proper spacing:
- * - Larger fonts (text-[15px])
- * - Tight line height (leading-[1.25])
- * - Reduced padding (py-8)
- * - Tight grid gaps (gap-y-6 gap-x-8)
- * - Minimal list spacing (space-y-1.5)
+ * COMPACT footer with exact spacing:
+ * - Outer padding: py-8 md:py-10
+ * - Grid gaps: gap-y-6 gap-x-10 md:gap-x-14
+ * - Link font: text-[15px] leading-[1.25]
+ * - List spacing: space-y-2
+ * - No extra wrapper padding/margins/min-height
  * 
  * @timestamp January 8, 2026
  */
@@ -46,10 +46,10 @@ export function Footer() {
 
   return (
     <footer className="bg-slate-950 border-t border-white/10" data-testid="site-footer">
-      {/* Main Footer - REDUCED PADDING py-8 */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* TIGHT GRID: gap-y-6 gap-x-8 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-8">
+      {/* Main Footer - EXACT PADDING: py-8 md:py-10 */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+        {/* EXACT GRID GAPS: gap-y-6 gap-x-10 md:gap-x-14 */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-10 md:gap-x-14">
           
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
@@ -63,10 +63,10 @@ export function Footer() {
             <p className="text-gray-500 text-xs mt-1">AI-powered creative tools.</p>
           </div>
 
-          {/* Navigation - LARGER FONT, TIGHT SPACING */}
+          {/* Navigation - EXACT: text-[15px] leading-[1.25], space-y-2 */}
           <div>
             <h3 className="text-white font-semibold text-[15px] mb-2">Navigation</h3>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {NAV_LINKS.map((link) => (
                 <Link 
                   key={link.href} 
@@ -79,10 +79,10 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Support - LARGER FONT, TIGHT SPACING */}
+          {/* Support - EXACT: text-[15px] leading-[1.25], space-y-2 */}
           <div>
             <h3 className="text-white font-semibold text-[15px] mb-2">Support</h3>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {SUPPORT_LINKS.map((link) => (
                 <Link 
                   key={link.href} 
@@ -95,10 +95,10 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Legal - LARGER FONT, TIGHT SPACING */}
+          {/* Legal - EXACT: text-[15px] leading-[1.25], space-y-2 */}
           <div>
             <h3 className="text-white font-semibold text-[15px] mb-2">Legal</h3>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {LEGAL_LINKS.map((link) => (
                 <Link 
                   key={link.href} 

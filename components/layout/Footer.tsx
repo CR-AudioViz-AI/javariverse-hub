@@ -1,17 +1,16 @@
 'use client';
 
 /**
- * CR AudioViz AI - FOOTER COMPONENT
+ * CR AudioViz AI - FOOTER COMPONENT (FINAL LOCK)
  * 
- * DEBUG: Added FOOTER_V10_ACTIVE marker to verify this file is rendering
+ * - Deep navy/near-black background (solid, no gradients)
+ * - Increased vertical padding
+ * - Breathable spacing between sections
+ * - White text, teal accents only
+ * - NO rainbow, purple, green
  * 
- * COMPACT footer:
- * - Outer padding: py-8 md:py-10
- * - Grid gaps: gap-y-6 gap-x-10 md:gap-x-14
- * - Link font: text-[15px] leading-[1.25]
- * - List spacing: space-y-2
- * 
- * @timestamp January 8, 2026
+ * DO NOT MODIFY AFTER LOCK
+ * @timestamp January 8, 2026 - FINAL
  */
 
 import Link from 'next/link';
@@ -46,35 +45,30 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-950 border-t border-white/10" data-testid="site-footer">
-      {/* DEBUG MARKER - Remove after confirming this footer renders */}
-      <div className="bg-red-600 text-white text-center py-1 text-xs font-bold">
-        FOOTER_V10_ACTIVE
-      </div>
-      
-      {/* Main Footer - py-8 md:py-10 */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
-        {/* Grid: gap-y-6 gap-x-10 md:gap-x-14 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-10 md:gap-x-14">
+    <footer className="bg-slate-900" data-testid="site-footer">
+      {/* Main Footer - INCREASED PADDING for breathing room */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        {/* Grid with increased gaps */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           
-          {/* Brand - text only */}
+          {/* Brand Column */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="inline-block mb-2">
-              <span className="text-white font-bold text-lg">CR AudioViz AI</span>
+            <Link href="/" className="inline-block mb-3">
+              <span className="text-white font-bold text-xl">CR AudioViz AI</span>
             </Link>
-            <p className="text-gray-400 text-sm">Your Story. Our Design.</p>
-            <p className="text-gray-500 text-xs mt-1">AI-powered creative tools.</p>
+            <p className="text-cyan-400 text-sm font-medium">Your Story. Our Design.</p>
+            <p className="text-slate-400 text-sm mt-2">AI-powered creative tools for the modern creator.</p>
           </div>
 
-          {/* Navigation - text-[15px] leading-[1.25], space-y-2 */}
+          {/* Navigation */}
           <div>
-            <h3 className="text-white font-semibold text-[15px] mb-2">Navigation</h3>
-            <div className="space-y-2">
+            <h3 className="text-white font-semibold text-base mb-4">Navigation</h3>
+            <div className="space-y-2.5">
               {NAV_LINKS.map((link) => (
                 <Link 
                   key={link.href} 
                   href={link.href} 
-                  className="block text-gray-400 hover:text-white text-[15px] leading-[1.25]"
+                  className="block text-slate-400 hover:text-cyan-400 text-sm transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -82,15 +76,15 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Support - text-[15px] leading-[1.25], space-y-2 */}
+          {/* Support */}
           <div>
-            <h3 className="text-white font-semibold text-[15px] mb-2">Support</h3>
-            <div className="space-y-2">
+            <h3 className="text-white font-semibold text-base mb-4">Support</h3>
+            <div className="space-y-2.5">
               {SUPPORT_LINKS.map((link) => (
                 <Link 
                   key={link.href} 
                   href={link.href} 
-                  className="block text-gray-400 hover:text-white text-[15px] leading-[1.25]"
+                  className="block text-slate-400 hover:text-cyan-400 text-sm transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -98,15 +92,15 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Legal - text-[15px] leading-[1.25], space-y-2 */}
+          {/* Legal */}
           <div>
-            <h3 className="text-white font-semibold text-[15px] mb-2">Legal</h3>
-            <div className="space-y-2">
+            <h3 className="text-white font-semibold text-base mb-4">Legal</h3>
+            <div className="space-y-2.5">
               {LEGAL_LINKS.map((link) => (
                 <Link 
                   key={link.href} 
                   href={link.href} 
-                  className="block text-gray-400 hover:text-white text-[15px] leading-[1.25]"
+                  className="block text-slate-400 hover:text-cyan-400 text-sm transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -116,12 +110,12 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
-            <p className="text-gray-400 text-xs">© {currentYear} CR AudioViz AI, LLC. All rights reserved.</p>
-            <p className="text-gray-500 text-xs">Made with ❤️ in Fort Myers, Florida</p>
+      {/* Bottom Bar - Slightly darker for separation */}
+      <div className="border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+            <p className="text-slate-400 text-sm">© {currentYear} CR AudioViz AI, LLC. All rights reserved.</p>
+            <p className="text-slate-500 text-sm">Made with ❤️ in Fort Myers, Florida</p>
           </div>
         </div>
       </div>

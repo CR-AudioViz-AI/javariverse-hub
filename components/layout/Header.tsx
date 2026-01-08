@@ -4,10 +4,10 @@
  * CR AudioViz AI - HEADER COMPONENT
  * 
  * LIGHT BACKGROUND for logo legibility (per founder directive)
- * - Header: 80px mobile / 92px desktop (LOCKED)
- * - Logo: full-color, crisp, visually dominant
- * - Light gradient background for maximum logo contrast
- * - Cindy & Roy = RED letters (not pink)
+ * - Header: 76px mobile / 84px desktop (REDUCED)
+ * - Logo wrapper: 220px / 300px / 360px
+ * - Logo: 44px / 52px / 56px
+ * - Cindy & Roy = RED letters
  * 
  * @timestamp January 8, 2026
  */
@@ -140,23 +140,23 @@ export default function Header() {
 
   return (
     <header className="bg-gradient-to-r from-sky-100 to-teal-100 border-b border-gray-200" data-testid="site-header">
-      {/* MAIN NAV BAR - FIXED HEIGHT: 80px mobile / 92px desktop */}
-      <div className="h-[80px] md:h-[92px] flex items-center">
+      {/* MAIN NAV BAR - REDUCED HEIGHT: 76px mobile / 84px desktop */}
+      <div className="h-[76px] md:h-[84px] flex items-center">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           
-          {/* Logo wrapper - WIDTH EMPHASIZED, full-color logo */}
+          {/* Logo wrapper - REDUCED WIDTH */}
           <Link 
             href="/" 
             data-testid="header-logo" 
             aria-label="CR AudioViz AI Home"
-            className="flex-shrink-0 w-[260px] md:w-[340px] lg:w-[420px] flex items-center"
+            className="flex-shrink-0 w-[220px] md:w-[300px] lg:w-[360px] flex items-center"
           >
             <Image
               src="/craudiovizailogo.png"
               alt="CR AudioViz AI"
               width={274}
               height={72}
-              className="h-[56px] md:h-[64px] lg:h-[72px] w-auto block"
+              className="h-[44px] md:h-[52px] lg:h-[56px] w-auto max-w-full block"
               priority
             />
           </Link>

@@ -133,7 +133,7 @@ export default function Header() {
 
   return (
     <header 
-      className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-white/10"
+      className="sticky top-0 z-50 bg-sky-100 backdrop-blur-md border-b border-sky-300 shadow-sm"
       data-testid="site-header"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -156,7 +156,7 @@ export default function Header() {
               alt="CR AudioViz AI"
               width={160}
               height={160}
-              className="w-[100px] h-auto sm:w-[120px] md:w-[140px] lg:w-[160px] drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+              className="w-[100px] h-auto sm:w-[120px] md:w-[140px] lg:w-[160px] "
               priority
             />
           </Link>
@@ -171,8 +171,8 @@ export default function Header() {
                 href={link.href}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive(link.href)
-                    ? 'bg-cyan-500/20 text-cyan-400'
-                    : 'text-gray-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-cyan-600 text-white'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-sky-200/50'
                 }`}
                 data-testid={`nav-link-${link.id}`}
               >
@@ -190,14 +190,14 @@ export default function Header() {
             {/* Desktop Auth */}
             <div className="hidden md:flex items-center gap-3" data-testid="auth-section">
               {loading ? (
-                <div className="w-20 h-10 bg-gray-800 rounded-lg animate-pulse" />
+                <div className="w-20 h-10 bg-sky-200 rounded-lg animate-pulse" />
               ) : user ? (
                 // Logged In: Name | Logout
                 <div className="flex items-center gap-2" data-testid="auth-logged-in">
                   {isAdmin && (
                     <Link
                       href="/admin"
-                      className="flex items-center gap-1 px-3 py-2 text-sm text-amber-400 hover:text-amber-300 transition-colors"
+                      className="flex items-center gap-1 px-3 py-2 text-sm text-amber-600 hover:text-amber-700 transition-colors"
                       data-testid="admin-link"
                     >
                       <Shield className="w-4 h-4" />
@@ -206,16 +206,16 @@ export default function Header() {
                   )}
                   <Link
                     href="/dashboard"
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:text-gray-900 transition-colors"
                     data-testid="user-name"
                   >
                     <User className="w-4 h-4" />
                     {getDisplayName()}
                   </Link>
-                  <span className="text-gray-600">|</span>
+                  <span className="text-gray-400">|</span>
                   <button
                     onClick={handleSignOut}
-                    className="text-sm text-gray-400 hover:text-white transition-colors"
+                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
                     data-testid="logout-button"
                   >
                     Logout
@@ -238,7 +238,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
+              className="lg:hidden p-2 rounded-lg text-gray-700 hover:text-gray-900 hover:bg-sky-200/50 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
               aria-label="Toggle menu"
               data-testid="mobile-menu-button"
             >
@@ -253,7 +253,7 @@ export default function Header() {
           ============================================================ */}
       {mobileMenuOpen && (
         <div 
-          className="lg:hidden fixed inset-0 top-16 bg-slate-950/98 backdrop-blur-lg z-40 overflow-y-auto"
+          className="lg:hidden fixed inset-0 top-16 bg-sky-100/98 backdrop-blur-lg z-40 overflow-y-auto"
           data-testid="mobile-menu"
         >
           <div className="px-4 py-6 space-y-2">
@@ -264,43 +264,43 @@ export default function Header() {
                 href={link.href}
                 className={`flex items-center justify-between px-4 py-4 rounded-xl text-base font-medium transition-colors min-h-[48px] ${
                   isActive(link.href)
-                    ? 'bg-cyan-500/20 text-cyan-400'
-                    : 'text-gray-200 hover:bg-white/5 active:bg-white/10'
+                    ? 'bg-cyan-600 text-white'
+                    : 'text-gray-700 hover:bg-sky-200/50 active:bg-sky-300/50'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
                 data-testid={`mobile-nav-${link.id}`}
               >
                 {link.label}
-                <ChevronRight className="w-5 h-5 text-gray-500" />
+                <ChevronRight className="w-5 h-5 text-gray-400" />
               </Link>
             ))}
 
             {/* Divider */}
-            <div className="border-t border-white/10 my-4" />
+            <div className="border-t border-sky-300 my-4" />
 
             {/* Mobile Auth */}
             {loading ? (
               <div className="px-4 py-4">
-                <div className="h-12 bg-gray-800 rounded-xl animate-pulse" />
+                <div className="h-12 bg-sky-200 rounded-xl animate-pulse" />
               </div>
             ) : user ? (
               <>
                 {/* User Info */}
-                <div className="px-4 py-3 text-gray-400 text-sm">
-                  Signed in as <span className="text-white font-medium">{getDisplayName()}</span>
+                <div className="px-4 py-3 text-gray-600 text-sm">
+                  Signed in as <span className="text-gray-900 font-medium">{getDisplayName()}</span>
                 </div>
                 
                 {/* Dashboard Link */}
                 <Link
                   href="/dashboard"
-                  className="flex items-center justify-between px-4 py-4 rounded-xl text-base font-medium text-gray-200 hover:bg-white/5 min-h-[48px]"
+                  className="flex items-center justify-between px-4 py-4 rounded-xl text-base font-medium text-gray-700 hover:bg-sky-200/50 min-h-[48px]"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <span className="flex items-center gap-3">
                     <User className="w-5 h-5" />
                     Dashboard
                   </span>
-                  <ChevronRight className="w-5 h-5 text-gray-500" />
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
                 </Link>
 
                 {/* Admin Link */}
@@ -334,7 +334,7 @@ export default function Header() {
               <div className="space-y-3 px-4">
                 <Link
                   href="/login"
-                  className="block w-full py-4 text-center rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-medium min-h-[48px]"
+                  className="block w-full py-4 text-center rounded-xl bg-cyan-600 hover:bg-cyan-700 text-gray-900 font-medium min-h-[48px]"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Log in

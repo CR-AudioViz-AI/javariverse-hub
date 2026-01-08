@@ -1,8 +1,8 @@
 /**
  * CR AudioViz AI - Root Layout
  * 
- * Structure: Header (top) > TopBar (below header) > Content > Footer
- * Both Header and TopBar are sticky
+ * Structure: Header (with CR bar integrated) > Content > Footer
+ * No separate TopBar - it's now part of Header
  * 
  * @timestamp January 8, 2026
  */
@@ -11,7 +11,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import '@/styles/phase2-mobile.css';
-import TopBar from "@/components/layout/TopBar";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SocialMediaButtons from "@/components/SocialMediaButtons";
@@ -92,10 +91,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <CanonicalLink />
-        {/* Sticky header area - Header FIRST, then TopBar below it */}
+        {/* Sticky header - CR bar is now integrated into Header */}
         <div className="sticky top-0 z-50">
           <Header />
-          <TopBar />
         </div>
         <div className="min-h-screen flex flex-col">
           <main className="flex-grow">

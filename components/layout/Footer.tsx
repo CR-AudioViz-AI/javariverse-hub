@@ -3,9 +3,8 @@
 /**
  * CR AudioViz AI - FOOTER COMPONENT
  * 
- * - Very compact spacing
- * - Bottom bar has SAME gradient as header (blue to green)
- * - Consistent branding throughout
+ * - Very compact spacing - links directly below each other
+ * - Clean professional layout
  * 
  * @timestamp January 8, 2026
  */
@@ -43,71 +42,72 @@ export function Footer() {
 
   return (
     <footer className="bg-slate-950 border-t border-white/10" data-testid="site-footer">
-      {/* Main Footer - tight spacing */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3">
+      {/* Main Footer */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-1">
+            <Link href="/" className="flex items-center gap-2 mb-2">
               <div className="w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded flex items-center justify-center">
                 <div className="w-1.5 h-1.5 bg-white rounded-full" />
               </div>
+              <span className="text-white font-semibold text-sm">CR AudioViz AI</span>
             </Link>
-            <p className="text-gray-400 text-[11px] leading-tight">Your Story. Our Design.</p>
-            <p className="text-gray-500 text-[11px] leading-tight">AI-powered creative tools.</p>
+            <p className="text-gray-400 text-xs leading-snug">Your Story. Our Design.</p>
+            <p className="text-gray-500 text-xs leading-snug">AI-powered creative tools.</p>
           </div>
 
-          {/* Navigation */}
+          {/* Navigation - NO EXTRA SPACING */}
           <div>
-            <h3 className="text-white font-semibold text-[11px] mb-1">Navigation</h3>
-            <ul className="space-y-0">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href} className="leading-none py-[2px]">
-                  <Link href={link.href} className="text-gray-400 hover:text-white text-[11px]">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <h3 className="text-white font-semibold text-xs mb-2">Navigation</h3>
+            {NAV_LINKS.map((link) => (
+              <Link 
+                key={link.href} 
+                href={link.href} 
+                className="block text-gray-400 hover:text-white text-xs leading-5"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
-          {/* Support */}
+          {/* Support - NO EXTRA SPACING */}
           <div>
-            <h3 className="text-white font-semibold text-[11px] mb-1">Support</h3>
-            <ul className="space-y-0">
-              {SUPPORT_LINKS.map((link) => (
-                <li key={link.href} className="leading-none py-[2px]">
-                  <Link href={link.href} className="text-gray-400 hover:text-white text-[11px]">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <h3 className="text-white font-semibold text-xs mb-2">Support</h3>
+            {SUPPORT_LINKS.map((link) => (
+              <Link 
+                key={link.href} 
+                href={link.href} 
+                className="block text-gray-400 hover:text-white text-xs leading-5"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
-          {/* Legal */}
+          {/* Legal - NO EXTRA SPACING */}
           <div>
-            <h3 className="text-white font-semibold text-[11px] mb-1">Legal</h3>
-            <ul className="space-y-0">
-              {LEGAL_LINKS.map((link) => (
-                <li key={link.href} className="leading-none py-[2px]">
-                  <Link href={link.href} className="text-gray-400 hover:text-white text-[11px]">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <h3 className="text-white font-semibold text-xs mb-2">Legal</h3>
+            {LEGAL_LINKS.map((link) => (
+              <Link 
+                key={link.href} 
+                href={link.href} 
+                className="block text-gray-400 hover:text-white text-xs leading-5"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Bottom Bar - SAME GRADIENT AS HEADER */}
-      <div className="bg-gradient-to-r from-blue-600 to-green-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+      {/* Bottom Bar */}
+      <div className="border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
-            <p className="text-white/90 text-[11px]">© {currentYear} CR AudioViz AI, LLC. All rights reserved.</p>
-            <p className="text-white/70 text-[11px]">Made with ❤️ in Fort Myers, Florida</p>
+            <p className="text-gray-400 text-xs">© {currentYear} CR AudioViz AI, LLC. All rights reserved.</p>
+            <p className="text-gray-500 text-xs">Made with ❤️ in Fort Myers, Florida</p>
           </div>
         </div>
       </div>

@@ -1,10 +1,12 @@
 /**
  * CR AudioViz AI - Root Layout
  * 
- * Complete page structure with canonical URLs for SEO
+ * Complete page structure with:
+ * - TopBar (combined CR + Credits bar) - sticky
+ * - Header with gradient - sticky
+ * - Footer
  * 
- * @timestamp Friday, January 02, 2026 - 8:04 PM EST
- * @author Claude (for Roy Henderson)
+ * @timestamp January 8, 2026
  */
 
 import type { Metadata, Viewport } from "next";
@@ -12,9 +14,8 @@ import Script from 'next/script';
 import { Inter } from "next/font/google";
 import "./globals.css";
 import '@/styles/phase2-mobile.css';
+import TopBar from "@/components/layout/TopBar";
 import Header from "@/components/layout/Header";
-import CRBar from "@/components/layout/CRBar";
-import CreditsBar from "@/components/layout/CreditsBar";
 import Footer from "@/components/layout/Footer";
 import SocialMediaButtons from "@/components/SocialMediaButtons";
 import JavariWidget from '@/components/JavariWidget';
@@ -28,8 +29,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' }
+    { media: '(prefers-color-scheme: light)', color: '#2563eb' },
+    { media: '(prefers-color-scheme: dark)', color: '#1e40af' }
   ],
 }
 
@@ -94,10 +95,12 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <CanonicalLink />
-        <div className="min-h-screen flex flex-col">
+        {/* Sticky header area */}
+        <div className="sticky top-0 z-50">
+          <TopBar />
           <Header />
-          <CRBar />
-          <CreditsBar />
+        </div>
+        <div className="min-h-screen flex flex-col">
           <main className="flex-grow">
             {children}
           </main>

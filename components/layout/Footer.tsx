@@ -3,12 +3,12 @@
 /**
  * CR AudioViz AI - FOOTER COMPONENT
  * 
- * COMPACT footer with exact spacing:
+ * COMPACT footer - NO blue box icon
+ * - Just text branding, no placeholder icon
  * - Outer padding: py-8 md:py-10
  * - Grid gaps: gap-y-6 gap-x-10 md:gap-x-14
  * - Link font: text-[15px] leading-[1.25]
  * - List spacing: space-y-2
- * - No extra wrapper padding/margins/min-height
  * 
  * @timestamp January 8, 2026
  */
@@ -51,13 +51,10 @@ export function Footer() {
         {/* EXACT GRID GAPS: gap-y-6 gap-x-10 md:gap-x-14 */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-10 md:gap-x-14">
           
-          {/* Brand */}
+          {/* Brand - NO blue box icon, just text */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded flex items-center justify-center">
-                <div className="w-1.5 h-1.5 bg-white rounded-full" />
-              </div>
-              <span className="text-white font-semibold text-[15px]">CR AudioViz AI</span>
+            <Link href="/" className="inline-block mb-2">
+              <span className="text-white font-bold text-lg">CR AudioViz AI</span>
             </Link>
             <p className="text-gray-400 text-sm">Your Story. Our Design.</p>
             <p className="text-gray-500 text-xs mt-1">AI-powered creative tools.</p>

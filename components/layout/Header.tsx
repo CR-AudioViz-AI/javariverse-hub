@@ -10,7 +10,7 @@
  * @timestamp January 8, 2026 - LAYOUT FIX
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -105,12 +105,20 @@ export default function Header() {
     return () => subscription.unsubscribe();
   }, [supabase]);
 
-  const handleSignOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setIsAdmin(false);
-    window.location.href = '/';
-  }, [supabase]);
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      setIsAdmin(false);
+      setCredits(null);
+      setPlan('Free');
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Sign out error:', error);
+      // Force redirect even on error
+      window.location.href = '/';
+    }
+  };
 
   const getDisplayName = () => {
     if (!user) return '';
@@ -175,7 +183,7 @@ export default function Header() {
                     <User className="w-4 h-4" />
                     <span>{getDisplayName()}</span>
                   </Link>
-                  <button onClick={handleSignOut} className="flex items-center gap-1.5 px-2 py-1 text-sm text-slate-500 hover:text-cyan-600">
+                  <button type="button" onClick={handleSignOut} className="flex items-center gap-1.5 px-2 py-1 text-sm text-slate-500 hover:text-cyan-600">
                     <LogOut className="w-4 h-4" />
                     <span>Logout</span>
                   </button>
@@ -216,7 +224,7 @@ export default function Header() {
                     <User className="w-4 h-4" />
                     <span className="hidden sm:inline">{getDisplayName()}</span>
                   </Link>
-                  <button onClick={handleSignOut} className="flex items-center gap-1 text-sm text-slate-500">
+                  <button type="button" onClick={handleSignOut} className="flex items-center gap-1 text-sm text-slate-500">
                     <LogOut className="w-4 h-4" />
                   </button>
                 </div>

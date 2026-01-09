@@ -162,7 +162,7 @@ export default function Header() {
                 <Link
                   key={link.id}
                   href={link.href}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`px-3 py-2.5 min-h-[44px] flex items-center rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                     isActive(link.href)
                       ? 'bg-cyan-100 text-cyan-700 border-b-2 border-cyan-500'
                       : 'text-slate-700 hover:text-cyan-600 hover:bg-cyan-50'
@@ -191,7 +191,7 @@ export default function Header() {
               ) : (
                 <div className="flex items-center gap-2">
                   <Link href="/login" className="px-3 py-1 text-sm text-slate-700 hover:text-cyan-600">Log In</Link>
-                  <Link href="/signup" className="px-3 py-1.5 bg-cyan-600 text-white hover:bg-cyan-700 rounded-lg text-sm font-medium">Sign Up</Link>
+                  <Link href="/signup" className="px-3 py-2.5 min-h-[44px] flex items-center bg-cyan-600 text-white hover:bg-cyan-700 rounded-lg text-sm font-medium">Sign Up</Link>
                 </div>
               )}
             </div>

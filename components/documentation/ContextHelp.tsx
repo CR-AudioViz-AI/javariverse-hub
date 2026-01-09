@@ -338,9 +338,9 @@ export function ContextHelp({
                           </span>
                           <button
                             onClick={() => rateAnswer(aiAnswer.question_id, 5)}
-                            className="p-1 hover:bg-green-100 dark:hover:bg-green-900/20 rounded"
+                            className="p-1 hover:bg-cyan-500 dark:hover:bg-cyan-500/20 rounded"
                           >
-                            <ThumbsUp className="w-4 h-4 text-green-600" />
+                            <ThumbsUp className="w-4 h-4 text-cyan-500" />
                           </button>
                           <button
                             onClick={() => rateAnswer(aiAnswer.question_id, 1)}

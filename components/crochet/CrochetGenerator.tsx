@@ -216,11 +216,11 @@ export default function CrochetGenerator({
       <div id="generator" className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Pattern Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-pink-500 text-white p-8">
+          <div className="bg-gradient-to-r from-cyan-500 to-cyan-500 text-white p-8">
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-3xl font-bold mb-2">{generatedPattern.title}</h2>
-                <p className="text-purple-100 mb-4">{generatedPattern.description}</p>
+                <p className="text-cyan-500 mb-4">{generatedPattern.description}</p>
                 <div className="flex flex-wrap gap-3 text-sm">
                   <span className="bg-white/20 px-3 py-1 rounded-full">
                     ⏱️ {generatedPattern.estimatedTime}
@@ -235,7 +235,7 @@ export default function CrochetGenerator({
               </div>
               <button
                 onClick={handleDownload}
-                className="flex items-center gap-2 bg-white text-purple-600 px-4 py-2 rounded-xl font-semibold hover:bg-purple-50 transition-colors"
+                className="flex items-center gap-2 bg-white text-cyan-500 px-4 py-2 rounded-xl font-semibold hover:bg-cyan-500 transition-colors"
               >
                 <Download className="w-4 h-4" />
                 Download
@@ -271,14 +271,14 @@ export default function CrochetGenerator({
             {generatedPattern.sections.map((section, idx) => (
               <div key={idx} className="mb-8 last:mb-0">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold">
+                  <div className="w-10 h-10 bg-cyan-500 text-cyan-500 rounded-full flex items-center justify-center font-bold">
                     {idx + 1}
                   </div>
                   <div>
                     <h4 className="text-lg font-bold text-gray-800">
                       {section.name}
                       {section.quantity > 1 && (
-                        <span className="text-purple-600 ml-2">(Make {section.quantity})</span>
+                        <span className="text-cyan-500 ml-2">(Make {section.quantity})</span>
                       )}
                     </h4>
                     {section.colorNote && (
@@ -288,15 +288,15 @@ export default function CrochetGenerator({
                 </div>
                 
                 <div className="bg-gray-900 rounded-xl p-4 overflow-x-auto">
-                  <pre className="text-green-400 text-sm font-mono whitespace-pre-wrap">
+                  <pre className="text-cyan-500 text-sm font-mono whitespace-pre-wrap">
                     {section.rounds.join('\n')}
                   </pre>
                 </div>
                 
                 {section.tips.length > 0 && (
-                  <div className="mt-3 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
-                    <div className="font-medium text-yellow-800 mb-1">💡 Tips:</div>
-                    <ul className="text-sm text-yellow-700 space-y-1">
+                  <div className="mt-3 p-4 bg-cyan-400 border-l-4 border-cyan-400 rounded-r-lg">
+                    <div className="font-medium text-cyan-400 mb-1">💡 Tips:</div>
+                    <ul className="text-sm text-cyan-400 space-y-1">
                       {section.tips.map((tip, tipIdx) => (
                         <li key={tipIdx}>• {tip}</li>
                       ))}
@@ -308,13 +308,13 @@ export default function CrochetGenerator({
           </div>
 
           {/* Assembly */}
-          <div className="p-8 border-t bg-purple-50">
+          <div className="p-8 border-t bg-cyan-500">
             <h3 className="text-xl font-bold text-gray-800 mb-4">🔧 Assembly</h3>
             <div className="space-y-2">
               {generatedPattern.assembly.map((step, idx) => (
                 <div key={idx} className={`${
                   step.startsWith('ATTACH') || step.startsWith('FINISHING') 
-                    ? 'font-bold text-purple-700 mt-4' 
+                    ? 'font-bold text-cyan-500 mt-4' 
                     : 'text-gray-700 pl-4'
                 }`}>
                   {step}
@@ -334,13 +334,13 @@ export default function CrochetGenerator({
         <div className="flex justify-center gap-4 mt-8">
           <button
             onClick={handleNewPattern}
-            className="px-6 py-3 bg-white text-purple-600 rounded-xl font-semibold border-2 border-purple-600 hover:bg-purple-50 transition-colors"
+            className="px-6 py-3 bg-white text-cyan-500 rounded-xl font-semibold border-2 border-cyan-500 hover:bg-cyan-500 transition-colors"
           >
             Generate Another Pattern
           </button>
           <button
             onClick={handleDownload}
-            className="px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors"
+            className="px-6 py-3 bg-cyan-500 text-white rounded-xl font-semibold hover:bg-cyan-500 transition-colors"
           >
             Download as Markdown
           </button>
@@ -370,7 +370,7 @@ export default function CrochetGenerator({
 
         {/* Auth Required Notice */}
         {!isAuthenticated && (
-          <div className="bg-purple-50 border border-purple-200 text-purple-700 px-4 py-3 rounded-xl mb-6 flex items-start gap-3">
+          <div className="bg-cyan-500 border border-cyan-500 text-cyan-500 px-4 py-3 rounded-xl mb-6 flex items-start gap-3">
             <Lock className="w-5 h-5 mt-0.5 flex-shrink-0" />
             <div>
               <div className="font-medium">Sign in required</div>
@@ -392,11 +392,11 @@ export default function CrochetGenerator({
                 key={idx}
                 type="button"
                 onClick={() => setPrompt(example.prompt)}
-                className="flex items-center gap-1 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-full text-sm transition-colors border border-purple-200"
+                className="flex items-center gap-1 px-3 py-1.5 bg-cyan-500 hover:bg-cyan-500 text-cyan-500 rounded-full text-sm transition-colors border border-cyan-500"
               >
                 <span>{example.icon}</span>
                 <span>{example.prompt}</span>
-                <span className="text-xs text-purple-400">({example.credits})</span>
+                <span className="text-xs text-cyan-500">({example.credits})</span>
               </button>
             ))}
           </div>
@@ -412,7 +412,7 @@ export default function CrochetGenerator({
             onChange={(e) => setPrompt(e.target.value)}
             rows={3}
             placeholder="e.g., 6 inch manatee, cute teddy bear, small octopus..."
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-base"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none text-base"
             disabled={loading}
           />
           <p className="text-xs text-gray-500 mt-1">
@@ -428,7 +428,7 @@ export default function CrochetGenerator({
           <select
             value={difficulty}
             onChange={(e) => setDifficulty(e.target.value as any)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-base"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent bg-white text-base"
             disabled={loading}
           >
             <option value="beginner">🌱 Beginner - New to crochet</option>
@@ -440,15 +440,15 @@ export default function CrochetGenerator({
 
         {/* Credit Cost Display */}
         {prompt && isAuthenticated && (
-          <div className={`mb-6 p-4 rounded-xl ${hasEnoughCredits ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+          <div className={`mb-6 p-4 rounded-xl ${hasEnoughCredits ? 'bg-cyan-500 border border-cyan-500' : 'bg-red-50 border border-red-200'}`}>
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-sm font-medium">Credit Cost:</span>
-                <span className={`ml-2 font-bold ${hasEnoughCredits ? 'text-green-700' : 'text-red-700'}`}>
+                <span className={`ml-2 font-bold ${hasEnoughCredits ? 'text-cyan-500' : 'text-red-700'}`}>
                   {canGenerateFree ? 'FREE' : `${estimatedCredits} credits`}
                 </span>
                 {canGenerateFree && (
-                  <span className="ml-2 text-xs text-green-600">(1 free simple pattern/day)</span>
+                  <span className="ml-2 text-xs text-cyan-500">(1 free simple pattern/day)</span>
                 )}
               </div>
               <div className="text-sm text-gray-500">
@@ -470,7 +470,7 @@ export default function CrochetGenerator({
           className={`w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 ${
             loading || !isAuthenticated || !hasEnoughCredits
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:from-purple-700 hover:to-pink-600 shadow-lg hover:shadow-xl'
+              : 'bg-gradient-to-r from-cyan-500 to-cyan-500 text-white hover:from-cyan-500 hover:to-cyan-500 shadow-lg hover:shadow-xl'
           }`}
         >
           {loading ? (

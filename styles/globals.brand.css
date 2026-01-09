@@ -1,0 +1,173 @@
+/**
+ * Henderson Standards Global CSS
+ * 
+ * Base styles for all CR AudioViz AI apps.
+ * Import this in your app's globals.css or layout.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@layer base {
+  /* Light mode defaults */
+  :root {
+    --color-background: #ffffff;
+    --color-background-alt: #f9fafb;
+    --color-card: #ffffff;
+    --color-text: #0f172a;
+    --color-text-muted: #475569;
+    --color-border: #e2e8f0;
+    --color-primary: #0891b2;
+    --color-primary-hover: #0e7490;
+  }
+
+  /* Dark mode */
+  .dark {
+    --color-background: #0f172a;
+    --color-background-alt: #1e293b;
+    --color-card: #1e293b;
+    --color-text: #f8fafc;
+    --color-text-muted: #94a3b8;
+    --color-border: #334155;
+    --color-primary: #22d3ee;
+    --color-primary-hover: #67e8f9;
+  }
+
+  /* Base HTML */
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-50;
+    @apply transition-colors duration-200;
+    min-height: 100vh;
+  }
+
+  /* Minimum font size for accessibility */
+  p, span, div, li, td, th, label {
+    @apply text-sm leading-relaxed;
+    min-font-size: 14px;
+  }
+
+  /* Focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-cyan-500 ring-offset-2 dark:ring-offset-slate-900;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-cyan-200 dark:bg-cyan-800 text-slate-900 dark:text-white;
+  }
+}
+
+@layer components {
+  /* 3D Logo Style */
+  .logo-3d {
+    @apply rounded-xl flex items-center justify-center;
+    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%);
+    box-shadow: 0 4px 14px 0 rgba(8, 145, 178, 0.39);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .logo-3d:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px 0 rgba(8, 145, 178, 0.5);
+  }
+
+  .dark .logo-3d {
+    box-shadow: 0 4px 14px 0 rgba(6, 182, 212, 0.25);
+  }
+
+  .dark .logo-3d:hover {
+    box-shadow: 0 6px 20px 0 rgba(6, 182, 212, 0.4);
+  }
+
+  /* Tap Target - Ensure minimum 44px */
+  .tap-target {
+    @apply min-h-tap min-w-tap flex items-center justify-center;
+  }
+
+  /* Button base */
+  .btn {
+    @apply inline-flex items-center justify-center min-h-tap px-4 py-2;
+    @apply text-sm font-medium rounded-lg transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2;
+    @apply dark:focus:ring-offset-slate-900;
+  }
+
+  .btn-primary {
+    @apply btn bg-cyan-600 text-white hover:bg-cyan-700;
+    @apply dark:bg-cyan-500 dark:hover:bg-cyan-400 dark:text-slate-900;
+  }
+
+  .btn-secondary {
+    @apply btn bg-slate-100 text-slate-700 hover:bg-slate-200;
+    @apply dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700;
+  }
+
+  .btn-ghost {
+    @apply btn text-slate-600 hover:bg-slate-100;
+    @apply dark:text-slate-400 dark:hover:bg-slate-800;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-white dark:bg-slate-800 rounded-xl shadow-sm;
+    @apply border border-slate-200 dark:border-slate-700;
+  }
+
+  /* Input */
+  .input {
+    @apply w-full min-h-tap px-4 py-2 text-sm rounded-lg;
+    @apply bg-white dark:bg-slate-800;
+    @apply border border-slate-300 dark:border-slate-600;
+    @apply text-slate-900 dark:text-slate-100;
+    @apply placeholder:text-slate-400 dark:placeholder:text-slate-500;
+    @apply focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent;
+  }
+
+  /* Credits warning */
+  .credits-warning {
+    @apply text-red-600 dark:text-red-400 font-medium;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+}
+
+@layer utilities {
+  /* Mobile-first utilities */
+  .mobile-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .mobile-safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* No horizontal scroll */
+  .no-h-scroll {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Single column on mobile */
+  .mobile-single-col {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  /* Henderson Red - ONLY for errors and "Cindy & Roy" */
+  .henderson-red {
+    @apply text-red-600 dark:text-red-400;
+  }
+}

@@ -97,7 +97,7 @@ export default async function AdminAnalyticsPage() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
               <Users className="w-5 h-5 text-blue-500" />
-              <span className="text-green-500 text-xs font-semibold flex items-center">
+              <span className="text-cyan-500 text-xs font-semibold flex items-center">
                 <ArrowUpRight className="w-3 h-3" /> 12%
               </span>
             </div>
@@ -106,21 +106,21 @@ export default async function AdminAnalyticsPage() {
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <Users className="w-5 h-5 text-purple-500" />
+              <Users className="w-5 h-5 text-cyan-500" />
             </div>
             <p className="text-sm text-gray-500">Weekly Active Users</p>
             <p className="text-3xl font-bold text-gray-900">{data.wau.toLocaleString()}</p>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <Target className="w-5 h-5 text-green-500" />
+              <Target className="w-5 h-5 text-cyan-500" />
             </div>
             <p className="text-sm text-gray-500">DAU/WAU Stickiness</p>
             <p className="text-3xl font-bold text-gray-900">{stickiness}%</p>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <Zap className="w-5 h-5 text-orange-500" />
+              <Zap className="w-5 h-5 text-cyan-500" />
             </div>
             <p className="text-sm text-gray-500">Tasks Today</p>
             <p className="text-3xl font-bold text-gray-900">{data.tasksToday.toLocaleString()}</p>
@@ -161,12 +161,12 @@ export default async function AdminAnalyticsPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">User Growth</h2>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-cyan-500 rounded-lg">
                 <div>
-                  <p className="text-sm text-green-600">New Users Today</p>
-                  <p className="text-2xl font-bold text-green-700">{data.newToday}</p>
+                  <p className="text-sm text-cyan-500">New Users Today</p>
+                  <p className="text-2xl font-bold text-cyan-500">{data.newToday}</p>
                 </div>
-                <Users className="w-8 h-8 text-green-500" />
+                <Users className="w-8 h-8 text-cyan-500" />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
@@ -200,8 +200,8 @@ export default async function AdminAnalyticsPage() {
             {[
               { label: 'Visitors', value: 10000, color: 'bg-gray-200' },
               { label: 'Signups', value: 2500, color: 'bg-blue-200' },
-              { label: 'First Task', value: 1500, color: 'bg-purple-200' },
-              { label: 'Paid', value: 380, color: 'bg-green-200' },
+              { label: 'First Task', value: 1500, color: 'bg-cyan-500' },
+              { label: 'Paid', value: 380, color: 'bg-cyan-500' },
             ].map((step, idx) => (
               <div key={step.label} className="flex-1 text-center">
                 <div className={`mx-2 h-24 ${step.color} rounded-lg flex items-center justify-center`}

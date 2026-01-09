@@ -130,7 +130,7 @@ export function JavariWidget({
       >
         <div className="relative flex items-center justify-center w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110">
           <Sparkles className="w-6 h-6 text-white" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-cyan-500 rounded-full border-2 border-white animate-pulse" />
         </div>
         <div className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
           Chat with Javari AI

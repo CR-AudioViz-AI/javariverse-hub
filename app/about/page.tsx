@@ -34,7 +34,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-blue-600 via-cyan-600 to-cyan-500 text-white py-24 px-4">
+      <div className="bg-gradient-to-br from-cyan-600 via-cyan-600 to-cyan-500 text-white py-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -47,7 +47,7 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-blue-100 max-w-2xl mx-auto"
+            className="text-xl text-cyan-100 max-w-2xl mx-auto"
           >
             We're building the future of AI-powered creativity. A platform where everyone connects and everyone wins.
           </motion.p>
@@ -107,11 +107,11 @@ export default function AboutPage() {
                 transition={{ delay: idx * 0.1 }}
                 className="text-center"
               >
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
+                <div className="w-24 h-24 bg-gradient-to-br from-cyan-500 to-cyan-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
                   {member.emoji}
                 </div>
                 <h3 className="font-bold text-gray-900 dark:text-white">{member.name}</h3>
-                <p className="text-blue-600 dark:text-blue-400 text-sm mb-2">{member.role}</p>
+                <p className="text-cyan-600 dark:text-cyan-400 text-sm mb-2">{member.role}</p>
                 <p className="text-gray-600 dark:text-gray-400 text-sm">{member.bio}</p>
               </motion.div>
             ))}
@@ -133,10 +133,10 @@ export default function AboutPage() {
                 className="flex gap-6"
               >
                 <div className="w-20 flex-shrink-0 text-right">
-                  <span className="font-bold text-blue-600 dark:text-blue-400">{milestone.year}</span>
+                  <span className="font-bold text-cyan-600 dark:text-cyan-400">{milestone.year}</span>
                 </div>
-                <div className="flex-1 pb-6 border-l-2 border-blue-500 pl-6 relative">
-                  <div className="absolute w-4 h-4 bg-blue-500 rounded-full -left-[9px] top-1" />
+                <div className="flex-1 pb-6 border-l-2 border-cyan-500 pl-6 relative">
+                  <div className="absolute w-4 h-4 bg-cyan-500 rounded-full -left-[9px] top-1" />
                   <p className="text-gray-700 dark:text-gray-300">{milestone.event}</p>
                 </div>
               </motion.div>
@@ -155,7 +155,7 @@ export default function AboutPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/signup"
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-slate-700"
+              className="px-8 py-3 bg-gradient-to-r from-cyan-600 to-cyan-600 text-white rounded-xl font-medium hover:from-cyan-700 hover:to-slate-700"
             >
               Get Started Free →
             </Link>

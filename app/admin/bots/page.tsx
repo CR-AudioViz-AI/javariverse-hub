@@ -118,7 +118,7 @@ export default async function AdminBotsPage() {
               <p className="text-gray-300">9 bots running 24/7 to keep the platform healthy</p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-semibold">
+              <span className="px-3 py-1 bg-cyan-500/20 text-cyan-500 rounded-full text-sm font-semibold">
                 9/9 Active
               </span>
             </div>
@@ -138,8 +138,8 @@ export default async function AdminBotsPage() {
               <div key={bot.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isActive ? 'bg-green-100' : 'bg-gray-100'}`}>
-                      <Bot className={`w-5 h-5 ${isActive ? 'text-green-600' : 'text-gray-400'}`} />
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isActive ? 'bg-cyan-500' : 'bg-gray-100'}`}>
+                      <Bot className={`w-5 h-5 ${isActive ? 'text-cyan-500' : 'text-gray-400'}`} />
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-900">{bot.name}</h3>
@@ -150,7 +150,7 @@ export default async function AdminBotsPage() {
                     <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
                       <Settings className="w-4 h-4" />
                     </button>
-                    <button className={`p-1.5 rounded-lg ${isActive ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-100'}`}>
+                    <button className={`p-1.5 rounded-lg ${isActive ? 'text-cyan-500 hover:bg-cyan-500' : 'text-gray-400 hover:bg-gray-100'}`}>
                       {isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                     </button>
                   </div>
@@ -176,11 +176,11 @@ export default async function AdminBotsPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     {isActive ? (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-cyan-500" />
                     ) : (
-                      <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                      <AlertTriangle className="w-4 h-4 text-cyan-400" />
                     )}
-                    <span className={`text-xs font-semibold ${isActive ? 'text-green-600' : 'text-yellow-600'}`}>
+                    <span className={`text-xs font-semibold ${isActive ? 'text-cyan-500' : 'text-cyan-400'}`}>
                       {isActive ? 'Active' : 'Paused'}
                     </span>
                   </div>
@@ -198,10 +198,10 @@ export default async function AdminBotsPage() {
               <div key={run.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    run.status === 'success' ? 'bg-green-100' : run.status === 'failed' ? 'bg-red-100' : 'bg-blue-100'
+                    run.status === 'success' ? 'bg-cyan-500' : run.status === 'failed' ? 'bg-red-100' : 'bg-blue-100'
                   }`}>
                     {run.status === 'success' ? (
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <CheckCircle className="w-4 h-4 text-cyan-500" />
                     ) : run.status === 'failed' ? (
                       <AlertTriangle className="w-4 h-4 text-red-600" />
                     ) : (
@@ -217,7 +217,7 @@ export default async function AdminBotsPage() {
                 </div>
                 <div className="text-right">
                   <p className={`text-sm font-semibold ${
-                    run.status === 'success' ? 'text-green-600' : run.status === 'failed' ? 'text-red-600' : 'text-blue-600'
+                    run.status === 'success' ? 'text-cyan-500' : run.status === 'failed' ? 'text-red-600' : 'text-blue-600'
                   }`}>
                     {run.status}
                   </p>

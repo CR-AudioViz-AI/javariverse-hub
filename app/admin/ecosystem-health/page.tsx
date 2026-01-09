@@ -66,8 +66,8 @@ export default function EcosystemHealthPage() {
 
   function getStatusColor(status: string) {
     switch (status) {
-      case 'operational': return 'bg-green-500'
-      case 'degraded': return 'bg-yellow-500'
+      case 'operational': return 'bg-cyan-500'
+      case 'degraded': return 'bg-cyan-400'
       case 'outage': return 'bg-red-500'
       case 'maintenance': return 'bg-blue-500'
       default: return 'bg-gray-500'
@@ -76,8 +76,8 @@ export default function EcosystemHealthPage() {
 
   function getOverallColor(overall: string) {
     switch (overall) {
-      case 'healthy': return 'text-green-600'
-      case 'degraded': return 'text-yellow-600'
+      case 'healthy': return 'text-cyan-500'
+      case 'degraded': return 'text-cyan-400'
       case 'critical': return 'text-red-600'
       default: return 'text-gray-600'
     }
@@ -127,8 +127,8 @@ export default function EcosystemHealthPage() {
           <div className="text-right">
             <div className="text-sm text-gray-500">Health Score</div>
             <div className={`text-4xl font-bold ${
-              (ecosystem?.score ?? 0) >= 80 ? 'text-green-600' :
-              (ecosystem?.score ?? 0) >= 50 ? 'text-yellow-600' : 'text-red-600'
+              (ecosystem?.score ?? 0) >= 80 ? 'text-cyan-500' :
+              (ecosystem?.score ?? 0) >= 50 ? 'text-cyan-400' : 'text-red-600'
             }`}>
               {ecosystem?.score ?? 0}%
             </div>
@@ -138,13 +138,13 @@ export default function EcosystemHealthPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="text-green-600 text-3xl font-bold">{ecosystem?.summary.operational ?? 0}</div>
-          <div className="text-green-700 text-sm">Operational</div>
+        <div className="bg-cyan-500 border border-cyan-500 rounded-lg p-4">
+          <div className="text-cyan-500 text-3xl font-bold">{ecosystem?.summary.operational ?? 0}</div>
+          <div className="text-cyan-500 text-sm">Operational</div>
         </div>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="text-yellow-600 text-3xl font-bold">{ecosystem?.summary.degraded ?? 0}</div>
-          <div className="text-yellow-700 text-sm">Degraded</div>
+        <div className="bg-cyan-400 border border-cyan-400 rounded-lg p-4">
+          <div className="text-cyan-400 text-3xl font-bold">{ecosystem?.summary.degraded ?? 0}</div>
+          <div className="text-cyan-400 text-sm">Degraded</div>
         </div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="text-red-600 text-3xl font-bold">{ecosystem?.summary.outage ?? 0}</div>
@@ -185,8 +185,8 @@ export default function EcosystemHealthPage() {
                   </div>
                 )}
                 <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  component.status === 'operational' ? 'bg-green-100 text-green-700' :
-                  component.status === 'degraded' ? 'bg-yellow-100 text-yellow-700' :
+                  component.status === 'operational' ? 'bg-cyan-500 text-cyan-500' :
+                  component.status === 'degraded' ? 'bg-cyan-400 text-cyan-400' :
                   component.status === 'outage' ? 'bg-red-100 text-red-700' :
                   'bg-blue-100 text-blue-700'
                 }`}>

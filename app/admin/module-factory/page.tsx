@@ -42,11 +42,11 @@ interface RegisteredModule {
 }
 
 const FAMILY_COLORS: Record<string, string> = {
-  revenue: 'bg-green-100 text-green-800 border-green-200',
-  creator: 'bg-purple-100 text-purple-800 border-purple-200',
+  revenue: 'bg-cyan-500 text-cyan-500 border-cyan-500',
+  creator: 'bg-cyan-500 text-cyan-500 border-cyan-500',
   professional: 'bg-blue-100 text-blue-800 border-blue-200',
-  social_impact: 'bg-orange-100 text-orange-800 border-orange-200',
-  lifestyle: 'bg-pink-100 text-pink-800 border-pink-200',
+  social_impact: 'bg-cyan-500 text-cyan-500 border-cyan-500',
+  lifestyle: 'bg-cyan-500 text-cyan-500 border-cyan-500',
   infrastructure: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
@@ -237,16 +237,16 @@ export default function ModuleFactoryPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Package className="w-8 h-8 text-indigo-600" />
+            <Package className="w-8 h-8 text-cyan-500" />
             Module Factory
           </h1>
           <p className="text-gray-600 mt-1">
             Rapid module deployment with Core 10 infrastructure inheritance
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-lg">
-          <Zap className="w-5 h-5 text-indigo-600" />
-          <span className="text-sm font-medium text-indigo-700">
+        <div className="flex items-center gap-2 bg-cyan-500 px-4 py-2 rounded-lg">
+          <Zap className="w-5 h-5 text-cyan-500" />
+          <span className="text-sm font-medium text-cyan-500">
             Launch modules in &lt;2 weeks
           </span>
         </div>
@@ -278,7 +278,7 @@ export default function ModuleFactoryPage() {
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-3 font-medium transition-colors ${
               activeTab === tab.id
-                ? 'text-indigo-600 border-b-2 border-indigo-600'
+                ? 'text-cyan-500 border-b-2 border-cyan-500'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -293,7 +293,7 @@ export default function ModuleFactoryPage() {
         <div className="bg-white rounded-xl border shadow-sm">
           {isLoading ? (
             <div className="p-12 text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-600" />
+              <Loader2 className="w-8 h-8 animate-spin mx-auto text-cyan-500" />
               <p className="mt-3 text-gray-600">Loading modules...</p>
             </div>
           ) : modules.length === 0 ? (
@@ -303,7 +303,7 @@ export default function ModuleFactoryPage() {
               <p className="mt-2 text-gray-600">Create your first module to get started</p>
               <button
                 onClick={() => setActiveTab('create')}
-                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2 mx-auto"
+                className="mt-4 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-500 flex items-center gap-2 mx-auto"
               >
                 <Plus className="w-4 h-4" />
                 Create Module
@@ -314,7 +314,7 @@ export default function ModuleFactoryPage() {
               {modules.map(module => (
                 <div key={module.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center text-xl">
+                    <div className="w-10 h-10 rounded-lg bg-cyan-500 flex items-center justify-center text-xl">
                       📦
                     </div>
                     <div>
@@ -325,9 +325,9 @@ export default function ModuleFactoryPage() {
                   <div className="flex items-center gap-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       module.status === 'active' 
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-cyan-500 text-cyan-500'
                         : module.status === 'draft'
-                        ? 'bg-yellow-100 text-yellow-700'
+                        ? 'bg-cyan-400 text-cyan-400'
                         : 'bg-gray-100 text-gray-700'
                     }`}>
                       {module.status}
@@ -335,7 +335,7 @@ export default function ModuleFactoryPage() {
                     {module.status === 'draft' && (
                       <button
                         onClick={() => handleActivateModule(module.id)}
-                        className="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 flex items-center gap-1"
+                        className="px-3 py-1 bg-cyan-500 text-white text-sm rounded-lg hover:bg-cyan-500 flex items-center gap-1"
                       >
                         <Play className="w-3 h-3" />
                         Activate
@@ -355,7 +355,7 @@ export default function ModuleFactoryPage() {
           {/* Form */}
           <div className="bg-white rounded-xl border shadow-sm p-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Settings className="w-5 h-5 text-indigo-600" />
+              <Settings className="w-5 h-5 text-cyan-500" />
               Module Configuration
             </h2>
 
@@ -368,7 +368,7 @@ export default function ModuleFactoryPage() {
                   value={definition.name}
                   onChange={(e) => updateDefinition('name', e.target.value)}
                   placeholder="e.g., Pet Care Services"
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                 />
               </div>
 
@@ -379,7 +379,7 @@ export default function ModuleFactoryPage() {
                   value={definition.slug}
                   onChange={(e) => updateDefinition('slug', e.target.value)}
                   placeholder="e.g., pet-care"
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                 />
               </div>
 
@@ -390,7 +390,7 @@ export default function ModuleFactoryPage() {
                   onChange={(e) => updateDefinition('description', e.target.value)}
                   placeholder="Brief description of the module..."
                   rows={3}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                 />
               </div>
 
@@ -400,7 +400,7 @@ export default function ModuleFactoryPage() {
                   <select
                     value={definition.family}
                     onChange={(e) => updateDefinition('family', e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500"
                   >
                     <option value="revenue">Revenue Engines</option>
                     <option value="creator">Creator Economy</option>
@@ -415,7 +415,7 @@ export default function ModuleFactoryPage() {
                   <select
                     value={definition.revenueModel}
                     onChange={(e) => updateDefinition('revenueModel', e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500"
                   >
                     <option value="credits">Credits</option>
                     <option value="subscription">Subscription</option>
@@ -445,7 +445,7 @@ export default function ModuleFactoryPage() {
                         type="checkbox"
                         checked={definition.settings[setting.key as keyof typeof definition.settings]}
                         onChange={(e) => updateSettings(setting.key, e.target.checked)}
-                        className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                        className="w-4 h-4 text-cyan-500 rounded focus:ring-cyan-500"
                       />
                       <span className="text-sm text-gray-700">{setting.label}</span>
                     </label>
@@ -458,7 +458,7 @@ export default function ModuleFactoryPage() {
             <div className="flex gap-3 mt-6 pt-4 border-t">
               <button
                 onClick={generatePreviewScaffold}
-                className="flex-1 px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 border border-cyan-500 text-cyan-500 rounded-lg hover:bg-cyan-500 flex items-center justify-center gap-2"
               >
                 <Code className="w-4 h-4" />
                 Preview Scaffold
@@ -466,7 +466,7 @@ export default function ModuleFactoryPage() {
               <button
                 onClick={handleCreateModule}
                 disabled={isCreating || !definition.name || !definition.slug}
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isCreating ? (
                   <>
@@ -489,7 +489,7 @@ export default function ModuleFactoryPage() {
             
             <div className="border rounded-lg p-4 bg-gray-50">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-xl bg-indigo-100 flex items-center justify-center text-3xl">
+                <div className="w-16 h-16 rounded-xl bg-cyan-500 flex items-center justify-center text-3xl">
                   {definition.icon || '📦'}
                 </div>
                 <div className="flex-1">
@@ -516,18 +516,18 @@ export default function ModuleFactoryPage() {
               <div className="mt-4 pt-4 border-t">
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Generated Routes</h4>
                 <div className="space-y-1 font-mono text-xs">
-                  <div className="text-green-600">/{definition.slug || 'module'}</div>
-                  <div className="text-green-600">/{definition.slug || 'module'}/[id]</div>
+                  <div className="text-cyan-500">/{definition.slug || 'module'}</div>
+                  <div className="text-cyan-500">/{definition.slug || 'module'}/[id]</div>
                   {definition.settings.hasSearch && (
                     <div className="text-blue-600">/{definition.slug || 'module'}/search</div>
                   )}
                   {definition.settings.hasMarketplace && (
                     <>
-                      <div className="text-purple-600">/{definition.slug || 'module'}/sell</div>
-                      <div className="text-purple-600">/{definition.slug || 'module'}/my-listings</div>
+                      <div className="text-cyan-500">/{definition.slug || 'module'}/sell</div>
+                      <div className="text-cyan-500">/{definition.slug || 'module'}/my-listings</div>
                     </>
                   )}
-                  <div className="text-orange-600">/api/{definition.slug || 'module'}</div>
+                  <div className="text-cyan-500">/api/{definition.slug || 'module'}</div>
                 </div>
               </div>
             </div>
@@ -551,7 +551,7 @@ export default function ModuleFactoryPage() {
                     onClick={() => setSelectedFile(file)}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm font-mono transition-colors ${
                       selectedFile === file
-                        ? 'bg-indigo-100 text-indigo-700'
+                        ? 'bg-cyan-500 text-cyan-500'
                         : 'hover:bg-gray-100 text-gray-600'
                     }`}
                   >
@@ -592,12 +592,12 @@ export default function ModuleFactoryPage() {
 
       {/* Success Result */}
       {createResult && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center gap-2 text-green-700">
+        <div className="mt-6 p-4 bg-cyan-500 border border-cyan-500 rounded-lg">
+          <div className="flex items-center gap-2 text-cyan-500">
             <CheckCircle className="w-5 h-5" />
             <span className="font-medium">{createResult.message}</span>
           </div>
-          <p className="mt-2 text-sm text-green-600">
+          <p className="mt-2 text-sm text-cyan-500">
             Module ID: {createResult.moduleId}
           </p>
         </div>

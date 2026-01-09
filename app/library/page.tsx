@@ -20,14 +20,14 @@ const FEATURES = [
 ]
 
 const CATEGORIES = [
-  { name: 'Business & Entrepreneurship', count: 25, color: 'from-purple-500 to-indigo-600' },
-  { name: 'Marketing & Social Media', count: 20, color: 'from-pink-500 to-rose-600' },
+  { name: 'Business & Entrepreneurship', count: 25, color: 'from-cyan-500 to-cyan-500' },
+  { name: 'Marketing & Social Media', count: 20, color: 'from-cyan-500 to-rose-600' },
   { name: 'AI & Technology', count: 18, color: 'from-cyan-500 to-blue-600' },
-  { name: 'Technical & Programming', count: 15, color: 'from-green-500 to-emerald-600' },
-  { name: 'Finance & Real Estate', count: 10, color: 'from-yellow-500 to-orange-600' },
-  { name: 'Legal & Compliance', count: 8, color: 'from-red-500 to-pink-600' },
+  { name: 'Technical & Programming', count: 15, color: 'from-cyan-500 to-cyan-500' },
+  { name: 'Finance & Real Estate', count: 10, color: 'from-cyan-400 to-cyan-500' },
+  { name: 'Legal & Compliance', count: 8, color: 'from-red-500 to-cyan-500' },
   { name: 'Wellness & Productivity', count: 8, color: 'from-teal-500 to-cyan-600' },
-  { name: 'Social Impact', count: 8, color: 'from-violet-500 to-purple-600' }
+  { name: 'Social Impact', count: 8, color: 'from-violet-500 to-cyan-500' }
 ]
 
 const TESTIMONIALS = [
@@ -43,20 +43,20 @@ export default function LibraryLandingPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-gray-950 to-blue-900/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-gray-950 to-blue-900/20" />
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 py-24 sm:py-32">
           <div className="text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 rounded-full text-purple-300 text-sm mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/20 rounded-full text-cyan-500 text-sm mb-6">
               <Sparkles className="w-4 h-4" />
               <span>200+ Professional eBooks • AI-Powered Audiobooks</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-500 to-white bg-clip-text text-transparent">
               Javari Library
             </h1>
             
@@ -68,7 +68,7 @@ export default function LibraryLandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 href="/apps/javari-library/subscribe"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl text-lg font-semibold hover:from-purple-500 hover:to-indigo-500 transition-all shadow-lg shadow-purple-500/25"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-cyan-500 rounded-xl text-lg font-semibold hover:from-cyan-500 hover:to-cyan-500 transition-all shadow-lg shadow-cyan-500/25"
               >
                 Get Full Access <ArrowRight className="w-5 h-5" />
               </Link>
@@ -81,7 +81,7 @@ export default function LibraryLandingPage() {
             </div>
             
             <p className="mt-6 text-gray-400">
-              <span className="text-green-400">✓</span> 112 Free eBooks Available Now
+              <span className="text-cyan-500">✓</span> 112 Free eBooks Available Now
             </p>
           </div>
         </div>
@@ -92,7 +92,7 @@ export default function LibraryLandingPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-purple-400">200+</div>
+              <div className="text-4xl font-bold text-cyan-500">200+</div>
               <div className="text-gray-400">Professional eBooks</div>
             </div>
             <div>
@@ -100,11 +100,11 @@ export default function LibraryLandingPage() {
               <div className="text-gray-400">Premium Titles</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-green-400">112</div>
+              <div className="text-4xl font-bold text-cyan-500">112</div>
               <div className="text-gray-400">Free Lead Magnets</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-yellow-400">50+</div>
+              <div className="text-4xl font-bold text-cyan-400">50+</div>
               <div className="text-gray-400">New Monthly</div>
             </div>
           </div>
@@ -123,9 +123,9 @@ export default function LibraryLandingPage() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {FEATURES.map((feature, i) => (
-              <div key={i} className="bg-gray-900/50 rounded-2xl p-6 border border-gray-800 hover:border-purple-500/50 transition-colors">
-                <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-purple-400" />
+              <div key={i} className="bg-gray-900/50 rounded-2xl p-6 border border-gray-800 hover:border-cyan-500/50 transition-colors">
+                <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-cyan-500" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                 <p className="text-gray-400">{feature.desc}</p>
@@ -165,14 +165,14 @@ export default function LibraryLandingPage() {
           <div className="grid md:grid-cols-2 gap-8">
             {/* Creator Plan */}
             <div className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-              <div className="text-purple-400 font-semibold mb-2">CREATOR</div>
+              <div className="text-cyan-500 font-semibold mb-2">CREATOR</div>
               <div className="text-4xl font-bold mb-1">$199<span className="text-lg text-gray-400">/year</span></div>
               <div className="text-gray-400 mb-6">Less than $17/month</div>
               
               <ul className="space-y-3 mb-8">
                 {['Full library access (200+ eBooks)', '1,000 credits/month', 'Audiobook conversions', 'Unlimited downloads', 'New releases first', 'Email support'].map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                    <CheckCircle className="w-5 h-5 text-cyan-500 flex-shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -187,19 +187,19 @@ export default function LibraryLandingPage() {
             </div>
             
             {/* Pro Plan */}
-            <div className="bg-gradient-to-br from-purple-900/50 to-indigo-900/50 rounded-2xl p-8 border border-purple-500/50 relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full text-sm font-semibold">
+            <div className="bg-gradient-to-br from-cyan-500/50 to-cyan-500/50 rounded-2xl p-8 border border-cyan-500/50 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-cyan-500 to-cyan-500 rounded-full text-sm font-semibold">
                 BEST VALUE
               </div>
               
-              <div className="text-purple-300 font-semibold mb-2">PRO</div>
+              <div className="text-cyan-500 font-semibold mb-2">PRO</div>
               <div className="text-4xl font-bold mb-1">$499<span className="text-lg text-gray-400">/year</span></div>
               <div className="text-gray-400 mb-6">Less than $42/month</div>
               
               <ul className="space-y-3 mb-8">
                 {['Everything in Creator', '5,000 credits/month', 'Source files (DOCX)', 'Commercial license', 'White-label rights', 'Priority support', 'API access'].map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                    <CheckCircle className="w-5 h-5 text-cyan-500 flex-shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -207,7 +207,7 @@ export default function LibraryLandingPage() {
               
               <Link
                 href="/apps/javari-library/subscribe?plan=pro"
-                className="block w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl text-center font-semibold hover:from-purple-500 hover:to-indigo-500 transition-all"
+                className="block w-full py-3 bg-gradient-to-r from-cyan-500 to-cyan-500 rounded-xl text-center font-semibold hover:from-cyan-500 hover:to-cyan-500 transition-all"
               >
                 Get Pro Access
               </Link>
@@ -232,7 +232,7 @@ export default function LibraryLandingPage() {
               <div key={i} className="bg-gray-900/50 rounded-2xl p-6 border border-gray-800">
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    <Star key={j} className="w-5 h-5 fill-cyan-400 text-cyan-400" />
                   ))}
                 </div>
                 <p className="text-gray-300 mb-4">"{t.text}"</p>
@@ -257,12 +257,12 @@ export default function LibraryLandingPage() {
           </p>
           <Link 
             href="/apps/javari-library/subscribe"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl text-lg font-semibold hover:from-purple-500 hover:to-indigo-500 transition-all shadow-lg shadow-purple-500/25"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-cyan-500 rounded-xl text-lg font-semibold hover:from-cyan-500 hover:to-cyan-500 transition-all shadow-lg shadow-cyan-500/25"
           >
             Get Full Access Now <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="mt-4 text-gray-400">
-            Or <Link href="/apps/javari-library" className="text-purple-400 hover:underline">browse 112 free eBooks</Link> first
+            Or <Link href="/apps/javari-library" className="text-cyan-500 hover:underline">browse 112 free eBooks</Link> first
           </p>
         </div>
       </section>

@@ -157,12 +157,12 @@ export default function PricingPage() {
 
         {/* Grace Period Info */}
         <section className="mb-12">
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-            <h3 className="font-bold text-blue-900 mb-3">10-Day Grace Period</h3>
-            <p className="text-blue-800 mb-3">
+          <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-6">
+            <h3 className="font-bold text-slate-900 mb-3">10-Day Grace Period</h3>
+            <p className="text-slate-800 mb-3">
               After your paid term expires, you get a 10-day grace period:
             </p>
-            <ul className="text-sm text-blue-700 space-y-1">
+            <ul className="text-sm text-cyan-700 space-y-1">
               <li>• Continue using remaining credits (plan + packs)</li>
               <li>• Cannot purchase additional credits</li>
               <li>• Auto-reload is paused</li>

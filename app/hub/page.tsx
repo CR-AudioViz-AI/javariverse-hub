@@ -350,8 +350,8 @@ const CATEGORIES = [
 
 function ModuleCard({ module }: { module: Module }) {
   const statusColors = {
-    live: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    beta: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+    live: 'bg-cyan-500 text-cyan-500 dark:bg-cyan-500/30 dark:text-cyan-500',
+    beta: 'bg-cyan-400 text-cyan-400 dark:bg-cyan-400/30 dark:text-cyan-400',
     coming_soon: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
   };
 
@@ -380,7 +380,7 @@ function ModuleCard({ module }: { module: Module }) {
             </span>
           )}
           {module.isFeatured && (
-            <span className="px-2 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 text-xs font-medium rounded-full">
+            <span className="px-2 py-1 bg-cyan-500 text-cyan-500 dark:bg-cyan-500/30 dark:text-cyan-500 text-xs font-medium rounded-full">
               ⭐ Featured
             </span>
           )}
@@ -470,7 +470,7 @@ export default function HubPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
                   <span className="text-white text-xl">J</span>
                 </div>
                 <div>
@@ -616,7 +616,7 @@ export default function HubPage() {
 
         {/* Social CTA */}
         <section className="mt-16">
-          <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-2xl p-8 text-white text-center">
+          <div className="bg-gradient-to-br from-blue-600 via-cyan-500 to-cyan-500 rounded-2xl p-8 text-white text-center">
             <h2 className="text-2xl font-bold mb-4">Stay Connected! 🎉</h2>
             <p className="text-blue-100 mb-6 max-w-xl mx-auto">
               Follow us for updates on new modules, features, tips, and exclusive content.

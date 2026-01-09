@@ -247,7 +247,7 @@ export default function AnalyticsReportsPage() {
           <div className="flex gap-3">
             <button
               onClick={exportReport}
-              className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all flex items-center gap-2"
+              className="px-6 py-3 bg-cyan-500 hover:bg-cyan-500 text-white rounded-lg font-medium transition-all flex items-center gap-2"
             >
               <Download className="w-5 h-5" />
               Export CSV
@@ -292,12 +292,12 @@ export default function AnalyticsReportsPage() {
               <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-slate-400 text-sm font-medium">Total Revenue</h3>
-                  <DollarSign className="w-5 h-5 text-green-500" />
+                  <DollarSign className="w-5 h-5 text-cyan-500" />
                 </div>
                 <p className="text-3xl font-bold text-white">
                   {formatCurrency(analytics.overview.total_revenue)}
                 </p>
-                <p className="text-green-400 text-sm mt-1 flex items-center gap-1">
+                <p className="text-cyan-500 text-sm mt-1 flex items-center gap-1">
                   <TrendingUp className="w-4 h-4" />
                   All time earnings
                 </p>
@@ -317,7 +317,7 @@ export default function AnalyticsReportsPage() {
               <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-slate-400 text-sm font-medium">Total Users</h3>
-                  <Users className="w-5 h-5 text-purple-500" />
+                  <Users className="w-5 h-5 text-cyan-500" />
                 </div>
                 <p className="text-3xl font-bold text-white">
                   {analytics.overview.total_users.toLocaleString()}
@@ -330,7 +330,7 @@ export default function AnalyticsReportsPage() {
               <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-slate-400 text-sm font-medium">Conversion Rate</h3>
-                  <Target className="w-5 h-5 text-orange-500" />
+                  <Target className="w-5 h-5 text-cyan-500" />
                 </div>
                 <p className="text-3xl font-bold text-white">
                   {analytics.overview.conversion_rate.toFixed(1)}%
@@ -388,8 +388,8 @@ export default function AnalyticsReportsPage() {
                   <div className="bg-slate-900/50 rounded-xl p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center">
-                          <DollarSign className="w-6 h-6 text-purple-500" />
+                        <div className="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                          <DollarSign className="w-6 h-6 text-cyan-500" />
                         </div>
                         <div>
                           <h3 className="text-white font-semibold text-lg">PayPal</h3>
@@ -405,7 +405,7 @@ export default function AnalyticsReportsPage() {
                         </div>
                         <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-purple-500"
+                            className="h-full bg-cyan-500"
                             style={{ width: `${paymentStats.paypal.percentage}%` }}
                           ></div>
                         </div>
@@ -427,7 +427,7 @@ export default function AnalyticsReportsPage() {
             {/* Revenue Growth Chart */}
             <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6 mb-8">
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <LineChart className="w-6 h-6 text-green-500" />
+                <LineChart className="w-6 h-6 text-cyan-500" />
                 Revenue Trend
               </h2>
               <div className="space-y-2">
@@ -442,7 +442,7 @@ export default function AnalyticsReportsPage() {
                       </div>
                       <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-green-500 to-blue-500 transition-all"
+                          className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all"
                           style={{ width: `${width}%` }}
                         ></div>
                       </div>
@@ -455,14 +455,14 @@ export default function AnalyticsReportsPage() {
             {/* Top Apps */}
             <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6 mb-8">
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <PieChart className="w-6 h-6 text-purple-500" />
+                <PieChart className="w-6 h-6 text-cyan-500" />
                 Top Performing Apps
               </h2>
               <div className="space-y-4">
                 {analytics.apps.usage_by_app.slice(0, 5).map((app, index) => (
                   <div key={app.app} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
                         {index + 1}
                       </div>
                       <div>
@@ -473,7 +473,7 @@ export default function AnalyticsReportsPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-green-400 font-semibold">
+                      <p className="text-cyan-500 font-semibold">
                         {formatCurrency(analytics.apps.revenue_by_app[index]?.revenue || 0)}
                       </p>
                     </div>

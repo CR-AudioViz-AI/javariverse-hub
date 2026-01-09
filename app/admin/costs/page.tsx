@@ -104,9 +104,9 @@ export default async function AdminCostsPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-amber-700 to-amber-600 text-white py-6">
+      <div className="bg-gradient-to-r from-cyan-500 to-cyan-500 text-white py-6">
         <div className="container mx-auto px-4">
-          <Link href="/admin" className="inline-flex items-center gap-2 text-amber-200 hover:text-white mb-4">
+          <Link href="/admin" className="inline-flex items-center gap-2 text-cyan-500 hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
           </Link>
@@ -114,7 +114,7 @@ export default async function AdminCostsPage() {
             <CreditCard className="w-8 h-8" />
             Cost Tracking
           </h1>
-          <p className="text-amber-200">Monitor infrastructure and API costs</p>
+          <p className="text-cyan-500">Monitor infrastructure and API costs</p>
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export default async function AdminCostsPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <p className="text-sm text-gray-500 mb-1">This Month</p>
             <p className="text-3xl font-bold text-gray-900">${totalCurrentMonth}</p>
-            <div className={`flex items-center gap-1 mt-2 ${changePercent > 0 ? 'text-red-600' : 'text-green-600'}`}>
+            <div className={`flex items-center gap-1 mt-2 ${changePercent > 0 ? 'text-red-600' : 'text-cyan-500'}`}>
               {changePercent > 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
               <span className="text-sm font-semibold">{Math.abs(changePercent).toFixed(1)}% vs last month</span>
             </div>
@@ -139,10 +139,10 @@ export default async function AdminCostsPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <p className="text-sm text-gray-500 mb-1">Budget Used</p>
-            <p className="text-3xl font-bold text-amber-600">{((totalCurrentMonth / totalLimit) * 100).toFixed(0)}%</p>
+            <p className="text-3xl font-bold text-cyan-500">{((totalCurrentMonth / totalLimit) * 100).toFixed(0)}%</p>
             <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
               <div 
-                className="h-full bg-amber-500 rounded-full"
+                className="h-full bg-cyan-500 rounded-full"
                 style={{ width: `${Math.min((totalCurrentMonth / totalLimit) * 100, 100)}%` }}
               />
             </div>
@@ -156,10 +156,10 @@ export default async function AdminCostsPage() {
             const usagePercent = (category.currentMonth / category.limit) * 100;
             const change = category.currentMonth - category.lastMonth;
             const colors: Record<string, string> = {
-              green: 'from-green-500 to-green-600',
+              green: 'from-cyan-500 to-cyan-500',
               blue: 'from-blue-500 to-blue-600',
-              purple: 'from-purple-500 to-purple-600',
-              orange: 'from-orange-500 to-orange-600',
+              purple: 'from-cyan-500 to-cyan-500',
+              orange: 'from-cyan-500 to-cyan-500',
               gray: 'from-gray-500 to-gray-600',
             };
             return (
@@ -176,7 +176,7 @@ export default async function AdminCostsPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold text-gray-900">${category.currentMonth}</p>
-                    <p className={`text-sm ${change > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    <p className={`text-sm ${change > 0 ? 'text-red-600' : 'text-cyan-500'}`}>
                       {change > 0 ? '+' : ''}{change} vs last month
                     </p>
                   </div>
@@ -192,8 +192,8 @@ export default async function AdminCostsPage() {
                     <div 
                       className={`h-full rounded-full ${
                         usagePercent > 80 ? 'bg-red-500' : 
-                        usagePercent > 60 ? 'bg-yellow-500' : 
-                        'bg-green-500'
+                        usagePercent > 60 ? 'bg-cyan-400' : 
+                        'bg-cyan-500'
                       }`}
                       style={{ width: `${Math.min(usagePercent, 100)}%` }}
                     />

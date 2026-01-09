@@ -21,7 +21,7 @@ export default function UserMenu() {
 
   if (loading || !user) return null;
 
-  const tierColors: Record<string, string> = { free: 'text-gray-400', starter: 'text-blue-400', pro: 'text-purple-400', enterprise: 'text-amber-400' };
+  const tierColors: Record<string, string> = { free: 'text-gray-400', starter: 'text-blue-400', pro: 'text-cyan-500', enterprise: 'text-cyan-500' };
 
   return (
     <div className="relative" ref={menuRef}>

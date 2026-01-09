@@ -82,14 +82,14 @@ function GameCard({ game }: { game: Game }) {
       whileHover={{ scale: 1.03, y: -4 }}
       className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all cursor-pointer"
     >
-      <div className="h-32 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center relative">
+      <div className="h-32 bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center relative">
         <span className="text-6xl">{game.thumbnail}</span>
         <div className="absolute top-2 left-2 flex gap-1">
           {game.isFeatured && (
-            <span className="px-2 py-0.5 bg-yellow-500 text-white text-xs font-bold rounded-full">⭐</span>
+            <span className="px-2 py-0.5 bg-cyan-500 text-white text-xs font-bold rounded-full">⭐</span>
           )}
           {game.isNew && (
-            <span className="px-2 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full">New</span>
+            <span className="px-2 py-0.5 bg-cyan-500 text-white text-xs font-bold rounded-full">New</span>
           )}
           {game.isHot && (
             <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">🔥</span>
@@ -107,7 +107,7 @@ function GameCard({ game }: { game: Game }) {
       <div className="px-4 pb-4">
         <Link
           href={`/games/play/${game.id}`}
-          className="block w-full py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-center rounded-lg font-medium hover:from-green-600 hover:to-emerald-600"
+          className="block w-full py-2 bg-gradient-to-r from-cyan-500 to-cyan-500 text-white text-center rounded-lg font-medium hover:from-cyan-600 hover:to-cyan-600"
         >
           ▶ Play Now
         </Link>
@@ -143,13 +143,13 @@ export default function GamesHubPage() {
   const hotGames = GAMES.filter(g => g.isHot);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-slate-900 to-gray-900">
       <header className="bg-black/30 backdrop-blur-lg border-b border-white/10 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-500 rounded-xl flex items-center justify-center">
                   <span className="text-white text-xl">🎮</span>
                 </div>
               </Link>
@@ -168,7 +168,7 @@ export default function GamesHubPage() {
               />
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/hub" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
+              <Link href="/hub" className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 text-sm font-medium">
                 More Tools
               </Link>
             </div>
@@ -185,7 +185,7 @@ export default function GamesHubPage() {
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                   selectedCategory === cat.id
-                    ? 'bg-green-600 text-white'
+                    ? 'bg-cyan-600 text-white'
                     : 'text-gray-300 hover:bg-white/10'
                 }`}
               >
@@ -255,7 +255,7 @@ export default function GamesHubPage() {
         <section className="mt-16 bg-black/30 rounded-2xl p-8">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-green-400">{GAMES.length}+</div>
+              <div className="text-4xl font-bold text-cyan-400">{GAMES.length}+</div>
               <div className="text-gray-400">Games</div>
             </div>
             <div>
@@ -263,11 +263,11 @@ export default function GamesHubPage() {
               <div className="text-gray-400">Categories</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-purple-400">Free</div>
+              <div className="text-4xl font-bold text-cyan-400">Free</div>
               <div className="text-gray-400">To Play</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-yellow-400">∞</div>
+              <div className="text-4xl font-bold text-cyan-400">∞</div>
               <div className="text-gray-400">Fun</div>
             </div>
           </div>
@@ -280,7 +280,7 @@ export default function GamesHubPage() {
           </p>
           <Link
             href="/hub"
-            className="inline-block px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-medium hover:from-blue-600 hover:to-purple-600"
+            className="inline-block px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-medium hover:from-blue-600 hover:to-cyan-600"
           >
             Explore More Tools →
           </Link>

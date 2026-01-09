@@ -75,9 +75,9 @@ export default function DistributionAdminPage() {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      pending: 'bg-yellow-500/20 text-yellow-400',
+      pending: 'bg-cyan-400/20 text-cyan-400',
       submitted: 'bg-blue-500/20 text-blue-400',
-      live: 'bg-green-500/20 text-green-400',
+      live: 'bg-cyan-500/20 text-cyan-500',
       rejected: 'bg-red-500/20 text-red-400'
     }
     return (
@@ -94,14 +94,14 @@ export default function DistributionAdminPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
-              <BookOpen className="w-8 h-8 text-purple-500" />
+              <BookOpen className="w-8 h-8 text-cyan-500" />
               External Distribution
             </h1>
             <p className="text-gray-400 mt-1">Track eBook distribution across all platforms</p>
           </div>
           <button
             onClick={loadDistributions}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700"
+            className="flex items-center gap-2 px-4 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-500"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -118,32 +118,32 @@ export default function DistributionAdminPage() {
             <p className="text-2xl font-bold">{stats.total}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-            <div className="flex items-center gap-2 text-green-400 mb-1">
+            <div className="flex items-center gap-2 text-cyan-500 mb-1">
               <CheckCircle className="w-4 h-4" />
               <span className="text-sm">Live</span>
             </div>
-            <p className="text-2xl font-bold text-green-400">{stats.live}</p>
+            <p className="text-2xl font-bold text-cyan-500">{stats.live}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-            <div className="flex items-center gap-2 text-yellow-400 mb-1">
+            <div className="flex items-center gap-2 text-cyan-400 mb-1">
               <Clock className="w-4 h-4" />
               <span className="text-sm">Pending</span>
             </div>
-            <p className="text-2xl font-bold text-yellow-400">{stats.pending}</p>
+            <p className="text-2xl font-bold text-cyan-400">{stats.pending}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-            <div className="flex items-center gap-2 text-purple-400 mb-1">
+            <div className="flex items-center gap-2 text-cyan-500 mb-1">
               <TrendingUp className="w-4 h-4" />
               <span className="text-sm">Total Sales</span>
             </div>
-            <p className="text-2xl font-bold text-purple-400">{stats.totalSales.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-cyan-500">{stats.totalSales.toLocaleString()}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-            <div className="flex items-center gap-2 text-green-400 mb-1">
+            <div className="flex items-center gap-2 text-cyan-500 mb-1">
               <DollarSign className="w-4 h-4" />
               <span className="text-sm">Revenue</span>
             </div>
-            <p className="text-2xl font-bold text-green-400">${stats.totalRevenue.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-cyan-500">${stats.totalRevenue.toLocaleString()}</p>
           </div>
         </div>
 
@@ -159,7 +159,7 @@ export default function DistributionAdminPage() {
                 <div className="text-2xl mb-2">{platform.icon}</div>
                 <h3 className="font-semibold text-sm">{platform.name}</h3>
                 <p className="text-xs text-gray-400">{liveCount} live</p>
-                <p className="text-sm text-green-400 mt-1">${revenue.toFixed(2)}</p>
+                <p className="text-sm text-cyan-500 mt-1">${revenue.toFixed(2)}</p>
               </div>
             )
           })}
@@ -208,14 +208,14 @@ export default function DistributionAdminPage() {
                       <td className="px-4 py-3">{getStatusBadge(entry.status)}</td>
                       <td className="px-4 py-3">${entry.price.toFixed(2)}</td>
                       <td className="px-4 py-3">{entry.sales_count}</td>
-                      <td className="px-4 py-3 text-green-400">${entry.revenue.toFixed(2)}</td>
+                      <td className="px-4 py-3 text-cyan-500">${entry.revenue.toFixed(2)}</td>
                       <td className="px-4 py-3">
                         {entry.external_url ? (
                           <a
                             href={entry.external_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-purple-400 hover:text-purple-300"
+                            className="text-cyan-500 hover:text-cyan-500"
                           >
                             <ExternalLink className="w-4 h-4" />
                           </a>
@@ -233,14 +233,14 @@ export default function DistributionAdminPage() {
 
         {/* Quick Actions */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-r from-orange-600/20 to-red-600/20 rounded-xl p-6 border border-orange-500/30">
+          <div className="bg-gradient-to-r from-cyan-500/20 to-red-600/20 rounded-xl p-6 border border-cyan-500/30">
             <h3 className="font-bold text-lg mb-2">📚 Amazon KDP</h3>
             <p className="text-sm text-gray-400 mb-4">Upload to the world's largest book marketplace</p>
             <a 
               href="https://kdp.amazon.com" 
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 rounded-lg hover:bg-orange-700 text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-500 text-sm"
             >
               Open KDP Dashboard <ExternalLink className="w-4 h-4" />
             </a>
@@ -259,14 +259,14 @@ export default function DistributionAdminPage() {
             </a>
           </div>
           
-          <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl p-6 border border-purple-500/30">
+          <div className="bg-gradient-to-r from-cyan-500/20 to-cyan-500/20 rounded-xl p-6 border border-cyan-500/30">
             <h3 className="font-bold text-lg mb-2">✍️ Draft2Digital</h3>
             <p className="text-sm text-gray-400 mb-4">Distribute to multiple platforms at once</p>
             <a 
               href="https://www.draft2digital.com" 
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 rounded-lg hover:bg-cyan-500 text-sm"
             >
               Open D2D Dashboard <ExternalLink className="w-4 h-4" />
             </a>

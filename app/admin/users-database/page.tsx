@@ -290,7 +290,7 @@ export default function UsersDatabasePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-500 to-slate-900 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -326,7 +326,7 @@ export default function UsersDatabasePage() {
 
             <div className="bg-slate-800/50 backdrop-blur-sm p-4 rounded-lg border border-slate-700">
               <div className="flex items-center justify-between mb-2">
-                <CheckCircle className="w-5 h-5 text-green-400" />
+                <CheckCircle className="w-5 h-5 text-cyan-500" />
                 <span className="text-2xl font-bold text-white">{stats.active}</span>
               </div>
               <p className="text-slate-400 text-sm">Active Users</p>
@@ -334,7 +334,7 @@ export default function UsersDatabasePage() {
 
             <div className="bg-slate-800/50 backdrop-blur-sm p-4 rounded-lg border border-slate-700">
               <div className="flex items-center justify-between mb-2">
-                <DollarSign className="w-5 h-5 text-emerald-400" />
+                <DollarSign className="w-5 h-5 text-cyan-500" />
                 <span className="text-2xl font-bold text-white">{stats.totalCredits.toLocaleString()}</span>
               </div>
               <p className="text-slate-400 text-sm">Total Credits</p>
@@ -342,7 +342,7 @@ export default function UsersDatabasePage() {
 
             <div className="bg-slate-800/50 backdrop-blur-sm p-4 rounded-lg border border-slate-700">
               <div className="flex items-center justify-between mb-2">
-                <Activity className="w-5 h-5 text-purple-400" />
+                <Activity className="w-5 h-5 text-cyan-500" />
                 <span className="text-2xl font-bold text-white">${stats.totalRevenue.toFixed(2)}</span>
               </div>
               <p className="text-slate-400 text-sm">Total Revenue</p>
@@ -413,7 +413,7 @@ export default function UsersDatabasePage() {
               onClick={() => setFilters({ ...filters, status: 'active' })}
               className={`px-4 py-2 rounded-lg transition-colors ${
                 filters.status === 'active'
-                  ? 'bg-green-600 text-white'
+                  ? 'bg-cyan-500 text-white'
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
               }`}
             >
@@ -433,14 +433,14 @@ export default function UsersDatabasePage() {
             <div className="ml-auto flex gap-2">
               <button
                 onClick={exportToCSV}
-                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-500 text-white rounded-lg transition-colors"
               >
                 <Download className="w-4 h-4" />
                 Export CSV
               </button>
               <button
                 onClick={exportToJSON}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-500 text-white rounded-lg transition-colors"
               >
                 <Download className="w-4 h-4" />
                 Export JSON
@@ -499,7 +499,7 @@ export default function UsersDatabasePage() {
                       <tr key={user.id} className="hover:bg-slate-700/30 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold">
                               {user.full_name?.[0] || user.email[0].toUpperCase()}
                             </div>
                             <div>
@@ -513,7 +513,7 @@ export default function UsersDatabasePage() {
                             user.role === 'superadmin'
                               ? 'bg-red-500/20 text-red-400'
                               : user.role === 'admin'
-                              ? 'bg-purple-500/20 text-purple-400'
+                              ? 'bg-cyan-500/20 text-cyan-500'
                               : 'bg-blue-500/20 text-blue-400'
                           }`}>
                             <Shield className="w-3 h-3" />
@@ -522,16 +522,16 @@ export default function UsersDatabasePage() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-emerald-400" />
+                            <DollarSign className="w-4 h-4 text-cyan-500" />
                             <span className="text-white font-medium">{user.credits.toLocaleString()}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
                             user.subscription_tier === 'enterprise'
-                              ? 'bg-yellow-500/20 text-yellow-400'
+                              ? 'bg-cyan-400/20 text-cyan-400'
                               : user.subscription_tier === 'business'
-                              ? 'bg-purple-500/20 text-purple-400'
+                              ? 'bg-cyan-500/20 text-cyan-500'
                               : user.subscription_tier === 'pro'
                               ? 'bg-blue-500/20 text-blue-400'
                               : 'bg-slate-500/20 text-slate-400'
@@ -541,7 +541,7 @@ export default function UsersDatabasePage() {
                         </td>
                         <td className="px-6 py-4">
                           {user.is_active ? (
-                            <span className="inline-flex items-center gap-1 text-green-400">
+                            <span className="inline-flex items-center gap-1 text-cyan-500">
                               <CheckCircle className="w-4 h-4" />
                               Active
                             </span>
@@ -575,7 +575,7 @@ export default function UsersDatabasePage() {
                               className="p-2 hover:bg-slate-600 rounded-lg transition-colors"
                               title={user.is_active ? 'Ban user' : 'Unban user'}
                             >
-                              <Ban className={`w-4 h-4 ${user.is_active ? 'text-red-400' : 'text-green-400'}`} />
+                              <Ban className={`w-4 h-4 ${user.is_active ? 'text-red-400' : 'text-cyan-500'}`} />
                             </button>
                             <button
                               onClick={() => {
@@ -585,7 +585,7 @@ export default function UsersDatabasePage() {
                               className="p-2 hover:bg-slate-600 rounded-lg transition-colors"
                               title="View activity"
                             >
-                              <Activity className="w-4 h-4 text-purple-400" />
+                              <Activity className="w-4 h-4 text-cyan-500" />
                             </button>
                           </div>
                         </td>
@@ -689,7 +689,7 @@ export default function UsersDatabasePage() {
                     />
                     <button
                       onClick={() => handleAdjustCredits(selectedUser.id, 100)}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                      className="px-4 py-2 bg-cyan-500 hover:bg-cyan-500 text-white rounded-lg transition-colors"
                     >
                       +100
                     </button>

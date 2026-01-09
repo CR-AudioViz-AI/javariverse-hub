@@ -154,11 +154,11 @@ export default function BotsManagementPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-500';
+        return 'bg-cyan-500';
       case 'inactive':
         return 'bg-slate-500';
       case 'maintenance':
-        return 'bg-yellow-500';
+        return 'bg-cyan-400';
       default:
         return 'bg-slate-500';
     }
@@ -167,11 +167,11 @@ export default function BotsManagementPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+        return <CheckCircle2 className="w-5 h-5 text-cyan-500" />;
       case 'inactive':
         return <XCircle className="w-5 h-5 text-slate-500" />;
       case 'maintenance':
-        return <Settings className="w-5 h-5 text-yellow-500" />;
+        return <Settings className="w-5 h-5 text-cyan-400" />;
       default:
         return <XCircle className="w-5 h-5 text-slate-500" />;
     }
@@ -223,7 +223,7 @@ export default function BotsManagementPage() {
           <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-slate-400 text-sm font-medium">Active Bots</h3>
-              <Activity className="w-5 h-5 text-green-500" />
+              <Activity className="w-5 h-5 text-cyan-500" />
             </div>
             <p className="text-3xl font-bold text-white">
               {bots.filter(b => b.status === 'active').length}
@@ -245,7 +245,7 @@ export default function BotsManagementPage() {
           <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-slate-400 text-sm font-medium">Avg Success Rate</h3>
-              <TrendingUp className="w-5 h-5 text-purple-500" />
+              <TrendingUp className="w-5 h-5 text-cyan-500" />
             </div>
             <p className="text-3xl font-bold text-white">
               {(bots.reduce((sum, bot) => sum + bot.success_rate, 0) / bots.length).toFixed(1)}%
@@ -256,7 +256,7 @@ export default function BotsManagementPage() {
           <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-slate-400 text-sm font-medium">Avg Response Time</h3>
-              <Clock className="w-5 h-5 text-orange-500" />
+              <Clock className="w-5 h-5 text-cyan-500" />
             </div>
             <p className="text-3xl font-bold text-white">
               {Math.round(bots.reduce((sum, bot) => sum + bot.metrics.response_time, 0) / bots.length)}ms
@@ -328,7 +328,7 @@ export default function BotsManagementPage() {
                   className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
                     bot.status === 'active'
                       ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400'
-                      : 'bg-green-600/20 hover:bg-green-600/30 text-green-400'
+                      : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-500'
                   }`}
                 >
                   {bot.status === 'active' ? (
@@ -406,7 +406,7 @@ export default function BotsManagementPage() {
                     </div>
                     <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-purple-500 transition-all"
+                        className="h-full bg-cyan-500 transition-all"
                         style={{ width: `${selectedBot.metrics.memory_usage}%` }}
                       ></div>
                     </div>
@@ -417,7 +417,7 @@ export default function BotsManagementPage() {
               {/* Performance Metrics */}
               <div>
                 <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-green-500" />
+                  <Activity className="w-5 h-5 text-cyan-500" />
                   Performance Stats
                 </h3>
                 <div className="grid grid-cols-2 gap-4">

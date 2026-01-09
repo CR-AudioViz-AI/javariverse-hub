@@ -78,20 +78,20 @@ export default function ContactPage() {
                 <Card>
                   <CardContent className="p-4 md:p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Mail className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-cyan-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Mail className="w-5 h-5 md:w-6 md:h-6 text-cyan-600" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
                         <a 
                           href="mailto:support@craudiovizai.com" 
-                          className="text-sm text-blue-600 hover:underline block"
+                          className="text-sm text-cyan-600 hover:underline block"
                         >
                           support@craudiovizai.com
                         </a>
                         <a 
                           href="mailto:sales@craudiovizai.com" 
-                          className="text-sm text-blue-600 hover:underline block"
+                          className="text-sm text-cyan-600 hover:underline block"
                         >
                           sales@craudiovizai.com
                         </a>

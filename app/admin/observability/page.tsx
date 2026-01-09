@@ -113,8 +113,8 @@ export default function ObservabilityDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'text-green-500'
-      case 'warning': return 'text-yellow-500'
+      case 'healthy': return 'text-cyan-500'
+      case 'warning': return 'text-cyan-400'
       case 'critical': return 'text-red-500'
       default: return 'text-gray-500'
     }
@@ -122,8 +122,8 @@ export default function ObservabilityDashboard() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'healthy': return <CheckCircle2 className="w-5 h-5 text-green-500" />
-      case 'warning': return <AlertTriangle className="w-5 h-5 text-yellow-500" />
+      case 'healthy': return <CheckCircle2 className="w-5 h-5 text-cyan-500" />
+      case 'warning': return <AlertTriangle className="w-5 h-5 text-cyan-400" />
       case 'critical': return <XCircle className="w-5 h-5 text-red-500" />
       default: return <Clock className="w-5 h-5 text-gray-500" />
     }
@@ -166,7 +166,7 @@ export default function ObservabilityDashboard() {
           <button
             onClick={() => setAutoRefresh(!autoRefresh)}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-              autoRefresh ? 'bg-green-600' : 'bg-gray-700'
+              autoRefresh ? 'bg-cyan-500' : 'bg-gray-700'
             }`}
           >
             <RefreshCw className={`w-4 h-4 ${autoRefresh ? 'animate-spin' : ''}`} />
@@ -191,13 +191,13 @@ export default function ObservabilityDashboard() {
             <div
               key={alert.id}
               className={`p-4 rounded-lg flex items-center gap-3 ${
-                alert.severity === 'critical' ? 'bg-red-900/50 border border-red-500' : 'bg-yellow-900/50 border border-yellow-500'
+                alert.severity === 'critical' ? 'bg-red-900/50 border border-red-500' : 'bg-cyan-400/50 border border-cyan-400'
               }`}
             >
               {alert.severity === 'critical' ? (
                 <XCircle className="w-5 h-5 text-red-500" />
               ) : (
-                <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                <AlertTriangle className="w-5 h-5 text-cyan-400" />
               )}
               <span>{alert.message}</span>
               <span className="ml-auto text-sm text-gray-400">
@@ -220,19 +220,19 @@ export default function ObservabilityDashboard() {
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-400">Latency (p50)</span>
-              <span className={data?.api.latency_p50 && data.api.latency_p50 > 500 ? 'text-yellow-500' : 'text-green-500'}>
+              <span className={data?.api.latency_p50 && data.api.latency_p50 > 500 ? 'text-cyan-400' : 'text-cyan-500'}>
                 {data?.api.latency_p50 || 0}ms
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Latency (p99)</span>
-              <span className={data?.api.latency_p99 && data.api.latency_p99 > 2000 ? 'text-red-500' : 'text-green-500'}>
+              <span className={data?.api.latency_p99 && data.api.latency_p99 > 2000 ? 'text-red-500' : 'text-cyan-500'}>
                 {data?.api.latency_p99 || 0}ms
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Error Rate</span>
-              <span className={data?.api.error_rate && data.api.error_rate > 2 ? 'text-red-500' : 'text-green-500'}>
+              <span className={data?.api.error_rate && data.api.error_rate > 2 ? 'text-red-500' : 'text-cyan-500'}>
                 {data?.api.error_rate?.toFixed(2) || 0}%
               </span>
             </div>
@@ -246,7 +246,7 @@ export default function ObservabilityDashboard() {
         {/* Cron Jobs */}
         <div className="bg-gray-800 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <Clock className="w-6 h-6 text-purple-500" />
+            <Clock className="w-6 h-6 text-cyan-500" />
             <h2 className="text-xl font-semibold">Cron Jobs</h2>
           </div>
           <div className="space-y-3">
@@ -270,13 +270,13 @@ export default function ObservabilityDashboard() {
         {/* Email System */}
         <div className="bg-gray-800 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <Mail className="w-6 h-6 text-green-500" />
+            <Mail className="w-6 h-6 text-cyan-500" />
             <h2 className="text-xl font-semibold">Email System</h2>
           </div>
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-400">Queued</span>
-              <span className={data?.email.queued && data.email.queued > 100 ? 'text-yellow-500' : 'text-green-500'}>
+              <span className={data?.email.queued && data.email.queued > 100 ? 'text-cyan-400' : 'text-cyan-500'}>
                 {data?.email.queued || 0}
               </span>
             </div>
@@ -286,7 +286,7 @@ export default function ObservabilityDashboard() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Bounced (24h)</span>
-              <span className={data?.email.bounced_24h && data.email.bounced_24h > 10 ? 'text-red-500' : 'text-green-500'}>
+              <span className={data?.email.bounced_24h && data.email.bounced_24h > 10 ? 'text-red-500' : 'text-cyan-500'}>
                 {data?.email.bounced_24h || 0}
               </span>
             </div>
@@ -300,7 +300,7 @@ export default function ObservabilityDashboard() {
         {/* Payments */}
         <div className="bg-gray-800 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <CreditCard className="w-6 h-6 text-yellow-500" />
+            <CreditCard className="w-6 h-6 text-cyan-400" />
             <h2 className="text-xl font-semibold">Payments</h2>
           </div>
           <div className="space-y-3">
@@ -310,17 +310,17 @@ export default function ObservabilityDashboard() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Conversions (24h)</span>
-              <span className="text-green-500">{data?.payments.conversions_24h || 0}</span>
+              <span className="text-cyan-500">{data?.payments.conversions_24h || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Conversion Rate</span>
-              <span className={data?.payments.conversion_rate && data.payments.conversion_rate < 2 ? 'text-yellow-500' : 'text-green-500'}>
+              <span className={data?.payments.conversion_rate && data.payments.conversion_rate < 2 ? 'text-cyan-400' : 'text-cyan-500'}>
                 {data?.payments.conversion_rate?.toFixed(1) || 0}%
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Failed Payments</span>
-              <span className={data?.payments.failed_payments_24h && data.payments.failed_payments_24h > 5 ? 'text-red-500' : 'text-green-500'}>
+              <span className={data?.payments.failed_payments_24h && data.payments.failed_payments_24h > 5 ? 'text-red-500' : 'text-cyan-500'}>
                 {data?.payments.failed_payments_24h || 0}
               </span>
             </div>
@@ -339,14 +339,14 @@ export default function ObservabilityDashboard() {
               <span className={
                 data?.database.connections_used && data?.database.connections_max && 
                 (data.database.connections_used / data.database.connections_max) > 0.8 
-                  ? 'text-red-500' : 'text-green-500'
+                  ? 'text-red-500' : 'text-cyan-500'
               }>
                 {data?.database.connections_used || 0}/{data?.database.connections_max || 0}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Slow Queries (24h)</span>
-              <span className={data?.database.slow_queries_24h && data.database.slow_queries_24h > 10 ? 'text-yellow-500' : 'text-green-500'}>
+              <span className={data?.database.slow_queries_24h && data.database.slow_queries_24h > 10 ? 'text-cyan-400' : 'text-cyan-500'}>
                 {data?.database.slow_queries_24h || 0}
               </span>
             </div>
@@ -360,7 +360,7 @@ export default function ObservabilityDashboard() {
         {/* Quick Actions */}
         <div className="bg-gray-800 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <Zap className="w-6 h-6 text-orange-500" />
+            <Zap className="w-6 h-6 text-cyan-500" />
             <h2 className="text-xl font-semibold">Quick Actions</h2>
           </div>
           <div className="space-y-3">

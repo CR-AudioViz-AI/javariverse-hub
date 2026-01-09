@@ -130,14 +130,14 @@ export function JavariUpload({ sessionId, userId, onUploadComplete }: JavariUplo
         className={`
           border-2 border-dashed rounded-lg p-8 text-center transition-colors
           ${isDragging 
-            ? 'border-purple-500 bg-purple-50' 
-            : 'border-gray-300 hover:border-purple-400'
+            ? 'border-cyan-500 bg-cyan-500' 
+            : 'border-gray-300 hover:border-cyan-500'
           }
         `}
       >
         <Upload className="mx-auto h-12 w-12 text-gray-400" />
         <p className="mt-2 text-sm text-gray-600">
-          <span className="font-semibold text-purple-600">Click to upload</span>
+          <span className="font-semibold text-cyan-500">Click to upload</span>
           {' '}or drag and drop
         </p>
         <p className="text-xs text-gray-500 mt-1">
@@ -177,19 +177,19 @@ export function JavariUpload({ sessionId, userId, onUploadComplete }: JavariUplo
                   </span>
                 )}
                 {file.status === 'processing' && (
-                  <span className="flex items-center text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">
+                  <span className="flex items-center text-xs bg-cyan-400 text-cyan-400 px-2 py-1 rounded-full">
                     <Loader2 className="h-3 w-3 mr-1 animate-spin" />
                     Processing
                   </span>
                 )}
                 {file.status === 'complete' && (
-                  <span className="flex items-center text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                  <span className="flex items-center text-xs bg-cyan-500 text-cyan-500 px-2 py-1 rounded-full">
                     <Check className="h-3 w-3 mr-1" />
                     Ready
                   </span>
                 )}
                 {file.status === 'error' && (
-                  <span className="flex items-center text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full" title={file.error}>
+                  <span className="flex items-center text-xs bg-cyan-500 text-cyan-500 px-2 py-1 rounded-full" title={file.error}>
                     <AlertCircle className="h-3 w-3 mr-1" />
                     Stored (retry available)
                   </span>

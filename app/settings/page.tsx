@@ -88,7 +88,7 @@ function ProfileSettings({ profile }: { profile: UserProfile }) {
 
       {/* Avatar */}
       <div className="flex items-center gap-6">
-        <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-4xl">
+        <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-4xl">
           {profile.avatar || '👤'}
         </div>
         <div>
@@ -166,7 +166,7 @@ function BillingSettings({ billing }: { billing: BillingInfo }) {
       </div>
 
       {/* Current Plan */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-blue-100">Current Plan</p>
@@ -236,7 +236,7 @@ function BillingSettings({ billing }: { billing: BillingInfo }) {
               </div>
               <div className="text-right">
                 <p className="font-medium text-gray-900 dark:text-white">{item.amount}</p>
-                <p className="text-sm text-green-600">{item.status}</p>
+                <p className="text-sm text-cyan-500">{item.status}</p>
               </div>
             </div>
           ))}
@@ -385,7 +385,7 @@ function SecuritySettings() {
             <h3 className="font-bold text-gray-900 dark:text-white">Two-Factor Authentication</h3>
             <p className="text-sm text-gray-500">Add an extra layer of security</p>
           </div>
-          <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+          <button className="px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-500">
             Enable 2FA
           </button>
         </div>
@@ -405,7 +405,7 @@ function SecuritySettings() {
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">
                     {session.device}
-                    {session.current && <span className="ml-2 text-xs text-green-600">(Current)</span>}
+                    {session.current && <span className="ml-2 text-xs text-cyan-500">(Current)</span>}
                   </p>
                   <p className="text-sm text-gray-500">{session.location}</p>
                 </div>
@@ -494,8 +494,8 @@ function APISettings() {
         <p className="text-gray-600 dark:text-gray-400">Manage your API access for integrations</p>
       </div>
 
-      <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4">
-        <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+      <div className="bg-cyan-50 dark:bg-cyan-500/20 rounded-xl p-4">
+        <p className="text-cyan-500 dark:text-cyan-500 text-sm">
           ⚠️ API access is available on Pro and Business plans. Keep your keys secret!
         </p>
       </div>

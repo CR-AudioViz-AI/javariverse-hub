@@ -109,7 +109,7 @@ export function ConversionFunnel({
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{config.title}</h1>
         <p className="text-gray-600">{config.subtitle}</p>
         {config.creditsReward && (
-          <p className="text-sm text-green-600 mt-2">
+          <p className="text-sm text-cyan-500 mt-2">
             🎁 Earn {config.creditsReward} credits on your first booking!
           </p>
         )}
@@ -254,7 +254,7 @@ function ItemCard({
     }`}>
       {/* Badge */}
       {item.badge && (
-        <div className="bg-green-500 text-white text-sm px-3 py-1 text-center">
+        <div className="bg-cyan-500 text-white text-sm px-3 py-1 text-center">
           {item.badge}
         </div>
       )}
@@ -274,7 +274,7 @@ function ItemCard({
         {/* Rating */}
         {item.rating && (
           <div className="flex items-center gap-1 mb-3">
-            <span className="text-yellow-500">★</span>
+            <span className="text-cyan-400">★</span>
             <span className="font-medium">{item.rating.toFixed(1)}</span>
             {item.reviewCount && (
               <span className="text-gray-500 text-sm">({item.reviewCount} reviews)</span>
@@ -287,7 +287,7 @@ function ItemCard({
           <ul className="text-sm text-gray-600 mb-4 space-y-1">
             {item.features.slice(0, 3).map((feature, i) => (
               <li key={i} className="flex items-center gap-1">
-                <span className="text-green-500">✓</span> {feature}
+                <span className="text-cyan-500">✓</span> {feature}
               </li>
             ))}
           </ul>
@@ -350,7 +350,7 @@ function CompareCard({
 
       {item.rating && (
         <div className="flex items-center gap-1 mb-3">
-          <span className="text-yellow-500">★</span>
+          <span className="text-cyan-400">★</span>
           <span>{item.rating.toFixed(1)}</span>
         </div>
       )}
@@ -359,7 +359,7 @@ function CompareCard({
         <ul className="text-sm space-y-2 mb-4">
           {item.features.map((feature, i) => (
             <li key={i} className="flex items-start gap-2">
-              <span className="text-green-500 mt-0.5">✓</span>
+              <span className="text-cyan-500 mt-0.5">✓</span>
               <span>{feature}</span>
             </li>
           ))}
@@ -407,7 +407,7 @@ function CrossSellBanner({
   if (relevantModules.length === 0) return null;
 
   return (
-    <div className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+    <div className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-cyan-500 rounded-xl">
       <h3 className="font-semibold text-lg mb-4">You might also be interested in...</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {relevantModules.map(module => {

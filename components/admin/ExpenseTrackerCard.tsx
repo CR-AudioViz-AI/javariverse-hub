@@ -124,10 +124,10 @@ export default function ExpenseTrackerCard() {
         </div>
 
         {summary && summary.pendingAlerts > 0 && (
-          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg border border-yellow-200 dark:border-yellow-800">
+          <div className="mt-4 p-3 bg-cyan-400 dark:bg-cyan-400 rounded-lg border border-cyan-400 dark:border-cyan-400">
             <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-              <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+              <AlertCircle className="h-4 w-4 text-cyan-400 dark:text-cyan-400" />
+              <span className="text-sm font-medium text-cyan-400 dark:text-cyan-400">
                 {summary.pendingAlerts} renewal{summary.pendingAlerts !== 1 ? 's' : ''} due soon
               </span>
             </div>

@@ -54,13 +54,13 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white px-4 py-12 md:py-16 lg:py-20">
+      <section className="bg-gradient-to-br from-cyan-500 to-cyan-500 text-white px-4 py-12 md:py-16 lg:py-20">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6">
               Contact Us
             </h1>
-            <p className="text-lg md:text-xl text-indigo-100">
+            <p className="text-lg md:text-xl text-cyan-100">
               Have a question? We'd love to hear from you.
             </p>
           </div>
@@ -103,14 +103,14 @@ export default function ContactPage() {
                 <Card>
                   <CardContent className="p-4 md:p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Phone className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-cyan-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Phone className="w-5 h-5 md:w-6 md:h-6 text-cyan-500" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900 mb-1">Phone</h3>
                         <a 
                           href="tel:1-800-CR-AUDIO" 
-                          className="text-sm text-green-600 hover:underline block"
+                          className="text-sm text-cyan-500 hover:underline block"
                         >
                           1-800-CR-AUDIO
                         </a>
@@ -123,8 +123,8 @@ export default function ContactPage() {
                 <Card>
                   <CardContent className="p-4 md:p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <MapPin className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-cyan-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-5 h-5 md:w-6 md:h-6 text-cyan-500" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900 mb-1">Office</h3>
@@ -138,8 +138,8 @@ export default function ContactPage() {
                 <Card className="hidden md:block">
                   <CardContent className="p-4 md:p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-orange-600" />
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-cyan-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-cyan-500" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900 mb-1">Live Chat</h3>
@@ -163,11 +163,11 @@ export default function ContactPage() {
 
                     {/* Success Message */}
                     {success && (
-                      <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-xl p-4 flex items-start gap-3">
-                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <div className="mb-6 bg-cyan-50 border-2 border-cyan-200 rounded-xl p-4 flex items-start gap-3">
+                        <Check className="w-5 h-5 text-cyan-500 flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-green-900 font-semibold">Message sent successfully!</p>
-                          <p className="text-green-700 text-sm mt-1">
+                          <p className="text-slate-900 font-semibold">Message sent successfully!</p>
+                          <p className="text-cyan-600 text-sm mt-1">
                             We'll get back to you within 24 hours.
                           </p>
                         </div>
@@ -245,7 +245,7 @@ export default function ContactPage() {
                         size="lg"
                         fullWidth
                         loading={loading}
-                        className="bg-indigo-600 hover:bg-indigo-700"
+                        className="bg-cyan-500 hover:bg-cyan-600"
                       >
                         {loading ? 'Sending...' : 'Send Message'}
                       </MobileButton>

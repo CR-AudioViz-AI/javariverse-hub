@@ -34,10 +34,10 @@ export function AffiliateBanner({
   };
 
   const baseStyles = {
-    banner: 'w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-lg shadow-lg',
+    banner: 'w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-4 rounded-lg shadow-lg',
     card: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-md',
     inline: 'inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full',
-    floating: 'fixed bottom-4 right-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-xl shadow-2xl max-w-sm z-50'
+    floating: 'fixed bottom-4 right-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-4 rounded-xl shadow-2xl max-w-sm z-50'
   };
 
   return (
@@ -45,7 +45,7 @@ export function AffiliateBanner({
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1">
           {program.badge && (
-            <span className="flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">
+            <span className="flex items-center gap-1 bg-cyan-400 text-cyan-400 text-xs font-bold px-2 py-1 rounded-full">
               <Sparkles className="w-3 h-3" />
               {program.badge}
             </span>
@@ -61,7 +61,7 @@ export function AffiliateBanner({
         <div className="flex items-center gap-2">
           <button
             onClick={handleClick}
-            className="flex items-center gap-2 bg-white text-purple-600 hover:bg-gray-100 px-4 py-2 rounded-lg font-semibold transition-colors"
+            className="flex items-center gap-2 bg-white text-cyan-500 hover:bg-gray-100 px-4 py-2 rounded-lg font-semibold transition-colors"
           >
             Learn More
             <ExternalLink className="w-4 h-4" />

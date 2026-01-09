@@ -14,7 +14,7 @@ export default function NewsletterSystem() {
   }
 
   return (
-    <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl p-8">
+    <div className="bg-gradient-to-r from-cyan-500 to-cyan-500 text-white rounded-xl p-8">
       {!subscribed ? (
         <>
           <div className="flex items-center gap-3 mb-4">
@@ -37,7 +37,7 @@ export default function NewsletterSystem() {
             />
             <button
               type="submit"
-              className="bg-white text-purple-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-cyan-500 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Subscribe
             </button>

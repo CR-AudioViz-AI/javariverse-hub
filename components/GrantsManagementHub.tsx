@@ -93,10 +93,10 @@ export default function GrantsManagementHub() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'awarded': return 'bg-green-500/20 text-green-400'
+      case 'awarded': return 'bg-cyan-500/20 text-cyan-500'
       case 'submitted': return 'bg-blue-500/20 text-blue-400'
-      case 'under_review': return 'bg-purple-500/20 text-purple-400'
-      case 'preparing': return 'bg-yellow-500/20 text-yellow-400'
+      case 'under_review': return 'bg-cyan-500/20 text-cyan-500'
+      case 'preparing': return 'bg-cyan-400/20 text-cyan-400'
       case 'researching': return 'bg-cyan-500/20 text-cyan-400'
       case 'rejected': return 'bg-red-500/20 text-red-400'
       default: return 'bg-gray-500/20 text-gray-400'
@@ -106,8 +106,8 @@ export default function GrantsManagementHub() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'critical': return 'bg-red-500/20 text-red-400 border-red-500/30'
-      case 'high': return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
-      case 'medium': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+      case 'high': return 'bg-cyan-500/20 text-cyan-500 border-cyan-500/30'
+      case 'medium': return 'bg-cyan-400/20 text-cyan-400 border-cyan-400/30'
       default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
     }
   }
@@ -127,7 +127,7 @@ export default function GrantsManagementHub() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-cyan-500 via-teal-600 to-cyan-600 rounded-xl p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
@@ -135,14 +135,14 @@ export default function GrantsManagementHub() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white">Grants Management Hub</h1>
-              <p className="text-emerald-200">Track, apply, and win funding for CR AudioViz AI</p>
+              <p className="text-cyan-500">Track, apply, and win funding for CR AudioViz AI</p>
             </div>
           </div>
           <div className="flex gap-2">
             <button className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg">
               <Download className="w-4 h-4" /> Export
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-white text-emerald-600 rounded-lg font-medium">
+            <button className="flex items-center gap-2 px-4 py-2 bg-white text-cyan-500 rounded-lg font-medium">
               <Plus className="w-4 h-4" /> Add Grant
             </button>
           </div>
@@ -152,23 +152,23 @@ export default function GrantsManagementHub() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-white/10 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-white">{PIPELINE_STATS.totalTracking}</p>
-            <p className="text-xs text-emerald-200">Grants Tracking</p>
+            <p className="text-xs text-cyan-500">Grants Tracking</p>
           </div>
           <div className="bg-white/10 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-white">{PIPELINE_STATS.totalPotential}</p>
-            <p className="text-xs text-emerald-200">Total Pool</p>
+            <p className="text-xs text-cyan-500">Total Pool</p>
           </div>
           <div className="bg-white/10 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-white">{PIPELINE_STATS.submitted}</p>
-            <p className="text-xs text-emerald-200">Submitted</p>
+            <p className="text-xs text-cyan-500">Submitted</p>
           </div>
           <div className="bg-white/10 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-white">{PIPELINE_STATS.awarded}</p>
-            <p className="text-xs text-emerald-200">Awarded</p>
+            <p className="text-xs text-cyan-500">Awarded</p>
           </div>
           <div className="bg-white/10 rounded-lg p-3 text-center">
             <p className="text-2xl font-bold text-white">${PIPELINE_STATS.awardedAmount.toLocaleString()}</p>
-            <p className="text-xs text-emerald-200">Won</p>
+            <p className="text-xs text-cyan-500">Won</p>
           </div>
         </div>
       </div>
@@ -209,7 +209,7 @@ export default function GrantsManagementHub() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-              activeTab === tab.id ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400'
+              activeTab === tab.id ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-400'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -265,7 +265,7 @@ export default function GrantsManagementHub() {
             {filteredGrants.map(grant => (
               <div
                 key={grant.id}
-                className={`bg-gray-900 rounded-xl border p-4 hover:border-emerald-500/50 transition-all cursor-pointer ${getPriorityColor(grant.priority)}`}
+                className={`bg-gray-900 rounded-xl border p-4 hover:border-cyan-500/50 transition-all cursor-pointer ${getPriorityColor(grant.priority)}`}
                 onClick={() => setSelectedGrant(grant)}
               >
                 <div className="flex items-center justify-between">
@@ -282,7 +282,7 @@ export default function GrantsManagementHub() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-emerald-400">
+                    <p className="font-bold text-cyan-500">
                       ${grant.amount.min === grant.amount.max
                         ? grant.amount.max.toLocaleString()
                         : `${(grant.amount.min / 1000).toFixed(0)}K - ${(grant.amount.max / 1000).toFixed(0)}K`}
@@ -302,7 +302,7 @@ export default function GrantsManagementHub() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-sm"
+                    className="flex items-center gap-1 text-cyan-500 hover:text-cyan-500 text-sm"
                   >
                     Apply <ExternalLink className="w-4 h-4" />
                   </a>
@@ -317,10 +317,10 @@ export default function GrantsManagementHub() {
       {activeTab === 'categories' && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {GRANT_CATEGORIES.map(cat => (
-            <div key={cat.name} className="bg-gray-900 rounded-xl border border-gray-700 p-4 hover:border-emerald-500/50 transition-all cursor-pointer">
+            <div key={cat.name} className="bg-gray-900 rounded-xl border border-gray-700 p-4 hover:border-cyan-500/50 transition-all cursor-pointer">
               <span className="text-4xl block mb-3">{cat.icon}</span>
               <h3 className="font-semibold">{cat.name}</h3>
-              <p className="text-2xl font-bold text-emerald-400">{cat.totalAvailable}</p>
+              <p className="text-2xl font-bold text-cyan-500">{cat.totalAvailable}</p>
               <p className="text-sm text-gray-400">{cat.grants} opportunities</p>
             </div>
           ))}
@@ -344,9 +344,9 @@ export default function GrantsManagementHub() {
               <div key={i} className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-3">
                   {req.status === 'complete' ? (
-                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <CheckCircle className="w-5 h-5 text-cyan-500" />
                   ) : (
-                    <AlertCircle className="w-5 h-5 text-yellow-400" />
+                    <AlertCircle className="w-5 h-5 text-cyan-400" />
                   )}
                   <div>
                     <p className="font-medium">{req.item}</p>
@@ -358,7 +358,7 @@ export default function GrantsManagementHub() {
                     href={req.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-sm"
+                    className="flex items-center gap-1 text-cyan-500 hover:text-cyan-500 text-sm"
                   >
                     Go <ExternalLink className="w-4 h-4" />
                   </a>
@@ -382,8 +382,8 @@ export default function GrantsManagementHub() {
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${
                       grant.priority === 'critical' ? 'bg-red-500' :
-                      grant.priority === 'high' ? 'bg-orange-500' :
-                      'bg-yellow-500'
+                      grant.priority === 'high' ? 'bg-cyan-500' :
+                      'bg-cyan-400'
                     }`} />
                     <div>
                       <p className="font-medium">{grant.name}</p>
@@ -392,7 +392,7 @@ export default function GrantsManagementHub() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium">{grant.deadline}</p>
-                    <p className="text-sm text-emerald-400">${grant.amount.max.toLocaleString()}</p>
+                    <p className="text-sm text-cyan-500">${grant.amount.max.toLocaleString()}</p>
                   </div>
                 </div>
               ))}
@@ -404,7 +404,7 @@ export default function GrantsManagementHub() {
                     <p className="font-medium">{grant.name}</p>
                     <p className="text-sm text-gray-400">{grant.funder}</p>
                   </div>
-                  <p className="text-emerald-400">${grant.amount.max.toLocaleString()}</p>
+                  <p className="text-cyan-500">${grant.amount.max.toLocaleString()}</p>
                 </div>
               ))}
             </div>

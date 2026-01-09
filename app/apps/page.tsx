@@ -20,8 +20,8 @@ const FALLBACK_APPS = [
 
 function DegradedBanner({ errorId }: { errorId?: string }) {
   return (
-    <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 mb-6">
-      <p className="text-sm text-yellow-700 dark:text-yellow-200">
+    <div className="bg-cyan-50 dark:bg-slate-900/20 border-l-4 border-cyan-400 p-4 mb-6">
+      <p className="text-sm text-cyan-600 dark:text-cyan-200">
         Showing cached apps. Some apps may not be visible.
         {errorId && <span className="block text-xs opacity-75">Ref: {errorId}</span>}
       </p>

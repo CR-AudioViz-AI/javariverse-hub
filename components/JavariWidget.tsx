@@ -99,7 +99,7 @@ export default function JavariWidget() {
     <>
       {/* Floating Button */}
       {!isOpen && (
-        <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all flex items-center justify-center z-50 group">
+        <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all flex items-center justify-center z-50 group">
           <MessageCircle className="w-6 h-6 text-white" />
           <span className="absolute -top-2 -right-1 w-4 h-4 bg-cyan-500 rounded-full border-2 border-white"></span>
         </button>
@@ -109,9 +109,9 @@ export default function JavariWidget() {
       {isOpen && (
         <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden">
           {/* Header */}
-          <div className="p-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-b border-gray-700 flex items-center justify-between">
+          <div className="p-4 bg-gradient-to-r from-cyan-500/20 to-cyan-500/20 border-b border-gray-700 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>

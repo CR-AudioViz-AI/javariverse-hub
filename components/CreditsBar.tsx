@@ -64,19 +64,19 @@ export default function CreditsBar() {
   if (!user) return null
 
   return (
-    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-200">
+    <div className="bg-gradient-to-r from-cyan-500 to-cyan-500 border-b border-cyan-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
           
           {/* Credits Display */}
           <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-2 px-4 py-2 bg-white rounded-lg shadow-sm border border-green-200">
-              <CreditCard className="w-5 h-5 text-green-600" />
+            <div className="flex items-center space-x-2 px-4 py-2 bg-white rounded-lg shadow-sm border border-cyan-500">
+              <CreditCard className="w-5 h-5 text-cyan-500" />
               <span className="font-semibold text-gray-900">Credits:</span>
               {loading ? (
                 <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
               ) : (
-                <span className="text-2xl font-bold text-green-600">
+                <span className="text-2xl font-bold text-cyan-500">
                   {credits?.toLocaleString() || 0}
                 </span>
               )}
@@ -84,7 +84,7 @@ export default function CreditsBar() {
 
             {/* Low credits warning */}
             {credits !== null && credits < 50 && (
-              <span className="text-sm text-orange-600 font-medium animate-pulse">
+              <span className="text-sm text-cyan-500 font-medium animate-pulse">
                 ⚠️ Low balance
               </span>
             )}
@@ -93,7 +93,7 @@ export default function CreditsBar() {
           {/* Purchase Button */}
           <button
             onClick={() => window.location.href = '/credits/purchase'}
-            className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-semibold"
+            className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg hover:from-blue-700 hover:to-cyan-500 transition-all shadow-md hover:shadow-lg font-semibold"
           >
             <Plus className="w-5 h-5" />
             <span>Purchase More Credits</span>

@@ -165,7 +165,7 @@ export default function AppWrapper({
           <p className="text-gray-400 mb-6">Please sign in to access {appId.replace(/-/g, ' ')}.</p>
           <a
             href="/auth/signin"
-            className="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+            className="inline-block px-6 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-500 transition"
           >
             Sign In
           </a>

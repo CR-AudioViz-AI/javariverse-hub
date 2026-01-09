@@ -36,7 +36,7 @@ export default function Navigation({ user }: NavigationProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
               <div className="relative">
                 <div className="flex gap-1 mb-0.5">
                   <div className="w-1.5 h-1.5 bg-white rounded-full" />
@@ -86,7 +86,7 @@ export default function Navigation({ user }: NavigationProps) {
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                       {user.avatar || user.name.charAt(0).toUpperCase()}
                     </div>
                     <span className="hidden sm:block text-sm text-gray-700 dark:text-gray-300">

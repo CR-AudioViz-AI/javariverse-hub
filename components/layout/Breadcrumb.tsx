@@ -33,7 +33,7 @@ export default function Breadcrumb() {
           <li>
             <Link 
               href="/" 
-              className="flex items-center text-gray-600 hover:text-purple-600 transition-colors"
+              className="flex items-center text-gray-600 hover:text-cyan-500 transition-colors"
             >
               <Home className="w-4 h-4" />
               <span className="ml-1">Home</span>
@@ -48,13 +48,13 @@ export default function Breadcrumb() {
               <li key={segment} className="flex items-center">
                 <ChevronRight className="w-4 h-4 text-gray-400 mx-1" />
                 {isLast ? (
-                  <span className="text-purple-600 font-semibold">
+                  <span className="text-cyan-500 font-semibold">
                     {getLabel(segment)}
                   </span>
                 ) : (
                   <Link 
                     href={href}
-                    className="text-gray-600 hover:text-purple-600 transition-colors"
+                    className="text-gray-600 hover:text-cyan-500 transition-colors"
                   >
                     {getLabel(segment)}
                   </Link>

@@ -119,14 +119,14 @@ export default function CommunityEngagement() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-pink-600 via-rose-600 to-red-600 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-cyan-500 via-cyan-500 to-red-600 rounded-xl p-6">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
             <Users className="w-7 h-7 text-white" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">Community Hub</h1>
-            <p className="text-pink-200">Connect, compete, and celebrate together</p>
+            <p className="text-cyan-500">Connect, compete, and celebrate together</p>
           </div>
         </div>
 
@@ -134,19 +134,19 @@ export default function CommunityEngagement() {
         <div className="grid grid-cols-4 gap-4 mt-6">
           <div className="bg-white/10 rounded-lg p-3 text-center">
             <p className="text-xl font-bold text-white">12.5K</p>
-            <p className="text-xs text-pink-200">Members</p>
+            <p className="text-xs text-cyan-500">Members</p>
           </div>
           <div className="bg-white/10 rounded-lg p-3 text-center">
             <p className="text-xl font-bold text-white">2.3K</p>
-            <p className="text-xs text-pink-200">Online Now</p>
+            <p className="text-xs text-cyan-500">Online Now</p>
           </div>
           <div className="bg-white/10 rounded-lg p-3 text-center">
             <p className="text-xl font-bold text-white">856</p>
-            <p className="text-xs text-pink-200">Posts Today</p>
+            <p className="text-xs text-cyan-500">Posts Today</p>
           </div>
           <div className="bg-white/10 rounded-lg p-3 text-center">
             <p className="text-xl font-bold text-white">4</p>
-            <p className="text-xs text-pink-200">Active Challenges</p>
+            <p className="text-xs text-cyan-500">Active Challenges</p>
           </div>
         </div>
       </div>
@@ -163,7 +163,7 @@ export default function CommunityEngagement() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-              activeTab === tab.id ? 'bg-pink-600 text-white' : 'bg-gray-800 text-gray-400'
+              activeTab === tab.id ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-400'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -186,7 +186,7 @@ export default function CommunityEngagement() {
                 placeholder="Share something with the community..."
                 className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2"
               />
-              <button className="px-4 py-2 bg-pink-600 hover:bg-pink-700 rounded-lg font-medium">
+              <button className="px-4 py-2 bg-cyan-500 hover:bg-cyan-500 rounded-lg font-medium">
                 Post
               </button>
             </div>
@@ -223,7 +223,7 @@ export default function CommunityEngagement() {
                 <div className="flex gap-4">
                   <button
                     onClick={() => toggleLike(post.id)}
-                    className={`flex items-center gap-2 ${post.liked ? 'text-pink-400' : 'text-gray-400'} hover:text-pink-400`}
+                    className={`flex items-center gap-2 ${post.liked ? 'text-cyan-500' : 'text-gray-400'} hover:text-cyan-500`}
                   >
                     <Heart className={`w-5 h-5 ${post.liked ? 'fill-current' : ''}`} />
                     {post.likes}
@@ -232,14 +232,14 @@ export default function CommunityEngagement() {
                     <MessageCircle className="w-5 h-5" />
                     {post.comments}
                   </button>
-                  <button className="flex items-center gap-2 text-gray-400 hover:text-green-400">
+                  <button className="flex items-center gap-2 text-gray-400 hover:text-cyan-500">
                     <Share2 className="w-5 h-5" />
                     {post.shares}
                   </button>
                 </div>
                 <button
                   onClick={() => toggleBookmark(post.id)}
-                  className={`${post.bookmarked ? 'text-yellow-400' : 'text-gray-400'} hover:text-yellow-400`}
+                  className={`${post.bookmarked ? 'text-cyan-400' : 'text-gray-400'} hover:text-cyan-400`}
                 >
                   <Bookmark className={`w-5 h-5 ${post.bookmarked ? 'fill-current' : ''}`} />
                 </button>
@@ -271,7 +271,7 @@ export default function CommunityEngagement() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-sm flex items-center gap-1">
+                  <span className="px-2 py-1 bg-cyan-400/20 text-cyan-400 rounded text-sm flex items-center gap-1">
                     <Zap className="w-3 h-3" /> {challenge.reward}
                   </span>
                 </div>
@@ -283,7 +283,7 @@ export default function CommunityEngagement() {
                 </div>
                 <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full"
+                    className="h-full bg-gradient-to-r from-cyan-500 to-cyan-500 rounded-full"
                     style={{ width: `${(challenge.progress / challenge.total) * 100}%` }}
                   />
                 </div>
@@ -303,9 +303,9 @@ export default function CommunityEngagement() {
             {LEADERBOARD.map(entry => (
               <div key={entry.rank} className="p-4 flex items-center gap-4">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold ${
-                  entry.rank === 1 ? 'bg-yellow-500/20 text-yellow-400' :
+                  entry.rank === 1 ? 'bg-cyan-400/20 text-cyan-400' :
                   entry.rank === 2 ? 'bg-gray-400/20 text-gray-300' :
-                  entry.rank === 3 ? 'bg-amber-600/20 text-amber-500' :
+                  entry.rank === 3 ? 'bg-cyan-500/20 text-cyan-500' :
                   'bg-gray-800 text-gray-400'
                 }`}>
                   #{entry.rank}
@@ -319,7 +319,7 @@ export default function CommunityEngagement() {
                 <div className="text-right">
                   <p className="font-bold">{entry.score.toLocaleString()}</p>
                   <p className={`text-xs ${
-                    entry.change === 'up' ? 'text-green-400' :
+                    entry.change === 'up' ? 'text-cyan-500' :
                     entry.change === 'down' ? 'text-red-400' :
                     'text-gray-400'
                   }`}>
@@ -345,21 +345,21 @@ export default function CommunityEngagement() {
           ].map((reward, i) => (
             <div key={i} className={`p-4 rounded-xl border ${
               reward.claimed 
-                ? 'bg-green-500/10 border-green-500/30' 
+                ? 'bg-cyan-500/10 border-cyan-500/30' 
                 : 'bg-gray-900 border-gray-700'
             }`}>
               <div className="flex items-center gap-3">
                 <span className="text-3xl">{reward.icon}</span>
                 <div className="flex-1">
                   <h4 className="font-medium">{reward.name}</h4>
-                  <p className="text-sm text-yellow-400 flex items-center gap-1">
+                  <p className="text-sm text-cyan-400 flex items-center gap-1">
                     <Zap className="w-3 h-3" /> {reward.credits} credits
                   </p>
                 </div>
                 {reward.claimed ? (
-                  <span className="text-green-400 text-sm">✓ Claimed</span>
+                  <span className="text-cyan-500 text-sm">✓ Claimed</span>
                 ) : (
-                  <button className="px-3 py-1 bg-pink-600 hover:bg-pink-700 rounded text-sm">
+                  <button className="px-3 py-1 bg-cyan-500 hover:bg-cyan-500 rounded text-sm">
                     Claim
                   </button>
                 )}

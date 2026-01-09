@@ -134,7 +134,7 @@ export function LoadingOverlay({ show, text, progress }: LoadingOverlayProps) {
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
             <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
-            <Sparkles className="w-6 h-6 text-purple-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+            <Sparkles className="w-6 h-6 text-cyan-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
           </div>
           
           {text && (
@@ -145,7 +145,7 @@ export function LoadingOverlay({ show, text, progress }: LoadingOverlayProps) {
             <div className="w-full">
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-blue-600 to-cyan-500 transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -171,7 +171,7 @@ export function PageLoading({ title = 'Loading...', description }: PageLoadingPr
           <div className="relative">
             <div className="w-20 h-20 border-4 border-blue-200 rounded-full" />
             <div className="w-20 h-20 border-4 border-blue-600 rounded-full border-t-transparent animate-spin absolute top-0 left-0" />
-            <Sparkles className="w-8 h-8 text-purple-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+            <Sparkles className="w-8 h-8 text-cyan-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
           </div>
         </div>
         

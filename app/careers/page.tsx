@@ -45,14 +45,14 @@ export default function CareersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 text-white px-4 py-12 md:py-16 lg:py-20">
+      <section className="bg-gradient-to-br from-cyan-600 via-cyan-600 to-red-600 text-white px-4 py-12 md:py-16 lg:py-20">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <Briefcase className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 md:mb-6" />
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 md:mb-6">
               Join Our Team
             </h1>
-            <p className="text-lg md:text-xl text-purple-100 mb-6 md:mb-8">
+            <p className="text-lg md:text-xl text-cyan-100 mb-6 md:mb-8">
               Help us build the future of AI-powered creativity
             </p>
           </div>
@@ -81,8 +81,8 @@ export default function CareersPage() {
 
               <Card>
                 <CardHeader className="p-4 md:p-6">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 md:mb-4">
-                    <Users className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-cyan-100 rounded-lg flex items-center justify-center mx-auto mb-3 md:mb-4">
+                    <Users className="w-5 h-5 md:w-6 md:h-6 text-cyan-600" />
                   </div>
                   <CardTitle className="text-center text-base md:text-lg">Amazing Team</CardTitle>
                 </CardHeader>
@@ -93,8 +93,8 @@ export default function CareersPage() {
 
               <Card>
                 <CardHeader className="p-4 md:p-6">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3 md:mb-4">
-                    <Heart className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-cyan-100 rounded-lg flex items-center justify-center mx-auto mb-3 md:mb-4">
+                    <Heart className="w-5 h-5 md:w-6 md:h-6 text-cyan-600" />
                   </div>
                   <CardTitle className="text-center text-base md:text-lg">Great Benefits</CardTitle>
                 </CardHeader>
@@ -158,7 +158,7 @@ export default function CareersPage() {
             </div>
 
             {/* No Openings Message */}
-            <Card className="mt-8 md:mt-12 bg-purple-50 border-purple-200">
+            <Card className="mt-8 md:mt-12 bg-cyan-50 border-cyan-200">
               <CardContent className="p-6 md:p-8 text-center">
                 <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-3">
                   Don't see the right role?
@@ -170,7 +170,7 @@ export default function CareersPage() {
                   <MobileButton 
                     fullWidth
                     variant="outline"
-                    className="border-2 border-purple-600 text-purple-600 hover:bg-purple-50"
+                    className="border-2 border-cyan-600 text-cyan-600 hover:bg-cyan-50"
                   >
                     Submit General Application
                   </MobileButton>
@@ -216,12 +216,12 @@ export default function CareersPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-purple-600 to-pink-600 text-white">
+      <section className="px-4 py-12 md:py-16 bg-gradient-to-br from-cyan-600 to-cyan-600 text-white">
         <div className="container mx-auto text-center">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
             Ready to Join Us?
           </h2>
-          <p className="text-base md:text-lg lg:text-xl text-purple-100 mb-6 md:mb-8 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-cyan-100 mb-6 md:mb-8 max-w-2xl mx-auto">
             Be part of a team that's revolutionizing creativity with AI
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
@@ -229,7 +229,7 @@ export default function CareersPage() {
               <MobileButton 
                 size="lg" 
                 fullWidth
-                className="bg-white text-purple-600 hover:bg-purple-50"
+                className="bg-white text-cyan-600 hover:bg-cyan-50"
               >
                 View Open Roles
               </MobileButton>

@@ -185,14 +185,14 @@ export default function EnterprisePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-400 text-sm mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-cyan-500 text-sm mb-6">
               <Building2 className="w-4 h-4" />
               Enterprise Solutions
             </span>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
               Your Brand. Our Platform.
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-cyan-500">
                 Unlimited Possibilities.
               </span>
             </h1>
@@ -203,7 +203,7 @@ export default function EnterprisePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => setShowContactForm(true)}
-                className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all flex items-center justify-center gap-2"
+                className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-cyan-500 text-white rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-cyan-500/25 transition-all flex items-center justify-center gap-2"
               >
                 Talk to Sales
                 <ArrowRight className="w-5 h-5" />
@@ -257,10 +257,10 @@ export default function EnterprisePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-purple-500/50 transition-colors"
+                className="bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-cyan-500/50 transition-colors"
               >
-                <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-purple-400" />
+                <div className="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-cyan-500" />
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
                 <p className="text-slate-400">{feature.description}</p>
@@ -287,7 +287,7 @@ export default function EnterprisePage() {
                 onClick={() => setSelectedSolution(sol.id)}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   selectedSolution === sol.id
-                    ? 'bg-purple-500 text-white'
+                    ? 'bg-cyan-500 text-white'
                     : 'bg-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
@@ -301,17 +301,17 @@ export default function EnterprisePage() {
               key={solution.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-8"
+              className="bg-gradient-to-r from-cyan-500/10 to-cyan-500/10 border border-cyan-500/20 rounded-2xl p-8"
             >
               <div className="flex flex-col md:flex-row gap-8">
                 <div className="flex-1">
-                  <solution.icon className="w-12 h-12 text-purple-400 mb-4" />
+                  <solution.icon className="w-12 h-12 text-cyan-500 mb-4" />
                   <h3 className="text-2xl font-bold text-white mb-4">{solution.title}</h3>
                   <p className="text-slate-300 mb-6">{solution.description}</p>
                   <ul className="grid grid-cols-2 gap-3">
                     {solution.features.map((feature, i) => (
                       <li key={i} className="flex items-center gap-2 text-slate-300">
-                        <Check className="w-4 h-4 text-green-400" />
+                        <Check className="w-4 h-4 text-cyan-500" />
                         {feature}
                       </li>
                     ))}
@@ -320,7 +320,7 @@ export default function EnterprisePage() {
                 <div className="md:w-80 flex flex-col justify-center">
                   <button
                     onClick={() => setShowContactForm(true)}
-                    className="w-full px-6 py-3 bg-purple-500 text-white rounded-lg font-semibold hover:bg-purple-600 transition-colors"
+                    className="w-full px-6 py-3 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-500 transition-colors"
                   >
                     Get Custom Quote
                   </button>
@@ -354,12 +354,12 @@ export default function EnterprisePage() {
                 viewport={{ once: true }}
                 className={`relative bg-slate-800 rounded-2xl p-6 ${
                   tier.popular 
-                    ? 'border-2 border-purple-500 ring-4 ring-purple-500/10' 
+                    ? 'border-2 border-cyan-500 ring-4 ring-cyan-500/10' 
                     : 'border border-slate-700'
                 }`}
               >
                 {tier.popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-purple-500 text-white text-xs font-semibold rounded-full">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-cyan-500 text-white text-xs font-semibold rounded-full">
                     Most Popular
                   </span>
                 )}
@@ -372,7 +372,7 @@ export default function EnterprisePage() {
                 <ul className="space-y-3 mb-6">
                   {tier.features.map((feature, j) => (
                     <li key={j} className="flex items-center gap-2 text-slate-300 text-sm">
-                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
+                      <Check className="w-4 h-4 text-cyan-500 flex-shrink-0" />
                       {feature}
                     </li>
                   ))}
@@ -381,7 +381,7 @@ export default function EnterprisePage() {
                   onClick={() => tier.name === 'Enterprise' ? setShowContactForm(true) : null}
                   className={`w-full py-3 rounded-lg font-semibold transition-colors ${
                     tier.popular
-                      ? 'bg-purple-500 text-white hover:bg-purple-600'
+                      ? 'bg-cyan-500 text-white hover:bg-cyan-500'
                       : 'bg-slate-700 text-white hover:bg-slate-600'
                   }`}
                 >
@@ -411,12 +411,12 @@ export default function EnterprisePage() {
               >
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star key={j} className="w-4 h-4 fill-cyan-500 text-cyan-500" />
                   ))}
                 </div>
                 <p className="text-slate-300 mb-6 italic">"{testimonial.quote}"</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 font-semibold">
+                  <div className="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-500 font-semibold">
                     {testimonial.avatar}
                   </div>
                   <div>
@@ -433,7 +433,7 @@ export default function EnterprisePage() {
       {/* CTA Section */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-2xl p-8 md:p-12 text-center">
+          <div className="bg-gradient-to-r from-cyan-500/20 to-cyan-500/20 border border-cyan-500/30 rounded-2xl p-8 md:p-12 text-center">
             <h2 className="text-3xl font-bold text-white mb-4">
               Ready to Launch Your Platform?
             </h2>
@@ -479,7 +479,7 @@ export default function EnterprisePage() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-cyan-500"
                     required
                   />
                 </div>
@@ -489,7 +489,7 @@ export default function EnterprisePage() {
                     type="text"
                     value={formData.company}
                     onChange={(e) => setFormData({...formData, company: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-cyan-500"
                     required
                   />
                 </div>
@@ -500,7 +500,7 @@ export default function EnterprisePage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-cyan-500"
                   required
                 />
               </div>
@@ -511,7 +511,7 @@ export default function EnterprisePage() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-cyan-500"
                   />
                 </div>
                 <div>
@@ -519,7 +519,7 @@ export default function EnterprisePage() {
                   <select
                     value={formData.employees}
                     onChange={(e) => setFormData({...formData, employees: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-cyan-500"
                   >
                     <option value="">Select...</option>
                     <option value="1-10">1-10</option>
@@ -535,7 +535,7 @@ export default function EnterprisePage() {
                 <textarea
                   value={formData.message}
                   onChange={(e) => setFormData({...formData, message: e.target.value})}
-                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 resize-none"
+                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-cyan-500 resize-none"
                   rows={3}
                   placeholder="Tell us about your use case..."
                 />
@@ -551,7 +551,7 @@ export default function EnterprisePage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-cyan-500 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center gap-2"
                 >
                   {submitting ? 'Sending...' : 'Send Message'}
                 </button>

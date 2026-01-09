@@ -66,7 +66,7 @@ export default function GameCard({ game, onFavorite, isFavorited }: GameCardProp
       <div className="group relative bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer">
         {/* Featured Badge */}
         {game.featured && (
-          <div className="absolute top-2 left-2 z-10 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded text-xs font-bold">
+          <div className="absolute top-2 left-2 z-10 bg-gradient-to-r from-cyan-400 to-cyan-500 text-white px-2 py-1 rounded text-xs font-bold">
             <Star className="w-3 h-3 inline mr-1" />
             FEATURED
           </div>
@@ -133,7 +133,7 @@ export default function GameCard({ game, onFavorite, isFavorited }: GameCardProp
               </div>
               {game.rating && (
                 <div className="flex items-center gap-1">
-                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                  <Star className="w-3 h-3 fill-cyan-400 text-cyan-400" />
                   <span>{game.rating.toFixed(1)}</span>
                 </div>
               )}

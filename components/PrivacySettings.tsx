@@ -257,10 +257,10 @@ export function PrivacySettings({
                     <span
                       className={`text-xs px-2 py-1 rounded-full ${
                         request.status === 'completed'
-                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          ? 'bg-cyan-500 text-cyan-500 dark:bg-cyan-500/30 dark:text-cyan-500'
                           : request.status === 'rejected'
                           ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                          : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                          : 'bg-cyan-400 text-cyan-400 dark:bg-cyan-400/30 dark:text-cyan-400'
                       }`}
                     >
                       {request.status}

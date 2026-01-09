@@ -78,9 +78,9 @@ function LoginForm() {
         <div className="text-6xl mb-4">📧</div>
         <h2 className="text-2xl font-bold text-white mb-2">Check Your Email</h2>
         <p className="text-stone-400 mb-6">
-          We sent a magic link to <span className="text-amber-500">{email}</span>
+          We sent a magic link to <span className="text-cyan-500">{email}</span>
         </p>
-        <button onClick={() => setEmailSent(false)} className="text-amber-500 hover:underline">
+        <button onClick={() => setEmailSent(false)} className="text-cyan-500 hover:underline">
           Use a different email
         </button>
       </div>
@@ -200,13 +200,13 @@ function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="your@email.com"
-          className="w-full px-4 py-3 bg-stone-800 border border-stone-600 rounded-xl text-white placeholder-stone-500 focus:outline-none focus:border-amber-500 transition"
+          className="w-full px-4 py-3 bg-stone-800 border border-stone-600 rounded-xl text-white placeholder-stone-500 focus:outline-none focus:border-cyan-500 transition"
           required
         />
         <button
           type="submit"
           disabled={loading !== null}
-          className="w-full py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-xl hover:from-amber-500 hover:to-orange-500 disabled:opacity-50 transition"
+          className="w-full py-3 bg-gradient-to-r from-cyan-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-cyan-500 hover:to-cyan-500 disabled:opacity-50 transition"
         >
           {loading === 'email' ? 'Sending Link...' : 'Send Magic Link'}
         </button>
@@ -226,9 +226,9 @@ function LoginForm() {
 
       <p className="mt-6 text-center text-xs text-stone-500">
         By signing in, you agree to our{' '}
-        <Link href="/terms" className="text-amber-500 hover:underline">Terms</Link>
+        <Link href="/terms" className="text-cyan-500 hover:underline">Terms</Link>
         {' '}and{' '}
-        <Link href="/privacy" className="text-amber-500 hover:underline">Privacy Policy</Link>
+        <Link href="/privacy" className="text-cyan-500 hover:underline">Privacy Policy</Link>
       </p>
     </div>
   )
@@ -238,7 +238,7 @@ function LoginForm() {
 function LoadingFallback() {
   return (
     <div className="max-w-md w-full p-8 bg-stone-900/80 backdrop-blur rounded-2xl border border-stone-700 text-center">
-      <div className="animate-spin w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+      <div className="animate-spin w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full mx-auto mb-4"></div>
       <p className="text-stone-400">Loading...</p>
     </div>
   )

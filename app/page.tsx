@@ -37,7 +37,7 @@ export default function LandingPage() {
               transition={{ duration: 0.5 }}
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full blur-2xl opacity-30 scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-cyan-500 rounded-full blur-2xl opacity-30 scale-110" />
                 <Image
                   src="/avatars/javariavatar.png"
                   alt="Javari - Your AI Assistant"
@@ -56,7 +56,7 @@ export default function LandingPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Javari</span>!
+                Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-500">Javari</span>!
               </h1>
               
               <p className="text-lg text-gray-300 mb-4 leading-relaxed">
@@ -109,7 +109,7 @@ export default function LandingPage() {
               <div className="flex flex-wrap gap-3">
                 <Link 
                   href="/apps"
-                  className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2"
+                  className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-500 text-white font-medium rounded-xl hover:from-cyan-600 hover:to-cyan-600 transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2"
                 >
                   Explore Our Apps <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -143,12 +143,12 @@ export default function LandingPage() {
             
             {/* Business Apps */}
             <motion.div 
-              className="bg-gray-800/70 p-6 rounded-2xl border border-blue-500/30 hover:border-blue-500/60 transition-all"
+              className="bg-gray-800/70 p-6 rounded-2xl border border-cyan-500/30 hover:border-cyan-500/60 transition-all"
               whileHover={{ y: -5 }}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                  <Briefcase className="w-6 h-6 text-blue-400" />
+                <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
+                  <Briefcase className="w-6 h-6 text-cyan-400" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold">Integrated Business Apps</h3>
@@ -388,7 +388,7 @@ export default function LandingPage() {
 
             {/* Build Your Own */}
             <motion.div 
-              className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 p-6 rounded-2xl border border-cyan-500/30"
+              className="bg-gradient-to-r from-cyan-900/30 to-slate-900/30 p-6 rounded-2xl border border-cyan-500/30"
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-start gap-4">
@@ -420,7 +420,7 @@ export default function LandingPage() {
               <span className="text-gray-300">
                 <strong className="text-white">Full Hosting Available</strong> — Deploy your apps, websites, and tools directly on our platform
               </span>
-              <Globe className="w-5 h-5 text-blue-400" />
+              <Globe className="w-5 h-5 text-cyan-400" />
             </div>
           </div>
         </div>
@@ -457,7 +457,7 @@ export default function LandingPage() {
       {/* JavariVerse Preview */}
       <section className="py-10 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-r from-slate-900/50 to-blue-900/50 rounded-2xl p-8 border border-cyan-500/30 text-center">
+          <div className="bg-gradient-to-r from-slate-900/50 to-slate-900/50 rounded-2xl p-8 border border-cyan-500/30 text-center">
             <span className="inline-block px-4 py-1 bg-cyan-500/20 text-cyan-400 text-sm font-medium rounded-full mb-4">
               COMING SOON
             </span>
@@ -469,7 +469,7 @@ export default function LandingPage() {
             </p>
             <Link 
               href="/javari-verse"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-500 text-white font-medium rounded-xl hover:from-cyan-600 hover:to-cyan-600 transition-all"
             >
               Learn More <ArrowRight className="w-4 h-4" />
             </Link>

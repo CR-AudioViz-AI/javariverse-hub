@@ -36,7 +36,7 @@ export default function Navigation({ user }: NavigationProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-500 rounded-xl flex items-center justify-center">
               <div className="relative">
                 <div className="flex gap-1 mb-0.5">
                   <div className="w-1.5 h-1.5 bg-white rounded-full" />
@@ -72,10 +72,10 @@ export default function Navigation({ user }: NavigationProps) {
                 {/* Credits Badge */}
                 <Link
                   href="/pricing"
-                  className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                  className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-cyan-50 dark:bg-slate-900/30 rounded-lg hover:bg-cyan-100 dark:hover:bg-slate-900/50 transition-colors"
                 >
-                  <span className="text-blue-600 dark:text-blue-400">💳</span>
-                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                  <span className="text-cyan-600 dark:text-cyan-400">💳</span>
+                  <span className="text-sm font-medium text-cyan-700 dark:text-cyan-300">
                     {user.credits.toLocaleString()}
                   </span>
                 </Link>
@@ -115,7 +115,7 @@ export default function Navigation({ user }: NavigationProps) {
                             <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
                             <p className="text-sm text-gray-500">{user.email}</p>
                             <div className="flex items-center gap-2 mt-2">
-                              <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full">
+                              <span className="px-2 py-0.5 bg-cyan-100 dark:bg-slate-900/30 text-cyan-700 dark:text-cyan-300 text-xs font-medium rounded-full">
                                 {user.tier}
                               </span>
                               <span className="text-sm text-gray-500">
@@ -184,7 +184,7 @@ export default function Navigation({ user }: NavigationProps) {
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors"
                 >
                   Get Started Free
                 </Link>
@@ -235,10 +235,10 @@ export default function Navigation({ user }: NavigationProps) {
                   <Link
                     href="/pricing"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg"
+                    className="flex items-center justify-between px-4 py-3 bg-cyan-50 dark:bg-slate-900/30 rounded-lg"
                   >
-                    <span className="font-medium text-blue-700 dark:text-blue-300">Credits</span>
-                    <span className="font-bold text-blue-700 dark:text-blue-300">{user.credits.toLocaleString()}</span>
+                    <span className="font-medium text-cyan-700 dark:text-cyan-300">Credits</span>
+                    <span className="font-bold text-cyan-700 dark:text-cyan-300">{user.credits.toLocaleString()}</span>
                   </Link>
                 </div>
               )}

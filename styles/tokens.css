@@ -1,0 +1,63 @@
+/* CRAI Color System R2 - Base Design Tokens */
+
+:root {
+  /* Primary Brand Colors */
+  --crai-primary: #4F46E5;
+  --crai-primary-hover: #4338CA;
+  --crai-primary-active: #3730A3;
+  
+  /* Secondary Colors */
+  --crai-secondary: #06B6D4;
+  --crai-secondary-hover: #0891B2;
+  
+  /* Neutral Palette */
+  --crai-bg-base: #0A0A0F;
+  --crai-bg-elevated: #14141F;
+  --crai-bg-overlay: #1C1C2A;
+  --crai-border: #2A2A3C;
+  --crai-border-subtle: #1F1F2E;
+  
+  /* Text Colors */
+  --crai-text-primary: #FFFFFF;
+  --crai-text-secondary: #A1A1AA;
+  --crai-text-muted: #71717A;
+  
+  /* Status Colors */
+  --crai-success: #10B981;
+  --crai-warning: #F59E0B;
+  --crai-error: #EF4444;
+  --crai-info: #3B82F6;
+  
+  /* Avatar Glow */
+  --crai-avatar-glow: rgba(79, 70, 229, 0.6);
+  
+  /* Spacing System */
+  --crai-space-xs: 0.25rem;
+  --crai-space-sm: 0.5rem;
+  --crai-space-md: 1rem;
+  --crai-space-lg: 1.5rem;
+  --crai-space-xl: 2rem;
+  --crai-space-2xl: 3rem;
+  
+  /* Border Radius */
+  --crai-radius-sm: 0.25rem;
+  --crai-radius-md: 0.5rem;
+  --crai-radius-lg: 0.75rem;
+  --crai-radius-xl: 1rem;
+  --crai-radius-full: 9999px;
+  
+  /* Transitions */
+  --crai-transition-fast: 150ms ease;
+  --crai-transition-base: 250ms ease;
+  --crai-transition-slow: 350ms ease;
+  
+  /* Z-index layers */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}

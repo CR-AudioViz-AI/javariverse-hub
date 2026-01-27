@@ -6,6 +6,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { paypalClient } from '@/lib/paypal/client';
 import { PAYPAL_PLANS } from '@/lib/paypal/config';
+import {
+  buildNoRefundMetadata
+} from '@/lib/payments/no-refund-policy';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -70,7 +73,11 @@ export async function POST(request: NextRequest) {
 
     const subscription = await paypalClient.createSubscription({
       planId: plan.paypalPlanId,
-      customId: `sub_${planId}_${userId}`,
+      customId: JSON.stringify({
+        planId,
+        userId,
+        ...buildNoRefundMetadata()
+      }),
       returnUrl: `${baseUrl}/dashboard/billing?subscription=success`,
       cancelUrl: `${baseUrl}/dashboard/billing?subscription=canceled`,
     });

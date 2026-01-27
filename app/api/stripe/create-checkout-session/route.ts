@@ -4,6 +4,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import {
+  NO_REFUND_POLICY,
+  buildNoRefundMetadata
+} from '@/lib/payments/no-refund-policy';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-06-20',
@@ -30,6 +34,14 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
+      consent_collection: {
+        terms_of_service: 'required'
+      },
+      custom_text: {
+        submit: {
+          message: NO_REFUND_POLICY.CONSENT_MESSAGE
+        }
+      },
       success_url: successUrl || `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_APP_URL}/checkout?cancelled=true`,
       allow_promotion_codes: true,
@@ -37,6 +49,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         source: 'craudiovizai',
         ...metadata,
+        ...buildNoRefundMetadata()
       },
     };
 
@@ -51,7 +64,17 @@ export async function POST(request: NextRequest) {
         trial_period_days: undefined, // Set to 7 for free trial
         metadata: {
           source: 'craudiovizai',
+          ...buildNoRefundMetadata()
         },
+      };
+    }
+
+    // Add payment intent metadata for one-time payments
+    if (mode === 'payment') {
+      sessionParams.payment_intent_data = {
+        metadata: {
+          ...buildNoRefundMetadata()
+        }
       };
     }
 

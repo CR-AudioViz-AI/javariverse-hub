@@ -1,5 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  verifyNoRefundMetadata
+} from '@/lib/payments/no-refund-policy';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -127,8 +130,77 @@ async function handlePaymentCompleted(event: any) {
     return;
   }
 
-  // custom_id format: "user_id:package_id"
-  const [userId, packageId] = customId.split(':');
+  // BACKWARD-COMPATIBLE PARSING (with non-compliant treatment for legacy formats)
+  let orderData: any = {};
+  let isLegacyFormat = false;
+  
+  try {
+    // Try JSON first (new format with policy metadata)
+    orderData = JSON.parse(customId);
+  } catch (e) {
+    // Legacy format detected: "user_id:package_id" (colon-delimited)
+    console.warn('Legacy PayPal custom_id format detected (pre-enforcement):', customId);
+    isLegacyFormat = true;
+    
+    // Parse legacy format but mark as non-compliant
+    const parts = customId.split(':');
+    if (parts.length === 2) {
+      orderData = {
+        userId: parts[0],
+        productId: parts[1]
+      };
+    } else {
+      console.error('Invalid legacy custom_id format:', customId);
+      return;
+    }
+  }
+
+  // LEGACY FORMAT ENFORCEMENT: Treat as policy violation
+  if (isLegacyFormat) {
+    console.error(
+      'NO_REFUND_POLICY_VIOLATION (PayPal Webhook - Legacy Format)',
+      'legacy_format_no_policy_metadata',
+      orderId
+    );
+
+    await supabase.from('policy_audit_log').insert({
+      event_type: 'violation',
+      paypal_order_id: orderId,
+      user_id: orderData.userId ?? null,
+      metadata_snapshot: { original_custom_id: customId, parsed: orderData },
+      violation_reason: 'legacy_format_no_policy_metadata'
+    });
+
+    // DO NOT grant credits for legacy orders - manual review required
+    return;
+  }
+
+  // NO-REFUND POLICY ENFORCEMENT GATE (JSON format only)
+  const metadataCheck = verifyNoRefundMetadata(
+    orderData as Record<string, string>
+  );
+
+  if (!metadataCheck.ok) {
+    console.error(
+      'NO_REFUND_POLICY_VIOLATION (PayPal Webhook - Payment Completed)',
+      metadataCheck.reason,
+      orderId
+    );
+
+    await supabase.from('policy_audit_log').insert({
+      event_type: 'violation',
+      paypal_order_id: orderId,
+      user_id: orderData.userId ?? null,
+      metadata_snapshot: orderData,
+      violation_reason: metadataCheck.reason
+    });
+
+    return; // DO NOT grant credits
+  }
+  // END NO-REFUND POLICY GATE
+
+  const userId = orderData.userId;
+  const packageId = orderData.productId;
   const packageInfo = CREDIT_PACKAGES[packageId];
 
   if (!packageInfo) {
@@ -146,7 +218,102 @@ async function handleSubscriptionActivated(event: any) {
 
   if (!customId) return;
 
-  const userId = customId;
+  // BACKWARD-COMPATIBLE PARSING (with non-compliant treatment for legacy formats)
+  let subscriptionData: any = {};
+  let isLegacyFormat = false;
+
+  try {
+    // Try JSON first (new format with policy metadata)
+    subscriptionData = JSON.parse(customId);
+  } catch (e) {
+    // Legacy format detected: "sub_{planId}_{userId}" or direct userId string
+    console.warn('Legacy PayPal subscription custom_id format detected (pre-enforcement):', customId);
+    isLegacyFormat = true;
+
+    // Parse legacy format but mark as non-compliant
+    if (customId.startsWith('sub_')) {
+      // Format: "sub_{planId}_{userId}"
+      const parts = customId.split('_');
+      if (parts.length >= 3) {
+        subscriptionData = {
+          planId: parts[1],
+          userId: parts.slice(2).join('_') // Handle user IDs with underscores
+        };
+      } else {
+        console.error('Invalid legacy subscription custom_id format:', customId);
+        return;
+      }
+    } else {
+      // Format: Direct userId string
+      subscriptionData = {
+        userId: customId,
+        planId: null
+      };
+    }
+  }
+
+  // LEGACY FORMAT ENFORCEMENT: Treat as policy violation
+  if (isLegacyFormat) {
+    console.error(
+      'NO_REFUND_POLICY_VIOLATION (PayPal Webhook - Legacy Subscription Format)',
+      'legacy_format_no_policy_metadata',
+      subscriptionId
+    );
+
+    await supabase.from('policy_audit_log').insert({
+      event_type: 'violation',
+      paypal_subscription_id: subscriptionId,
+      user_id: subscriptionData.userId ?? null,
+      metadata_snapshot: { original_custom_id: customId, parsed: subscriptionData },
+      violation_reason: 'legacy_format_no_policy_metadata'
+    });
+
+    // Flag subscription for manual review - DO NOT grant credits
+    await supabase.from('craiverse_subscriptions').upsert({
+      user_id: subscriptionData.userId,
+      requires_manual_review: true,
+      paypal_subscription_id: subscriptionId,
+      status: 'pending_review',
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'paypal_subscription_id' });
+
+    return; // DO NOT grant credits for legacy subscriptions
+  }
+
+  // NO-REFUND POLICY ENFORCEMENT GATE (JSON format only)
+  const metadataCheck = verifyNoRefundMetadata(
+    subscriptionData as Record<string, string>
+  );
+
+  if (!metadataCheck.ok) {
+    console.error(
+      'NO_REFUND_POLICY_VIOLATION (PayPal Webhook - Subscription Activated)',
+      metadataCheck.reason,
+      subscriptionId
+    );
+
+    await supabase.from('policy_audit_log').insert({
+      event_type: 'violation',
+      paypal_subscription_id: subscriptionId,
+      user_id: subscriptionData.userId ?? null,
+      metadata_snapshot: subscriptionData,
+      violation_reason: metadataCheck.reason
+    });
+
+    // Flag subscription for manual review
+    await supabase.from('craiverse_subscriptions').upsert({
+      user_id: subscriptionData.userId,
+      requires_manual_review: true,
+      paypal_subscription_id: subscriptionId,
+      status: 'pending_review',
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'paypal_subscription_id' });
+
+    return; // DO NOT grant credits
+  }
+  // END NO-REFUND POLICY GATE
+
+  const userId = subscriptionData.userId;
   const planInfo = SUBSCRIPTION_PLANS[planId];
 
   if (!planInfo) return;
@@ -165,6 +332,7 @@ async function handleSubscriptionActivated(event: any) {
     credits_per_month: planInfo.credits_per_month,
     credits_used_this_month: 0,
     credits_reset_at: nextBillingTime.toISOString(),
+    requires_manual_review: false,
     updated_at: new Date().toISOString(),
   }, { onConflict: 'user_id' });
 
@@ -205,11 +373,30 @@ async function handlePaymentSaleCompleted(event: any) {
 
   const { data: sub } = await supabase
     .from('craiverse_subscriptions')
-    .select('user_id, credits_per_month')
+    .select('user_id, credits_per_month, requires_manual_review')
     .eq('paypal_subscription_id', subscriptionId)
     .single();
 
   if (!sub) return;
+
+  // NO-REFUND POLICY ENFORCEMENT - Check manual review flag
+  if (sub.requires_manual_review === true) {
+    console.error(
+      'NO_REFUND_POLICY_VIOLATION (PayPal Recurring Payment)',
+      'Subscription requires manual review',
+      subscriptionId
+    );
+
+    await supabase.from('policy_audit_log').insert({
+      event_type: 'violation',
+      user_id: sub.user_id,
+      paypal_subscription_id: subscriptionId,
+      violation_reason: 'subscription_requires_manual_review'
+    });
+
+    return; // DO NOT grant renewal credits
+  }
+  // END NO-REFUND POLICY GATE
 
   await addCreditsToUser(sub.user_id, sub.credits_per_month, 0, 'subscription_renewal', event.resource.id);
 

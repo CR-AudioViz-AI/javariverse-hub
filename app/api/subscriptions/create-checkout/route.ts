@@ -4,6 +4,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
+import {
+  NO_REFUND_POLICY,
+  buildNoRefundMetadata
+} from '@/lib/payments/no-refund-policy'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-11-20.acacia'
@@ -94,8 +98,23 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [{ price: plan.priceId, quantity: 1 }],
+      consent_collection: {
+        terms_of_service: 'required'
+      },
+      custom_text: {
+        submit: {
+          message: NO_REFUND_POLICY.CONSENT_MESSAGE
+        }
+      },
+      metadata: {
+        ...buildNoRefundMetadata()
+      },
       subscription_data: {
-        metadata: { user_id: user.id, plan_id: planId }
+        metadata: { 
+          user_id: user.id, 
+          plan_id: planId,
+          ...buildNoRefundMetadata()
+        }
       },
       success_url: process.env.NEXT_PUBLIC_APP_URL + '/apps/javari-library/success?session_id={CHECKOUT_SESSION_ID}',
       cancel_url: process.env.NEXT_PUBLIC_APP_URL + '/apps/javari-library/subscribe',

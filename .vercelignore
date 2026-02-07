@@ -1,3 +1,7 @@
+# Temporarily exclude admin pages for clean build
+app/admin/**
+
+# Cache directories
 .next
 .vercel
 node_modules

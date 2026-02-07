@@ -74,4 +74,15 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = {
+  ...nextConfig,
+  async redirects() {
+    return [
+      {
+        source: '/javari-hub',
+        destination: '/chamber',
+        permanent: true,
+      },
+    ];
+  },
+}

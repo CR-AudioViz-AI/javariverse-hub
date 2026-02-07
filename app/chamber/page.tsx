@@ -5,7 +5,9 @@
  */
 
 import { Metadata } from 'next';
-import JavariChamberUI from '@/components/JavariChamberUI';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import JavariChamberUI from '@/app/components/JavariChamberUI';
 
 export const metadata: Metadata = {
   title: 'Multi-AI Chamber | CR AudioViz AI',
@@ -13,5 +15,13 @@ export const metadata: Metadata = {
 };
 
 export default function ChamberPage() {
-  return <JavariChamberUI />;
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navigation />
+      <main className="flex-grow">
+        <JavariChamberUI />
+      </main>
+      <Footer />
+    </div>
+  );
 }

@@ -19,6 +19,7 @@ export default function Footer() {
   const footerLinks = {
     product: [
       { href: '/hub', label: 'All Tools' },
+      { href: '/chamber', label: 'Multi-AI Chamber' },
       { href: '/chat', label: 'Javari AI' },
       { href: '/games', label: 'Games Hub' },
       { href: '/marketplace', label: 'Marketplace' },

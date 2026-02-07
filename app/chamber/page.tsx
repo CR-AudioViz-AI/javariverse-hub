@@ -4,15 +4,11 @@
  * ChatGPT (Architect) + Claude (Builder) + Javari (Observer)
  */
 
-import { Metadata } from 'next';
+'use client';
+
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import JavariChamberUI from '@/components/JavariChamberUI';
-
-export const metadata: Metadata = {
-  title: 'Multi-AI Chamber | CR AudioViz AI',
-  description: 'Build with ChatGPT (Architect) + Claude (Builder) + Javari (Observer)',
-};
 
 export default function ChamberPage() {
   return (

@@ -25,7 +25,6 @@ export default function Navigation({ user }: NavigationProps) {
   const navLinks = [
     { href: '/hub', label: 'Tools', icon: '🛠️' },
     { href: '/chamber', label: 'Chamber', icon: '🔬' },
-    { href: '/javari-hub', label: 'Javari Hub', icon: '🚀' },
     { href: '/chat', label: 'Chat', icon: '💬' },
     { href: '/games', label: 'Games', icon: '🎮' },
     { href: '/marketplace', label: 'Marketplace', icon: '🏪' },

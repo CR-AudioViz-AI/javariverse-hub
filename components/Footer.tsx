@@ -20,7 +20,6 @@ export default function Footer() {
     product: [
       { href: '/hub', label: 'All Tools' },
       { href: '/chamber', label: 'Multi-AI Chamber' },
-      { href: '/javari-hub', label: 'Javari Hub' },
       { href: '/chat', label: 'Javari AI' },
       { href: '/games', label: 'Games Hub' },
       { href: '/marketplace', label: 'Marketplace' },

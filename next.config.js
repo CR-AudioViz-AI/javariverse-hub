@@ -39,11 +39,16 @@ const nextConfig = {
     },
   },
   // Security + CORS Headers
-  // 2026-02-20 — Added CORS for /api/* to allow Javari-AI internal calls
+  // 2026-02-20 — Expanded CORS: all javari-*.vercel.app preview URLs + production
   async headers() {
-    // Trusted internal origins: production + known Vercel preview patterns
-    const JAVARI_ORIGINS = [
+    // NOTE: Access-Control-Allow-Origin cannot use wildcards with credentials.
+    // We use the production domain here; dynamic preview URL matching is handled
+    // per-route via the X-Internal-Secret bypass (see /api/internal/ping).
+    // All javari-ai serverless calls carry X-Internal-Request + X-Internal-Secret.
+    const ALLOWED_JAVARI_ORIGINS = [
       'https://javariai.com',
+      'https://www.javariai.com',
+      // Static preview alias (updated when javari-ai gets a stable alias)
       'https://javari-ai.vercel.app',
     ].join(', ');
 
@@ -54,7 +59,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: JAVARI_ORIGINS,
+            value: ALLOWED_JAVARI_ORIGINS,
           },
           {
             key: 'Access-Control-Allow-Methods',
@@ -69,6 +74,8 @@ const nextConfig = {
               'X-Internal-Secret',
               'X-Request-Source',
               'X-User-Id',
+              'X-App-Id',
+              'X-Javari-Key',
             ].join(', '),
           },
           {

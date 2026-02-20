@@ -10,7 +10,7 @@ import { createServerClient } from '@supabase/ssr';
 
 // Configuration - with safe defaults
 const CONFIG = {
-  APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'crav-website',
+  APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'craudiovizai',
   SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
   SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   RATE_LIMIT_WINDOW_MS: 60000,

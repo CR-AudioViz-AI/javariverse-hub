@@ -38,9 +38,46 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
-  // Security Headers
+  // Security + CORS Headers
+  // 2026-02-20 — Added CORS for /api/* to allow Javari-AI internal calls
   async headers() {
+    // Trusted internal origins: production + known Vercel preview patterns
+    const JAVARI_ORIGINS = [
+      'https://javariai.com',
+      'https://javari-ai.vercel.app',
+    ].join(', ');
+
     return [
+      // ── CORS preflight for all /api/* routes ──────────────────────────
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: JAVARI_ORIGINS,
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: [
+              'Content-Type',
+              'Authorization',
+              'X-Internal-Request',
+              'X-Internal-Secret',
+              'X-Request-Source',
+              'X-User-Id',
+            ].join(', '),
+          },
+          {
+            key: 'Access-Control-Max-Age',
+            value: '86400', // 24hr preflight cache
+          },
+        ],
+      },
+      // ── Security headers for all other routes ─────────────────────────
       {
         source: '/(.*)',
         headers: [
